@@ -20,8 +20,6 @@ const TEAMS = [
 
 const SEASONS = [
   { id: 50, label: "Season 50", totalCastaways: 24, picksPerTeam: 5, undrafted: 4, current: true },
-  { id: 46, label: "Season 46", totalCastaways: 18, picksPerTeam: 4, undrafted: 2, current: false },
-  { id: 45, label: "Season 45", totalCastaways: 18, picksPerTeam: 4, undrafted: 2, current: false },
 ];
 
 // Tribe colors for S50
