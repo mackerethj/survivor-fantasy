@@ -349,6 +349,11 @@ export default function App() {
   // Draft state per season: randomOrder = order teams rolled, draftPositions = {teamId: positionIndex}
   const [draftStateBySeason, setDraftStateBySeason] = useState({ 50: { randomOrder: null, draftPositions: {} }, 46: { randomOrder: null, draftPositions: {} }, 45: { randomOrder: null, draftPositions: {} } });
   const [toast, setToast] = useState(null);
+  const [showOdds, setShowOdds] = useState(false);
+  const [adminUnlocked, setAdminUnlocked] = useState(false);
+  const [adminPassword, setAdminPassword] = useState("");
+  const [adminError, setAdminError] = useState(false);
+  const [historySeason, setHistorySeason] = useState(null);
 
   const season = SEASONS.find(s => s.id === selectedSeason);
   const castaways = castawaysBySeason[selectedSeason];
@@ -453,7 +458,7 @@ export default function App() {
           <div className="logo">SURVIVOR<span>FANTASY</span></div>
           <nav className="nav">
             {["leaderboard","castaways","draft","admin"].map(p => (
-              <button key={p} className={`nav-btn ${page===p?"active":""}`} onClick={() => setPage(p)}>{p}</button>
+              <button key={p} className={`nav-btn ${page===p?"active":""}`} onClick={() => { setPage(p); setHistorySeason(null); }}>{p}</button>
             ))}
           </nav>
           <div className="header-commissioner">Commissioner</div>
@@ -462,15 +467,49 @@ export default function App() {
           <div className="season-bar">
             <span className="season-label">Season</span>
             {SEASONS.map(s => (
-              <button key={s.id} className={`season-btn ${selectedSeason===s.id?"active":""}`} onClick={() => setSelectedSeason(s.id)}>
+              <button key={s.id} className={`season-btn ${selectedSeason===s.id && !historySeason?"active":""}`} onClick={() => { setSelectedSeason(s.id); setHistorySeason(null); }}>
                 {s.id}{s.current && <span className="live-pill">live</span>}
               </button>
             ))}
+            <button className={`season-btn ${historySeason===49?"active":""}`} onClick={() => { setHistorySeason(49); setPage("leaderboard"); }}>49</button>
+            <button className={`season-btn ${historySeason===48?"active":""}`} onClick={() => { setHistorySeason(48); setPage("leaderboard"); }}>48</button>
+            <button className={`season-btn ${historySeason===47?"active":""}`} onClick={() => { setHistorySeason(47); setPage("leaderboard"); }}>47</button>
+            <button className={`season-btn ${historySeason===46?"active":""}`} onClick={() => { setHistorySeason(46); setPage("leaderboard"); }}>46</button>
+            <button className={`season-btn ${historySeason===45?"active":""}`} onClick={() => { setHistorySeason(45); setPage("leaderboard"); }}>45</button>
+            <button className={`season-btn ${historySeason===44?"active":""}`} onClick={() => { setHistorySeason(44); setPage("leaderboard"); }}>44</button>
+            <button className={`season-btn ${historySeason===43?"active":""}`} onClick={() => { setHistorySeason(43); setPage("leaderboard"); }}>43</button>
           </div>
-          {page==="leaderboard" && <Leaderboard scores={scores} season={season} castaways={castaways} />}
-          {page==="castaways"   && <Castaways castaways={castaways} season={season} />}
-          {page==="draft"       && <Draft castaways={castaways} season={season} draftState={draftState} randomizeOrder={randomizeOrder} selectPosition={selectPosition} buildDraftOrder={buildDraftOrder} setCastaways={setCastaways} showToast={showToast} undoLastDraftPick={undoLastDraftPick} />}
-          {page==="admin"       && <Admin castaways={castaways} nextElimOrder={nextElimOrder} season={season} eliminate={eliminate} restore={restore} resetSeason={resetSeason} />}
+          {page==="leaderboard" && !historySeason && <Leaderboard scores={scores} season={season} castaways={castaways} showOdds={showOdds} onS49={() => setShowS49(true)} />}
+          {page==="leaderboard" && historySeason && <SeasonHistory season={historySeason} onBack={() => setHistorySeason(null)} />}
+          {page==="castaways"   && <Castaways castaways={castaways} season={season} showOdds={showOdds} />}
+          {page==="draft"       && <Draft castaways={castaways} season={season} draftState={draftState} randomizeOrder={randomizeOrder} selectPosition={selectPosition} buildDraftOrder={buildDraftOrder} setCastaways={setCastaways} showToast={showToast} undoLastDraftPick={undoLastDraftPick} showOdds={showOdds} resetSeason={resetSeason} />}
+          {page==="admin" && !adminUnlocked && (
+            <div style={{maxWidth:"340px",margin:"4rem auto",padding:"2rem",background:"rgba(255,255,255,0.03)",border:"1px solid rgba(255,255,255,0.08)",borderRadius:"4px"}}>
+              <div style={{fontFamily:"'Playfair Display',serif",fontSize:"1.3rem",fontWeight:900,marginBottom:"0.4rem"}}>Commissioner Access</div>
+              <div style={{fontSize:"0.68rem",color:"#999",letterSpacing:"0.08em",textTransform:"uppercase",marginBottom:"1.5rem"}}>Enter password to continue</div>
+              <input
+                type="password"
+                value={adminPassword}
+                onChange={e => { setAdminPassword(e.target.value); setAdminError(false); }}
+                onKeyDown={e => {
+                  if (e.key === "Enter") {
+                    if (adminPassword === "Ottffsse9") { setAdminUnlocked(true); setAdminPassword(""); setAdminError(false); }
+                    else { setAdminError(true); setAdminPassword(""); }
+                  }
+                }}
+                placeholder="Password"
+                style={{width:"100%",background:"rgba(255,255,255,0.05)",border:`1px solid ${adminError ? "#cc6060" : "rgba(255,255,255,0.1)"}`,borderRadius:"3px",padding:"0.6rem 0.75rem",color:"#f0ebe0",fontFamily:"'DM Mono',monospace",fontSize:"16px",marginBottom:"0.75rem",outline:"none"}}
+                autoFocus
+              />
+              {adminError && <div style={{fontSize:"0.65rem",color:"#cc6060",marginBottom:"0.75rem"}}>Incorrect password</div>}
+              <button className="action-btn primary" style={{width:"100%",justifyContent:"center"}} onClick={() => {
+                if (adminPassword === "Ottffsse9") { setAdminUnlocked(true); setAdminPassword(""); setAdminError(false); }
+                else { setAdminError(true); setAdminPassword(""); }
+              }}>Unlock</button>
+              <button className="action-btn" style={{width:"100%",justifyContent:"center",marginTop:"0.5rem",marginBottom:0}} onClick={() => { setPage("leaderboard"); setAdminPassword(""); setAdminError(false); }}>Cancel</button>
+            </div>
+          )}
+          {page==="admin" && adminUnlocked && <Admin castaways={castaways} nextElimOrder={nextElimOrder} season={season} eliminate={eliminate} restore={restore} resetSeason={resetSeason} showOdds={showOdds} setShowOdds={setShowOdds} />}
         </div>
       </div>
       {toast && <div className="toast">{toast}</div>}
@@ -489,7 +528,338 @@ function Photo({ src, alt, className }) {
   return <img src={proxyPhoto(src)} alt={alt} className={className} onError={() => setErr(true)} loading="lazy" />;
 }
 
-function Leaderboard({ scores, season, castaways }) {
+// Season 45 historical results
+const S45_RESULTS = {
+  season: 45,
+  teamScores: [
+    { name: "Miloa",  members: "Team Miller",    color: "#c8922a", score: 121, winner: true },
+    { name: "Jinga",  members: "Team Mackereth", color: "#6a9fd8", score: 118 },
+    { name: "Ojalu",  members: "Team Lestan",    color: "#6db86d", score: 51  },
+  ],
+  placements: [
+    { place: 1,  points: 38, player: "Dee",      team: "Miloa",  teamColor: "#c8922a" },
+    { place: 2,  points: 28, player: "Austin",   team: "Miloa",  teamColor: "#c8922a" },
+    { place: 3,  points: 19, player: "Drew",     team: "Miloa",  teamColor: "#c8922a" },
+    { place: 4,  points: 44, player: "Julie",    team: "Jinga",  teamColor: "#6a9fd8" },
+    { place: 5,  points: 20, player: "Katura",   team: "Jinga",  teamColor: "#6a9fd8" },
+    { place: 6,  points: 13, player: "Niki",     team: "Ojalu",  teamColor: "#6db86d" },
+    { place: 7,  points: 11, player: "Emily",    team: "Jinga",  teamColor: "#6a9fd8" },
+    { place: 8,  points: 20, player: "Bruce",    team: "Ojalu",  teamColor: "#6db86d" },
+    { place: 9,  points: 11, player: "Kellie",   team: "Jinga",  teamColor: "#6a9fd8" },
+    { place: 10, points: 12, player: "Kendra",   team: "Ojalu",  teamColor: "#6db86d" },
+    { place: 11, points: 33, player: "Jake",     team: "Miloa",  teamColor: "#c8922a" },
+    { place: 12, points: 32, player: "Kaleb",    team: "Jinga",  teamColor: "#6a9fd8" },
+    { place: 13, points: 10, player: "J.",       team: "NA",     teamColor: "#777" },
+    { place: 14, points: 6,  player: "Brando",   team: "Ojalu",  teamColor: "#6db86d" },
+    { place: 15, points: 3,  player: "Sean",     team: "Miloa",  teamColor: "#c8922a" },
+    { place: 16, points: 0,  player: "Sabiyah",  team: "Ojalu",  teamColor: "#6db86d" },
+    { place: 17, points: -1, player: "Brandon",  team: "NA",     teamColor: "#777" },
+    { place: 18, points: 0,  player: "Hanna",    team: "NA",     teamColor: "#777" },
+  ],
+};
+
+// Season 44 historical results
+const S44_RESULTS = {
+  season: 44,
+  teamScores: [
+    { name: "Jinga",  members: "Team Mackereth", color: "#6a9fd8", score: 56, winner: true },
+    { name: "Ojalu",  members: "Team Lestan",    color: "#6db86d", score: 40 },
+    { name: "Miloa",  members: "Team Miller",    color: "#c8922a", score: 24 },
+  ],
+  placements: [
+    { place: 1,  points: 21, player: "Yam Yam",  team: "Jinga",  teamColor: "#6a9fd8" },
+    { place: 2,  points: 17, player: "Heidi",    team: "Ojalu",  teamColor: "#6db86d" },
+    { place: 3,  points: 14, player: "Carolyn",  team: "Ojalu",  teamColor: "#6db86d" },
+    { place: 4,  points: 12, player: "Carson",   team: "Jinga",  teamColor: "#6a9fd8" },
+    { place: 5,  points: 11, player: "Lauren",   team: "Jinga",  teamColor: "#6a9fd8" },
+    { place: 6,  points: 10, player: "Jaime",    team: "NA",     teamColor: "#777" },
+    { place: 7,  points: 9,  player: "Danny",    team: "Jinga",  teamColor: "#6a9fd8" },
+    { place: 8,  points: 8,  player: "Frannie",  team: "Miloa",  teamColor: "#c8922a" },
+    { place: 9,  points: 7,  player: "Kane",     team: "Miloa",  teamColor: "#c8922a" },
+    { place: 10, points: 6,  player: "Brandon",  team: "Ojalu",  teamColor: "#6db86d" },
+    { place: 11, points: 5,  player: "MattB",    team: "Miloa",  teamColor: "#c8922a" },
+    { place: 12, points: 4,  player: "Josh",     team: "Miloa",  teamColor: "#c8922a" },
+    { place: 13, points: 3,  player: "MattG",    team: "Jinga",  teamColor: "#6a9fd8" },
+    { place: 14, points: 2,  player: "Sarah",    team: "Ojalu",  teamColor: "#6db86d" },
+    { place: 15, points: 1,  player: "Claire",   team: "Ojalu",  teamColor: "#6db86d" },
+    { place: 16, points: 0,  player: "Helen",    team: "Miloa",  teamColor: "#c8922a" },
+    { place: 17, points: 0,  player: "Maddy",    team: "NA",     teamColor: "#777" },
+    { place: 18, points: 0,  player: "Bruce",    team: "NA",     teamColor: "#777" },
+  ],
+};
+
+// Season 43 historical results
+const S43_RESULTS = {
+  season: 43,
+  teamScores: [
+    { name: "Jinga",  members: "Team Mackereth", color: "#6a9fd8", score: 56, winner: true },
+    { name: "Miloa",  members: "Team Miller",    color: "#c8922a", score: 40 },
+    { name: "Ojalu",  members: "Team Lestan",    color: "#6db86d", score: 35 },
+  ],
+  placements: [
+    { place: 1,  points: 22, player: "Gabler",   team: "Miloa",  teamColor: "#c8922a" },
+    { place: 2,  points: 18, player: "Cassidy",  team: "Jinga",  teamColor: "#6a9fd8" },
+    { place: 3,  points: 15, player: "Owen",     team: "Jinga",  teamColor: "#6a9fd8" },
+    { place: 4,  points: 13, player: "Jesse",    team: "Miloa",  teamColor: "#c8922a" },
+    { place: 5,  points: 12, player: "Karla",    team: "Ojalu",  teamColor: "#6db86d" },
+    { place: 6,  points: 11, player: "Cody",     team: "Ojalu",  teamColor: "#6db86d" },
+    { place: 7,  points: 10, player: "Sami",     team: "Jinga",  teamColor: "#6a9fd8" },
+    { place: 8,  points: 9,  player: "Noelle",   team: "NA",     teamColor: "#777" },
+    { place: 9,  points: 8,  player: "Ryan",     team: "Jinga",  teamColor: "#6a9fd8" },
+    { place: 10, points: 7,  player: "James",    team: "Ojalu",  teamColor: "#6db86d" },
+    { place: 11, points: 6,  player: "Jeanine",  team: "NA",     teamColor: "#777" },
+    { place: 12, points: 5,  player: "Dwight",   team: "Jinga",  teamColor: "#6a9fd8" },
+    { place: 13, points: 4,  player: "Elie",     team: "Miloa",  teamColor: "#c8922a" },
+    { place: 14, points: 3,  player: "Geo",      team: "Ojalu",  teamColor: "#6db86d" },
+    { place: 15, points: 2,  player: "Lindsay",  team: "Ojalu",  teamColor: "#6db86d" },
+    { place: 16, points: 1,  player: "Nneka",    team: "Miloa",  teamColor: "#c8922a" },
+    { place: 17, points: 0,  player: "Justine",  team: "Miloa",  teamColor: "#c8922a" },
+    { place: 18, points: 0,  player: "Morriah",  team: "NA",     teamColor: "#777" },
+  ],
+};
+
+
+// Tribe totem SVGs (inline, for championship indicators)
+const TRIBE_TOTEMS = {
+  Miloa:  `<svg viewBox="0 0 130 160" fill="none" xmlns="http://www.w3.org/2000/svg"> <!-- CROSSED SPEARS crown --> <line x1="30" y1="5" x2="75" y2="40" stroke="#c8922a" stroke-width="3" stroke-linecap="round"/> <line x1="100" y1="5" x2="55" y2="40" stroke="#c8922a" stroke-width="3" stroke-linecap="round"/> <!-- spear tips --> <polygon points="30,5 24,12 36,10" fill="#c8922a"/> <polygon points="100,5 106,12 94,10" fill="#c8922a"/> <!-- spear butts --> <rect x="72" y="35" width="5" height="8" rx="1" fill="#c8922a" opacity="0.5" transform="rotate(35,74,39)"/> <rect x="52" y="35" width="5" height="8" rx="1" fill="#c8922a" opacity="0.5" transform="rotate(-35,54,39)"/> <!-- crown band --> <rect x="30" y="38" width="70" height="7" rx="2" fill="#c8922a" opacity="0.75"/> <rect x="32" y="40" width="66" height="3" rx="1" fill="#1a1208" opacity="0.6"/> <!-- FACE — wide square warrior, strong jaw --> <path d="M22 44 L22 105 Q22 130 65 138 Q108 130 108 105 L108 44 Q90 40 65 40 Q40 40 22 44Z" fill="#1a1208" stroke="#c8922a" stroke-width="2.5"/> <!-- Chiseled cheekbones — angled planes --> <path d="M22 70 L40 62 L40 90 L22 95Z" fill="#c8922a" fill-opacity="0.12"/> <path d="M108 70 L90 62 L90 90 L108 95Z" fill="#c8922a" fill-opacity="0.12"/> <!-- Heavy brow — single thick bar, chiseled --> <path d="M28 55 L102 55 L98 66 L32 66Z" fill="#c8922a" opacity="0.9"/> <path d="M55 55 L65 48 L75 55 L75 66 L55 66Z" fill="#1a1208"/> <!-- brow texture lines --> <line x1="34" y1="58" x2="52" y2="60" stroke="#1a1208" stroke-width="1" opacity="0.4"/> <line x1="78" y1="58" x2="96" y2="60" stroke="#1a1208" stroke-width="1" opacity="0.4"/> <!-- EYES — narrow angry warrior slits --> <path d="M30 76 L50 70 L68 76 L50 82Z" fill="#c8922a" opacity="0.95"/> <path d="M62 76 L82 70 L100 76 L82 82Z" fill="#c8922a" opacity="0.95"/> <!-- pupils — rectangular harsh --> <rect x="44" y="73" width="12" height="7" rx="1" fill="#0a0802"/> <rect x="76" y="73" width="12" height="7" rx="1" fill="#0a0802"/> <!-- war paint lines under eyes --> <line x1="34" y1="84" x2="44" y2="88" stroke="#c8922a" stroke-width="1.5" stroke-linecap="round" opacity="0.6"/> <line x1="86" y1="84" x2="96" y2="88" stroke="#c8922a" stroke-width="1.5" stroke-linecap="round" opacity="0.6"/> <line x1="36" y1="88" x2="44" y2="91" stroke="#c8922a" stroke-width="1" stroke-linecap="round" opacity="0.4"/> <line x1="86" y1="88" x2="94" y2="91" stroke="#c8922a" stroke-width="1" stroke-linecap="round" opacity="0.4"/> <!-- Flat wide nose --> <path d="M54 88 L54 100 Q54 106 65 106 Q76 106 76 100 L76 88 Q70 92 65 92 Q60 92 54 88Z" fill="#c8922a" opacity="0.75"/> <ellipse cx="56" cy="102" rx="5" ry="3" fill="#0a0802"/> <ellipse cx="74" cy="102" rx="5" ry="3" fill="#0a0802"/> <!-- TUSKS — warrior beast --> <path d="M36 115 Q28 122 30 132 Q35 128 42 118Z" fill="#c8922a" opacity="0.85"/> <path d="M94 115 Q102 122 100 132 Q95 128 88 118Z" fill="#c8922a" opacity="0.85"/> <!-- tusk ridge --> <line x1="30" y1="124" x2="34" y2="130" stroke="#f0c060" stroke-width="1" opacity="0.5"/> <line x1="100" y1="124" x2="96" y2="130" stroke="#f0c060" stroke-width="1" opacity="0.5"/> <!-- Grimace mouth — wide, asymmetric battle snarl --> <path d="M36 112 Q42 106 52 113 Q60 107 65 111 Q70 107 78 113 Q88 106 94 112 Q88 126 65 128 Q42 126 36 112Z" fill="#c8922a" opacity="0.85"/> <rect x="46" y="112" width="9" height="10" rx="1" fill="#0a0802"/> <rect x="61" y="112" width="8" height="10" rx="1" fill="#0a0802"/> <rect x="76" y="112" width="9" height="10" rx="1" fill="#0a0802"/> <!-- Ear gauges — warrior stretchers --> <ellipse cx="18" cy="84" rx="6" ry="10" fill="#c8922a" opacity="0.7" stroke="#c8922a" stroke-width="1"/> <ellipse cx="18" cy="84" rx="3" ry="5" fill="#1a1208" opacity="0.8"/> <ellipse cx="112" cy="84" rx="6" ry="10" fill="#c8922a" opacity="0.7" stroke="#c8922a" stroke-width="1"/> <ellipse cx="112" cy="84" rx="3" ry="5" fill="#1a1208" opacity="0.8"/> <!-- Base plinth — double tier --> <rect x="34" y="138" width="62" height="7" rx="2" fill="#c8922a" opacity="0.45"/> <rect x="26" y="145" width="78" height="5" rx="2" fill="#c8922a" opacity="0.25"/> <!-- plinth etching --> <line x1="40" y1="141" x2="90" y2="141" stroke="#f0c060" stroke-width="0.75" opacity="0.3"/> </svg>`,
+  Jinga:  `<svg viewBox="0 0 130 160" fill="none" xmlns="http://www.w3.org/2000/svg"> <!-- TENTACLE / wave headdress — sinuous --> <path d="M65 8 Q55 20 58 32 Q48 18 42 30 Q36 14 28 26 Q24 38 34 44" stroke="#6a9fd8" stroke-width="2.5" stroke-linecap="round" fill="none"/> <path d="M65 8 Q75 20 72 32 Q82 18 88 30 Q94 14 102 26 Q106 38 96 44" stroke="#6a9fd8" stroke-width="2.5" stroke-linecap="round" fill="none"/> <path d="M65 8 Q65 22 65 38" stroke="#6a9fd8" stroke-width="2" stroke-linecap="round" fill="none"/> <!-- tentacle tips --> <circle cx="34" cy="44" r="3" fill="#6a9fd8" opacity="0.8"/> <circle cx="96" cy="44" r="3" fill="#6a9fd8" opacity="0.8"/> <circle cx="65" cy="38" r="2.5" fill="#6a9fd8" opacity="0.8"/> <circle cx="28" cy="26" r="2" fill="#6a9fd8" opacity="0.5"/> <circle cx="102" cy="26" r="2" fill="#6a9fd8" opacity="0.5"/> <!-- wave collar band --> <path d="M30 44 Q48 38 65 42 Q82 38 100 44 Q90 52 65 50 Q40 52 30 44Z" fill="#6a9fd8" opacity="0.7"/> <!-- FACE — narrow elongated serpent --> <path d="M40 50 Q36 72 36 100 Q36 130 65 140 Q94 130 94 100 Q94 72 90 50 Q78 46 65 46 Q52 46 40 50Z" fill="#080f18" stroke="#6a9fd8" stroke-width="2.5"/> <!-- Scale texture on cheeks --> <path d="M40 68 Q44 64 48 68 Q44 72 40 68Z" fill="#6a9fd8" opacity="0.2"/> <path d="M42 76 Q46 72 50 76 Q46 80 42 76Z" fill="#6a9fd8" opacity="0.2"/> <path d="M40 84 Q44 80 48 84 Q44 88 40 84Z" fill="#6a9fd8" opacity="0.2"/> <path d="M82 68 Q86 64 90 68 Q86 72 82 68Z" fill="#6a9fd8" opacity="0.2"/> <path d="M80 76 Q84 72 88 76 Q84 80 80 76Z" fill="#6a9fd8" opacity="0.2"/> <path d="M82 84 Q86 80 90 84 Q86 88 82 84Z" fill="#6a9fd8" opacity="0.2"/> <!-- Thin arched brow — serpent elegant --> <path d="M40 60 Q52 54 65 56 Q78 54 90 60" stroke="#6a9fd8" stroke-width="3" stroke-linecap="round" fill="none"/> <!-- EYES — vertical slit serpent pupils --> <ellipse cx="52" cy="72" rx="10" ry="12" fill="#6a9fd8" opacity="0.9"/> <ellipse cx="78" cy="72" rx="10" ry="12" fill="#6a9fd8" opacity="0.9"/> <!-- vertical slit pupils --> <ellipse cx="52" cy="72" rx="3" ry="9" fill="#080f18"/> <ellipse cx="78" cy="72" rx="3" ry="9" fill="#080f18"/> <!-- iris ring --> <ellipse cx="52" cy="72" rx="7" ry="10" stroke="#a8d0f0" stroke-width="0.8" fill="none" opacity="0.4"/> <ellipse cx="78" cy="72" rx="7" ry="10" stroke="#a8d0f0" stroke-width="0.8" fill="none" opacity="0.4"/> <!-- eye shine --> <circle cx="54" cy="67" r="2" fill="#d0eeff" opacity="0.7"/> <circle cx="80" cy="67" r="2" fill="#d0eeff" opacity="0.7"/> <!-- Long narrow nose ridge --> <path d="M62 86 L62 104 Q62 108 65 108 Q68 108 68 104 L68 86 Q66 84 65 84 Q64 84 62 86Z" fill="#6a9fd8" opacity="0.6"/> <ellipse cx="61" cy="106" rx="3.5" ry="2" fill="#080f18"/> <ellipse cx="69" cy="106" rx="3.5" ry="2" fill="#080f18"/> <!-- FORKED TONGUE — serpent signature --> <path d="M65 118 L65 135" stroke="#6a9fd8" stroke-width="2.5" stroke-linecap="round"/> <path d="M65 135 L58 145" stroke="#6a9fd8" stroke-width="2" stroke-linecap="round"/> <path d="M65 135 L72 145" stroke="#6a9fd8" stroke-width="2" stroke-linecap="round"/> <!-- Thin mouth — serpent lips --> <path d="M44 114 Q54 108 65 112 Q76 108 86 114 Q78 122 65 122 Q52 122 44 114Z" fill="#6a9fd8" opacity="0.75"/> <rect x="55" y="114" width="20" height="6" rx="1" fill="#080f18"/> <!-- Fin ears — sea creature --> <path d="M36 70 Q20 75 22 90 Q24 100 34 96 Q30 85 36 78Z" fill="#6a9fd8" fill-opacity="0.6" stroke="#6a9fd8" stroke-width="1"/> <path d="M94 70 Q110 75 108 90 Q106 100 96 96 Q100 85 94 78Z" fill="#6a9fd8" fill-opacity="0.6" stroke="#6a9fd8" stroke-width="1"/> <!-- fin rays --> <line x1="24" y1="80" x2="32" y2="76" stroke="#a8d0f0" stroke-width="0.8" opacity="0.5"/> <line x1="23" y1="88" x2="32" y2="84" stroke="#a8d0f0" stroke-width="0.8" opacity="0.5"/> <line x1="106" y1="80" x2="98" y2="76" stroke="#a8d0f0" stroke-width="0.8" opacity="0.5"/> <line x1="107" y1="88" x2="98" y2="84" stroke="#a8d0f0" stroke-width="0.8" opacity="0.5"/> <!-- Base --> <rect x="36" y="140" width="58" height="7" rx="2" fill="#6a9fd8" opacity="0.4"/> <rect x="28" y="147" width="74" height="5" rx="2" fill="#6a9fd8" opacity="0.2"/> </svg>`,
+  Ojalu:  `<svg viewBox="0 0 130 160" fill="none" xmlns="http://www.w3.org/2000/svg"> <!-- ANTLER branches headdress --> <!-- left antler --> <path d="M45 42 Q38 30 32 18 Q28 10 24 6" stroke="#6db86d" stroke-width="2.5" stroke-linecap="round" fill="none"/> <path d="M38 30 Q30 24 22 24" stroke="#6db86d" stroke-width="2" stroke-linecap="round" fill="none"/> <path d="M32 18 Q26 14 20 16" stroke="#6db86d" stroke-width="1.5" stroke-linecap="round" fill="none"/> <path d="M38 30 Q34 22 38 14" stroke="#6db86d" stroke-width="1.5" stroke-linecap="round" fill="none"/> <!-- right antler --> <path d="M85 42 Q92 30 98 18 Q102 10 106 6" stroke="#6db86d" stroke-width="2.5" stroke-linecap="round" fill="none"/> <path d="M92 30 Q100 24 108 24" stroke="#6db86d" stroke-width="2" stroke-linecap="round" fill="none"/> <path d="M98 18 Q104 14 110 16" stroke="#6db86d" stroke-width="1.5" stroke-linecap="round" fill="none"/> <path d="M92 30 Q96 22 92 14" stroke="#6db86d" stroke-width="1.5" stroke-linecap="round" fill="none"/> <!-- center leaf burst --> <path d="M65 8 Q60 18 65 26 Q70 18 65 8Z" fill="#6db86d" opacity="0.8"/> <path d="M58 12 Q54 22 60 28 Q62 20 58 12Z" fill="#6db86d" opacity="0.5"/> <path d="M72 12 Q76 22 70 28 Q68 20 72 12Z" fill="#6db86d" opacity="0.5"/> <!-- antler buds --> <circle cx="24" cy="6" r="2.5" fill="#6db86d" opacity="0.8"/> <circle cx="106" cy="6" r="2.5" fill="#6db86d" opacity="0.8"/> <circle cx="22" cy="24" r="2" fill="#6db86d" opacity="0.6"/> <circle cx="108" cy="24" r="2" fill="#6db86d" opacity="0.6"/> <circle cx="20" cy="16" r="1.5" fill="#6db86d" opacity="0.5"/> <circle cx="110" cy="16" r="1.5" fill="#6db86d" opacity="0.5"/> <!-- antler collar --> <path d="M32 42 Q48 36 65 38 Q82 36 98 42 Q86 50 65 48 Q44 50 32 42Z" fill="#6db86d" opacity="0.65"/> <!-- FACE — wide and flat forest spirit --> <path d="M20 48 Q16 68 16 90 Q16 120 65 132 Q114 120 114 90 Q114 68 110 48 Q90 44 65 44 Q40 44 20 48Z" fill="#0d1f0d" stroke="#6db86d" stroke-width="2.5"/> <!-- Vine tattoos on forehead --> <path d="M28 56 Q36 50 44 56" stroke="#6db86d" stroke-width="1" fill="none" opacity="0.4"/> <path d="M86 56 Q94 50 102 56" stroke="#6db86d" stroke-width="1" fill="none" opacity="0.4"/> <circle cx="32" cy="53" r="1.5" fill="#6db86d" opacity="0.3"/> <circle cx="98" cy="53" r="1.5" fill="#6db86d" opacity="0.3"/> <!-- LOW flat brow ridge — barely above eyes --> <rect x="22" y="60" width="86" height="6" rx="2" fill="#6db86d" opacity="0.75"/> <rect x="60" y="60" width="10" height="6" fill="#0d1f0d"/> <!-- EYES — huge round disc eyes, signature Ojalu --> <circle cx="44" cy="80" r="18" fill="#6db86d" opacity="0.15" stroke="#6db86d" stroke-width="2.5"/> <circle cx="86" cy="80" r="18" fill="#6db86d" opacity="0.15" stroke="#6db86d" stroke-width="2.5"/> <!-- inner eye rings --> <circle cx="44" cy="80" r="12" fill="#6db86d" opacity="0.3"/> <circle cx="86" cy="80" r="12" fill="#6db86d" opacity="0.3"/> <!-- pupil --> <circle cx="44" cy="80" r="7" fill="#0d1f0d"/> <circle cx="86" cy="80" r="7" fill="#0d1f0d"/> <!-- iris flecks --> <circle cx="44" cy="80" r="4.5" fill="#6db86d" opacity="0.7"/> <circle cx="86" cy="80" r="4.5" fill="#6db86d" opacity="0.7"/> <circle cx="44" cy="80" r="2" fill="#0d1f0d"/> <circle cx="86" cy="80" r="2" fill="#0d1f0d"/> <!-- shine --> <circle cx="47" cy="75" r="3" fill="#c0ffc0" opacity="0.55"/> <circle cx="89" cy="75" r="3" fill="#c0ffc0" opacity="0.55"/> <circle cx="42" cy="77" r="1.2" fill="white" opacity="0.3"/> <circle cx="84" cy="77" r="1.2" fill="white" opacity="0.3"/> <!-- Mushroom/leaf nose — organic forest --> <path d="M58 100 Q56 108 65 110 Q74 108 72 100 Q70 94 65 92 Q60 94 58 100Z" fill="#6db86d" opacity="0.65"/> <ellipse cx="59" cy="108" rx="4.5" ry="2.5" fill="#0d1f0d"/> <ellipse cx="71" cy="108" rx="4.5" ry="2.5" fill="#0d1f0d"/> <!-- Mouth — wide organic grin --> <path d="M28 118 Q38 110 48 118 Q56 110 65 114 Q74 110 82 118 Q92 110 102 118 Q94 130 65 132 Q36 130 28 118Z" fill="#6db86d" opacity="0.75"/> <rect x="40" y="118" width="10" height="10" rx="2" fill="#0d1f0d"/> <rect x="57" y="118" width="16" height="10" rx="2" fill="#0d1f0d"/> <rect x="80" y="118" width="10" height="10" rx="2" fill="#0d1f0d"/> <!-- Vine chin tattoos --> <path d="M52 132 Q58 128 65 132 Q72 128 78 132" stroke="#6db86d" stroke-width="1.5" stroke-linecap="round" fill="none" opacity="0.5"/> <circle cx="52" cy="132" r="1.5" fill="#6db86d" opacity="0.4"/> <circle cx="78" cy="132" r="1.5" fill="#6db86d" opacity="0.4"/> <!-- Leaf ears — wide flat panels --> <path d="M16 72 Q4 80 6 96 Q8 108 18 104 Q12 92 18 82Z" fill="#6db86d" fill-opacity="0.6" stroke="#6db86d" stroke-width="1.5"/> <path d="M114 72 Q126 80 124 96 Q122 108 112 104 Q118 92 112 82Z" fill="#6db86d" fill-opacity="0.6" stroke="#6db86d" stroke-width="1.5"/> <!-- ear vein --> <line x1="8" y1="90" x2="16" y2="86" stroke="#c0ffc0" stroke-width="0.8" opacity="0.4"/> <line x1="122" y1="90" x2="114" y2="86" stroke="#c0ffc0" stroke-width="0.8" opacity="0.4"/> <!-- Base --> <rect x="36" y="132" width="58" height="7" rx="2" fill="#6db86d" opacity="0.4"/> <rect x="28" y="139" width="74" height="5" rx="2" fill="#6db86d" opacity="0.22"/> </svg>`,
+  Weloki: `<svg viewBox="0 0 130 160" fill="none" xmlns="http://www.w3.org/2000/svg"> <!-- CRESCENT MOON horns crown --> <path d="M65 6 Q44 8 36 22 Q30 36 40 46 Q50 32 65 30 Q80 32 90 46 Q100 36 94 22 Q86 8 65 6Z" fill="#c46ab0" fill-opacity="0.85"/> <!-- crescent inner shadow --> <path d="M65 10 Q48 12 42 24 Q38 34 46 42 Q52 30 65 28 Q78 30 84 42 Q92 34 88 24 Q82 12 65 10Z" fill="#18080f" opacity="0.6"/> <!-- moon star details --> <circle cx="65" cy="18" r="3" fill="#f0b0e8" opacity="0.8"/> <circle cx="50" cy="22" r="1.5" fill="#f0b0e8" opacity="0.5"/> <circle cx="80" cy="22" r="1.5" fill="#f0b0e8" opacity="0.5"/> <circle cx="56" cy="14" r="1" fill="#f0b0e8" opacity="0.4"/> <circle cx="74" cy="14" r="1" fill="#f0b0e8" opacity="0.4"/> <!-- crown collar --> <path d="M38 44 Q52 38 65 40 Q78 38 92 44 Q84 54 65 52 Q46 54 38 44Z" fill="#c46ab0" opacity="0.7"/> <!-- FACE — tall oval, elegant goddess --> <path d="M42 52 Q38 72 38 98 Q38 128 65 138 Q92 128 92 98 Q92 72 88 52 Q78 48 65 48 Q52 48 42 52Z" fill="#18080f" stroke="#c46ab0" stroke-width="2.5"/> <!-- INTRICATE FOREHEAD SPIRAL tattoo --> <path d="M65 56 Q72 56 74 62 Q74 68 68 70 Q62 70 60 64 Q60 58 65 56Z" stroke="#c46ab0" stroke-width="1.2" fill="none" opacity="0.6"/> <path d="M65 60 Q70 60 71 64 Q71 68 67 69 Q63 69 62 65 Q62 61 65 60Z" stroke="#c46ab0" stroke-width="0.8" fill="none" opacity="0.4"/> <circle cx="65" cy="64" r="1.5" fill="#c46ab0" opacity="0.5"/> <!-- flanking dots --> <circle cx="54" cy="60" r="1.5" fill="#c46ab0" opacity="0.4"/> <circle cx="76" cy="60" r="1.5" fill="#c46ab0" opacity="0.4"/> <circle cx="50" cy="66" r="1" fill="#c46ab0" opacity="0.3"/> <circle cx="80" cy="66" r="1" fill="#c46ab0" opacity="0.3"/> <!-- Arched elegant brow — thin single lines --> <path d="M44 72 Q54 65 65 67 Q76 65 86 72" stroke="#c46ab0" stroke-width="2.5" stroke-linecap="round" fill="none"/> <!-- EYES — long almond goddess eyes --> <path d="M42 84 Q54 74 66 84 Q54 92 42 84Z" fill="#c46ab0" opacity="0.9"/> <path d="M64 84 Q76 74 88 84 Q76 92 64 84Z" fill="#c46ab0" opacity="0.9"/> <!-- pupils — round soft --> <circle cx="54" cy="83" r="6" fill="#18080f"/> <circle cx="76" cy="83" r="6" fill="#18080f"/> <!-- iris --> <circle cx="54" cy="83" r="4" fill="#c46ab0" opacity="0.65"/> <circle cx="76" cy="83" r="4" fill="#c46ab0" opacity="0.65"/> <!-- pupil center --> <circle cx="54" cy="83" r="2" fill="#18080f"/> <circle cx="76" cy="83" r="2" fill="#18080f"/> <!-- double shine --> <circle cx="56" cy="80" r="2" fill="#f8d0f0" opacity="0.8"/> <circle cx="78" cy="80" r="2" fill="#f8d0f0" opacity="0.8"/> <circle cx="52" cy="82" r="1" fill="white" opacity="0.4"/> <circle cx="74" cy="82" r="1" fill="white" opacity="0.4"/> <!-- upper lash line --> <path d="M42 84 Q54 76 66 84" stroke="#c46ab0" stroke-width="1" fill="none" opacity="0.6"/> <path d="M64 84 Q76 76 88 84" stroke="#c46ab0" stroke-width="1" fill="none" opacity="0.6"/> <!-- Delicate nose --> <path d="M63 96 L63 106 Q63 109 65 109 Q67 109 67 106 L67 96 Q66 94 65 94 Q64 94 63 96Z" fill="#c46ab0" opacity="0.55"/> <ellipse cx="61" cy="108" rx="3" ry="2" fill="#18080f"/> <ellipse cx="69" cy="108" rx="3" ry="2" fill="#18080f"/> <!-- MOUTH — full lips, goddess-like --> <path d="M46 116 Q54 110 65 114 Q76 110 84 116 Q80 124 65 126 Q50 124 46 116Z" fill="#c46ab0" opacity="0.85"/> <!-- cupid's bow detail --> <path d="M46 116 Q55 112 65 115 Q75 112 84 116" stroke="#f0b0e8" stroke-width="0.8" fill="none" opacity="0.5"/> <!-- lower lip split --> <path d="M50 122 Q58 126 65 124 Q72 126 80 122" stroke="#18080f" stroke-width="1.5" fill="none" opacity="0.4"/> <!-- Cheek spiral tattoos — goddess marks --> <!-- left cheek --> <path d="M44 100 Q48 96 52 100 Q48 104 44 100Z" stroke="#c46ab0" stroke-width="1" fill="none" opacity="0.5"/> <path d="M44 100 Q50 94 54 100" stroke="#c46ab0" stroke-width="0.8" fill="none" opacity="0.3"/> <!-- right cheek --> <path d="M86 100 Q82 96 78 100 Q82 104 86 100Z" stroke="#c46ab0" stroke-width="1" fill="none" opacity="0.5"/> <path d="M86 100 Q80 94 76 100" stroke="#c46ab0" stroke-width="0.8" fill="none" opacity="0.3"/> <!-- chin triple dot marks --> <circle cx="60" cy="128" r="1.8" fill="#c46ab0" opacity="0.5"/> <circle cx="65" cy="130" r="1.8" fill="#c46ab0" opacity="0.5"/> <circle cx="70" cy="128" r="1.8" fill="#c46ab0" opacity="0.5"/> <!-- Elegant shell ears --> <path d="M38 78 Q24 84 26 100 Q28 112 38 108 Q32 98 36 88Z" fill="#c46ab0" fill-opacity="0.55" stroke="#c46ab0" stroke-width="1.5"/> <path d="M92 78 Q106 84 104 100 Q102 112 92 108 Q98 98 94 88Z" fill="#c46ab0" fill-opacity="0.55" stroke="#c46ab0" stroke-width="1.5"/> <!-- shell spiral inside ear --> <path d="M28 94 Q30 88 34 92 Q30 96 28 94Z" stroke="#f0b0e8" stroke-width="0.8" fill="none" opacity="0.5"/> <path d="M102 94 Q100 88 96 92 Q100 96 102 94Z" stroke="#f0b0e8" stroke-width="0.8" fill="none" opacity="0.5"/> <!-- Base — elegant two-tier --> <rect x="38" y="138" width="54" height="7" rx="3" fill="#c46ab0" opacity="0.4"/> <rect x="30" y="145" width="70" height="5" rx="2" fill="#c46ab0" opacity="0.22"/> <!-- base moon motif --> <path d="M52 141 Q65 138 78 141" stroke="#f0b0e8" stroke-width="0.8" fill="none" opacity="0.4"/> </svg>`,
+};
+
+// Championship record up to (but not including) each season
+// Key = season number, value = { teamName: count }
+function getChampionshipsBefore(season) {
+  const allSeasons = [
+    { season: 43, winner: "Jinga"  },
+    { season: 44, winner: "Jinga"  },
+    { season: 45, winner: "Miloa"  },
+    { season: 46, winner: "Weloki" },
+    { season: 47, winner: "Weloki" },
+    { season: 48, winner: "Jinga"  },
+    { season: 49, winner: "Jinga"  },
+  ];
+  const counts = {};
+  for (const s of allSeasons) {
+    if (s.season < season) {
+      counts[s.winner] = (counts[s.winner] || 0) + 1;
+    }
+  }
+  return counts;
+}
+
+// For history pages — championships AT END of that season (cumulative through that season)
+function getChampionshipsThrough(season) {
+  const allSeasons = [
+    { season: 43, winner: "Jinga"  },
+    { season: 44, winner: "Jinga"  },
+    { season: 45, winner: "Miloa"  },
+    { season: 46, winner: "Weloki" },
+    { season: 47, winner: "Weloki" },
+    { season: 48, winner: "Jinga"  },
+    { season: 49, winner: "Jinga"  },
+  ];
+  const counts = {};
+  for (const s of allSeasons) {
+    if (s.season <= season) {
+      counts[s.winner] = (counts[s.winner] || 0) + 1;
+    }
+  }
+  return counts;
+}
+
+// Season 46 historical results
+const S46_RESULTS = {
+  season: 46,
+  teamScores: [
+    { name: "Weloki", members: "Team Wells",     color: "#c46ab0", score: 76, winner: true },
+    { name: "Ojalu",  members: "Team Lestan",    color: "#6db86d", score: 72 },
+    { name: "Miloa",  members: "Team Miller",    color: "#c8922a", score: 53 },
+    { name: "Jinga",  members: "Team Mackereth", color: "#6a9fd8", score: 29 },
+  ],
+  placements: [
+    { place: 1,  points: 29, player: "Kenzie",  team: "Weloki", teamColor: "#c46ab0" },
+    { place: 2,  points: 27, player: "Charlie", team: "Miloa",  teamColor: "#c8922a" },
+    { place: 3,  points: 23, player: "Ben",     team: "Ojalu",  teamColor: "#6db86d" },
+    { place: 4,  points: 19, player: "Liz",     team: "NA",     teamColor: "#777" },
+    { place: 5,  points: 21, player: "Maria",   team: "Weloki", teamColor: "#c46ab0" },
+    { place: 6,  points: 24, player: "Q",       team: "Ojalu",  teamColor: "#6db86d" },
+    { place: 7,  points: 21, player: "Venus",   team: "Weloki", teamColor: "#c46ab0" },
+    { place: 8,  points: 10, player: "Tiffany", team: "Miloa",  teamColor: "#c8922a" },
+    { place: 9,  points: 20, player: "Hunter",  team: "Jinga",  teamColor: "#6a9fd8" },
+    { place: 10, points: 16, player: "Tevin",   team: "Ojalu",  teamColor: "#6db86d" },
+    { place: 11, points: 13, player: "Soda",    team: "Miloa",  teamColor: "#c8922a" },
+    { place: 12, points: 9,  player: "Tim",     team: "Ojalu",  teamColor: "#6db86d" },
+    { place: 13, points: 5,  player: "Jem",     team: "Jinga",  teamColor: "#6a9fd8" },
+    { place: 14, points: 0,  player: "Moriah",  team: "Jinga",  teamColor: "#6a9fd8" },
+    { place: 15, points: 3,  player: "Bhanu",   team: "Miloa",  teamColor: "#c8922a" },
+    { place: 16, points: 5,  player: "Randen",  team: "Weloki", teamColor: "#c46ab0" },
+    { place: 17, points: 4,  player: "Jess",    team: "Jinga",  teamColor: "#6a9fd8" },
+    { place: 18, points: 0,  player: "David",   team: "NA",     teamColor: "#777" },
+  ],
+};
+
+// Season 47 historical results
+const S47_RESULTS = {
+  season: 47,
+  teamScores: [
+    { name: "Weloki", members: "Team Wells",     color: "#c46ab0", score: 94, winner: true },
+    { name: "Miloa",  members: "Team Miller",    color: "#c8922a", score: 62 },
+    { name: "Ojalu",  members: "Team Lestan",    color: "#6db86d", score: 56 },
+    { name: "Jinga",  members: "Team Mackereth", color: "#6a9fd8", score: 46 },
+  ],
+  placements: [
+    { place: 1,  points: 46, player: "Rachel",    team: "Weloki", teamColor: "#c46ab0" },
+    { place: 2,  points: 38, player: "Sam",       team: "Miloa",  teamColor: "#c8922a" },
+    { place: 3,  points: 27, player: "Sue",       team: "Ojalu",  teamColor: "#6db86d" },
+    { place: 4,  points: 24, player: "Genevieve", team: "Weloki", teamColor: "#c46ab0" },
+    { place: 5,  points: 21, player: "Kyle",      team: "Jinga",  teamColor: "#6a9fd8" },
+    { place: 6,  points: 20, player: "Andy",      team: "NA",     teamColor: "#777" },
+    { place: 7,  points: 17, player: "Teeny",     team: "Jinga",  teamColor: "#6a9fd8" },
+    { place: 8,  points: 15, player: "Gabe",      team: "Ojalu",  teamColor: "#6db86d" },
+    { place: 9,  points: 14, player: "Sierra",    team: "Weloki", teamColor: "#c46ab0" },
+    { place: 10, points: 12, player: "Sol",       team: "Ojalu",  teamColor: "#6db86d" },
+    { place: 11, points: 12, player: "Caroline",  team: "Miloa",  teamColor: "#c8922a" },
+    { place: 12, points: 10, player: "Rome",      team: "Miloa",  teamColor: "#c8922a" },
+    { place: 13, points: 10, player: "Tiyana",    team: "Weloki", teamColor: "#c46ab0" },
+    { place: 14, points: 8,  player: "Anika",     team: "Jinga",  teamColor: "#6a9fd8" },
+    { place: 15, points: 2,  player: "Kishan",    team: "Ojalu",  teamColor: "#6db86d" },
+    { place: 16, points: 2,  player: "Aysha",     team: "Miloa",  teamColor: "#c8922a" },
+    { place: 17, points: 0,  player: "TK",        team: "Jinga",  teamColor: "#6a9fd8" },
+    { place: 18, points: 0,  player: "Jon",       team: "NA",     teamColor: "#777" },
+  ],
+};
+const S48_RESULTS = {
+  season: 48,
+  teamScores: [
+    { name: "Jinga",  members: "Team Mackereth", color: "#6a9fd8", score: 45, winner: true },
+    { name: "Weloki", members: "Team Wells",     color: "#c46ab0", score: 37 },
+    { name: "Miloa",  members: "Team Miller",    color: "#c8922a", score: 36 },
+    { name: "Ojalu",  members: "Team Lestan",    color: "#6db86d", score: 35 },
+  ],
+  placements: [
+    { place: 1,  points: 20, player: "Kyle",      team: "Miloa",  teamColor: "#c8922a" },
+    { place: 2,  points: 18, player: "Joe",       team: "Jinga",  teamColor: "#6a9fd8" },
+    { place: 3,  points: 16, player: "Eva",       team: "Ojalu",  teamColor: "#6db86d" },
+    { place: 4,  points: 14, player: "Kamilla",   team: "Jinga",  teamColor: "#6a9fd8" },
+    { place: 5,  points: 13, player: "Mitch",     team: "Weloki", teamColor: "#c46ab0" },
+    { place: 6,  points: 12, player: "Shauhin",   team: "Weloki", teamColor: "#c46ab0" },
+    { place: 7,  points: 11, player: "Mary",      team: "Miloa",  teamColor: "#c8922a" },
+    { place: 8,  points: 10, player: "Star",      team: "Ojalu",  teamColor: "#6db86d" },
+    { place: 9,  points: 9,  player: "David",     team: "Jinga",  teamColor: "#6a9fd8" },
+    { place: 10, points: 8,  player: "Chrissy",   team: "Ojalu",  teamColor: "#6db86d" },
+    { place: 11, points: 7,  player: "Cedrek",    team: "Weloki", teamColor: "#c46ab0" },
+    { place: 12, points: 6,  player: "Sai",       team: "NA",     teamColor: "#777" },
+    { place: 13, points: 5,  player: "Charity",   team: "Weloki", teamColor: "#c46ab0" },
+    { place: 14, points: 4,  player: "Bianca",    team: "Jinga",  teamColor: "#6a9fd8" },
+    { place: 15, points: 3,  player: "Thomas",    team: "Miloa",  teamColor: "#c8922a" },
+    { place: 16, points: 2,  player: "Justin",    team: "Miloa",  teamColor: "#c8922a" },
+    { place: 17, points: 1,  player: "Kevin",     team: "Ojalu",  teamColor: "#6db86d" },
+    { place: 18, points: 0,  player: "Stephanie", team: "NA",     teamColor: "#777" },
+  ],
+};
+const S49_RESULTS = {
+  season: 49,
+  teamScores: [
+    { name: "Jinga",  members: "Team Mackereth", color: "#6a9fd8", score: 61, winner: true },
+    { name: "Ojalu",  members: "Team Lestan",    color: "#6db86d", score: 40 },
+    { name: "Weloki", members: "Team Wells",     color: "#c46ab0", score: 38 },
+    { name: "Miloa",  members: "Team Miller",    color: "#c8922a", score: 19 },
+  ],
+  placements: [
+    { place: 1,  points: 20, player: "Savannah",  team: "Jinga",  teamColor: "#6a9fd8" },
+    { place: 2,  points: 18, player: "Sophi B",   team: "Jinga",  teamColor: "#6a9fd8" },
+    { place: 3,  points: 16, player: "Sage",      team: "Ojalu",  teamColor: "#6db86d" },
+    { place: 4,  points: 14, player: "Rizo",      team: "Weloki", teamColor: "#c46ab0" },
+    { place: 5,  points: 13, player: "Kristina",  team: "Weloki", teamColor: "#c46ab0" },
+    { place: 6,  points: 12, player: "Steven",    team: "Jinga",  teamColor: "#6a9fd8" },
+    { place: 7,  points: 11, player: "Sophie S",  team: "Jinga",  teamColor: "#6a9fd8" },
+    { place: 8,  points: 10, player: "Javan",     team: "Ojalu",  teamColor: "#6db86d" },
+    { place: 9,  points: 9,  player: "Alex",      team: "Weloki", teamColor: "#c46ab0" },
+    { place: 10, points: 8,  player: "MC",        team: "Ojalu",  teamColor: "#6db86d" },
+    { place: 11, points: 7,  player: "Nate",      team: "Miloa",  teamColor: "#c8922a" },
+    { place: 12, points: 6,  player: "Shannon",   team: "Ojalu",  teamColor: "#6db86d" },
+    { place: 13, points: 5,  player: "Jason",     team: "Miloa",  teamColor: "#c8922a" },
+    { place: 14, points: 4,  player: "Matt",      team: "Miloa",  teamColor: "#c8922a" },
+    { place: 15, points: 3,  player: "Jeremiah",  team: "Miloa",  teamColor: "#c8922a" },
+    { place: 16, points: 2,  player: "Jake",      team: "Weloki", teamColor: "#c46ab0" },
+    { place: 17, points: 1,  player: "Annie",     team: "NA",     teamColor: "#777" },
+    { place: 18, points: 0,  player: "Nicole",    team: "NA",     teamColor: "#777" },
+  ],
+};
+
+function TribeTotem({ team, size = 28 }) {
+  const svg = TRIBE_TOTEMS[team];
+  if (!svg) return null;
+  return (
+    <span
+      title={`${team} championship`}
+      style={{ display:"inline-block", width:size, height:Math.round(size*1.23), verticalAlign:"middle" }}
+      dangerouslySetInnerHTML={{ __html: svg.replace('<svg ', '<svg style="width:100%;height:100%" ') }}
+    />
+  );
+}
+
+function SeasonHistory({ season, onBack }) {
+  const r = season === 43 ? S43_RESULTS : season === 44 ? S44_RESULTS : season === 45 ? S45_RESULTS : season === 46 ? S46_RESULTS : season === 47 ? S47_RESULTS : season === 48 ? S48_RESULTS : S49_RESULTS;
+  const championships = getChampionshipsThrough(season);
+  return (
+    <div>
+      <div className="page-title">Season {r.season} Results</div>
+      <div className="page-subtitle" style={{marginBottom:"2rem"}}>Final standings · {r.placements.length} castaways</div>
+
+      {/* Team scores */}
+      <div className="section-title">Final Team Scores</div>
+      <div className="leaderboard" style={{marginBottom:"2.5rem"}}>
+        {r.teamScores.map((t, i) => (
+          <div key={t.name} className={`lb-card ${i===0?"first":""}`}>
+            <div className="lb-rank" style={{color: i===0 ? t.color : ""}}>{i+1}</div>
+            <div style={{flex:1}}>
+              <div className="lb-tribe" style={{color:t.color}}>
+                {t.name} <span style={{fontSize:"0.63rem",color:"#999",fontWeight:400}}>{t.members}</span>
+              </div>
+              {t.winner && <div style={{fontSize:"0.6rem",color:"#c8922a",letterSpacing:"0.1em",textTransform:"uppercase",marginTop:"0.15rem"}}>★ Season Champion</div>}
+              {championships[t.name] > 0 && (
+                <div style={{display:"flex",alignItems:"center",gap:"2px",marginTop:"0.3rem",flexWrap:"wrap"}}>
+                  {Array.from({length: championships[t.name]}).map((_, ci) => (
+                    <TribeTotem key={ci} team={t.name} size={22} />
+                  ))}
+                  <span style={{fontSize:"0.52rem",color:"#666",marginLeft:"4px",letterSpacing:"0.08em"}}>
+                    {championships[t.name]} TITLE{championships[t.name]>1?"S":""}
+                  </span>
+                </div>
+              )}
+            </div>
+            <div className="lb-score">
+              <div className="lb-pts" style={{color: t.color}}>{t.score}</div>
+              <div className="lb-pts-label">points</div>
+            </div>
+          </div>
+        ))}
+      </div>
+
+      {/* Placement table */}
+      <div className="section-title">Castaway Placements</div>
+      <div style={{border:"1px solid rgba(255,255,255,0.07)",borderRadius:"4px",overflow:"hidden",marginBottom:"2rem"}}>
+        <div style={{display:"grid",gridTemplateColumns:"3rem 3.5rem 1fr 5rem",background:"rgba(255,255,255,0.04)",padding:"0.6rem 1rem",fontSize:"0.58rem",letterSpacing:"0.1em",textTransform:"uppercase",color:"#999",borderBottom:"1px solid rgba(255,255,255,0.07)"}}>
+          <div>Place</div><div>Pts</div><div>Player</div><div>Team</div>
+        </div>
+        {r.placements.map((p, i) => (
+          <div key={p.place} style={{display:"grid",gridTemplateColumns:"3rem 3.5rem 1fr 5rem",padding:"0.55rem 1rem",fontSize:"0.72rem",borderBottom: i < r.placements.length-1 ? "1px solid rgba(255,255,255,0.04)" : "none",background: i%2===0 ? "rgba(255,255,255,0.01)" : "transparent",alignItems:"center"}}>
+            <div style={{color:"#999",fontSize:"0.65rem"}}>#{p.place}</div>
+            <div style={{fontFamily:"'Playfair Display',serif",fontWeight:900,color: p.points > 0 ? "#f0ebe0" : "#555"}}>{p.points}</div>
+            <div style={{color:"#f0ebe0"}}>{p.player}</div>
+            <div style={{color: p.teamColor, fontSize:"0.65rem"}}>{p.team}</div>
+          </div>
+        ))}
+      </div>
+
+      <button className="action-btn" onClick={onBack} style={{marginBottom:0}}>← Back</button>
+    </div>
+  );
+}
+
+function Leaderboard({ scores, season, castaways, showOdds, onS49 }) {
   const eliminated = castaways.filter(c => c.eliminationOrder).length;
   const hasDrafted = castaways.some(c => c.draftedBy);
   const hasOdds = season.id === 50;
@@ -508,7 +878,7 @@ function Leaderboard({ scores, season, castaways }) {
       <div className="page-title">Leaderboard</div>
       <div className="page-subtitle">
         Season {season.id}: In the Hands of the Fans · {season.totalCastaways} Castaways · {eliminated} Eliminated · {season.totalCastaways - eliminated} Remaining
-        {simResults && <span style={{color:"#999"}}> · odds via 5,000-season Monte Carlo sim</span>}
+        {simResults && showOdds && <span style={{color:"#999"}}> · odds via 5,000-season Monte Carlo sim</span>}
       </div>
       <div className="leaderboard">
         {scores.map((team, i) => {
@@ -521,7 +891,17 @@ function Leaderboard({ scores, season, castaways }) {
                 <div className="lb-tribe" style={{color:def.color}}>
                   {team.name} <span style={{fontSize:"0.63rem",color:"#999",fontWeight:400}}>{team.members}</span>
                 </div>
-                {sim && (
+                {(() => { const champs = getChampionshipsThrough(49); const count = champs[def.name] || 0; return count > 0 ? (
+                  <div style={{display:"flex",alignItems:"center",gap:"2px",marginBottom:"0.25rem",flexWrap:"wrap"}}>
+                    {Array.from({length: count}).map((_, ci) => (
+                      <TribeTotem key={ci} team={def.name} size={20} />
+                    ))}
+                    <span style={{fontSize:"0.5rem",color:"#555",marginLeft:"3px",letterSpacing:"0.08em"}}>
+                      {count} TITLE{count>1?"S":""}
+                    </span>
+                  </div>
+                ) : null; })()}
+                {sim && showOdds && (
                   <div style={{display:"flex",gap:"1.25rem",marginBottom:"0.5rem",marginTop:"0.2rem",flexWrap:"wrap"}}>
                     <div>
                       <span style={{fontSize:"0.58rem",color:"#999",letterSpacing:"0.08em",textTransform:"uppercase"}}>Win Probability </span>
@@ -547,7 +927,7 @@ function Leaderboard({ scores, season, castaways }) {
                     <span key={c.id} className={`c-tag ${c.eliminationOrder?"eliminated":"alive"}`}>
                       {c.name}{c.eliminationOrder
                         ? ` · ${calcPoints(c.eliminationOrder, season.totalCastaways)}pt`
-                        : (c.odds ? ` · ${c.odds}` : "")}
+                        : (showOdds && c.odds ? ` · ${c.odds}` : "")}
                     </span>
                   ))}
                   {team.picks.length === 0 && <span style={{fontSize:"0.65rem",color:"#aaa"}}>No picks yet — draft to see projected odds</span>}
@@ -570,7 +950,7 @@ function Leaderboard({ scores, season, castaways }) {
   );
 }
 
-function Castaways({ castaways, season }) {
+function Castaways({ castaways, season, showOdds }) {
   const alive      = castaways.filter(c => !c.eliminationOrder && c.draftedBy);
   const undrafted  = castaways.filter(c => !c.eliminationOrder && !c.draftedBy);
   const eliminated = castaways.filter(c => c.eliminationOrder).sort((a,b) => b.eliminationOrder - a.eliminationOrder);
@@ -583,20 +963,20 @@ function Castaways({ castaways, season }) {
         <span><span className="odds-dot" style={{background:"#2ab8a0"}} /> Kalo (teal)</span>
         <span><span className="odds-dot" style={{background:"#e8782a"}} /> Cila (orange)</span>
       </div>
-      <div className="odds-key" style={{marginBottom:"1.5rem"}}>
+      {showOdds && <div className="odds-key" style={{marginBottom:"1.5rem"}}>
         <span><span className="odds-dot" style={{background:"#c8922a"}} /> Heavy favorite (odds-)</span>
         <span><span className="odds-dot" style={{background:"#6db86d"}} /> Strong contender (+700–1000)</span>
         <span><span className="odds-dot" style={{background:"#6a9fd8"}} /> Solid shot (+1000–2500)</span>
         <span><span className="odds-dot" style={{background:"#aaa"}} /> Longshot (+2500+)</span>
-      </div>
-      {alive.length > 0 && (<><div className="section-title">Active — {alive.length}</div><div className="castaways-grid">{alive.map(c => <CastawayCard key={c.id} c={c} season={season} />)}</div></>)}
-      {undrafted.length > 0 && (<><div className="section-title">Undrafted — {undrafted.length}</div><div className="castaways-grid">{undrafted.map(c => <CastawayCard key={c.id} c={c} season={season} />)}</div></>)}
-      {eliminated.length > 0 && (<><div className="divider" /><div className="section-title">Eliminated — {eliminated.length}</div><div className="castaways-grid">{eliminated.map(c => <CastawayCard key={c.id} c={c} season={season} />)}</div></>)}
+      </div>}
+      {alive.length > 0 && (<><div className="section-title">Active — {alive.length}</div><div className="castaways-grid">{alive.map(c => <CastawayCard key={c.id} c={c} season={season} showOdds={showOdds} />)}</div></>)}
+      {undrafted.length > 0 && (<><div className="section-title">Undrafted — {undrafted.length}</div><div className="castaways-grid">{undrafted.map(c => <CastawayCard key={c.id} c={c} season={season} showOdds={showOdds} />)}</div></>)}
+      {eliminated.length > 0 && (<><div className="divider" /><div className="section-title">Eliminated — {eliminated.length}</div><div className="castaways-grid">{eliminated.map(c => <CastawayCard key={c.id} c={c} season={season} showOdds={showOdds} />)}</div></>)}
     </div>
   );
 }
 
-function CastawayCard({ c, season }) {
+function CastawayCard({ c, season, showOdds }) {
   const team = TEAMS.find(t => t.id === c.draftedBy);
   const pts  = c.eliminationOrder ? calcPoints(c.eliminationOrder, season.totalCastaways) : null;
   const cls  = c.eliminationOrder ? "eliminated" : (c.draftedBy ? "alive" : "undrafted");
@@ -619,7 +999,7 @@ function CastawayCard({ c, season }) {
         )}
         <div className="c-row">
           <div className="c-tribe" style={{color: team ? team.color : "#888"}}>{team ? team.name : "Undrafted"}</div>
-          {c.odds && <div className="c-odds" style={{color: oddsColor(c.odds)}}>{c.odds}</div>}
+          {c.odds && showOdds && <div className="c-odds" style={{color: oddsColor(c.odds)}}>{c.odds}</div>}
         </div>
         <div className={`c-status ${cls}`} style={{marginTop:"0.2rem"}}>{c.eliminationOrder ? `Elim. #${c.eliminationOrder}` : (c.draftedBy ? "Active" : "—")}</div>
         {pts !== null && <div className="c-pts">{pts} pts</div>}
@@ -628,7 +1008,7 @@ function CastawayCard({ c, season }) {
   );
 }
 
-function Draft({ castaways, season, draftState, randomizeOrder, selectPosition, buildDraftOrder, setCastaways, showToast, undoLastDraftPick }) {
+function Draft({ castaways, season, draftState, randomizeOrder, selectPosition, buildDraftOrder, setCastaways, showToast, undoLastDraftPick, showOdds, resetSeason }) {
   const { randomOrder, draftPositions } = draftState;
   const positionsFilled = Object.keys(draftPositions).length;
   const allPositionsPicked = positionsFilled >= TEAMS.length;
@@ -662,6 +1042,26 @@ function Draft({ castaways, season, draftState, randomizeOrder, selectPosition, 
     <div>
       <div className="page-title">Draft Board</div>
       <div className="page-subtitle">Season {season.id} · Snake Draft · {season.picksPerTeam} Rounds · {totalPicks} Picks · {season.undrafted} Undrafted</div>
+      <button className="action-btn" style={{background:"rgba(200,60,60,0.08)",borderColor:"rgba(200,60,60,0.3)",color:"#cc6060",marginBottom:"1.5rem"}} onClick={resetSeason}>
+        ↺ Reset Draft (temp)
+      </button>
+
+      {/* PRE-DRAFT ELIMINATIONS */}
+      {preEliminated.length > 0 && (
+        <div style={{marginBottom:"1.5rem",padding:"1rem 1.25rem",background:"rgba(255,255,255,0.02)",border:"1px solid rgba(255,255,255,0.07)",borderRadius:"4px"}}>
+          <div style={{fontSize:"0.62rem",letterSpacing:"0.12em",textTransform:"uppercase",color:"#999",marginBottom:"0.75rem"}}>
+            ⚠ Eliminated Before Draft — Not Available ({preEliminated.length})
+          </div>
+          <div style={{display:"flex",flexWrap:"wrap",gap:"0.5rem"}}>
+            {preEliminated.map(c => (
+              <div key={c.id} style={{display:"flex",alignItems:"center",gap:"0.4rem",padding:"0.25rem 0.6rem",background:"rgba(255,255,255,0.03)",border:"1px solid rgba(255,255,255,0.08)",borderRadius:"3px"}}>
+                <span style={{fontSize:"0.65rem",color:"#888",textDecoration:"line-through"}}>{c.name}</span>
+                <span style={{fontSize:"0.55rem",color:"#666"}}>#{c.eliminationOrder}</span>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
 
       {/* PHASE 1: Randomizer & Position Selection */}
       {!allPositionsPicked && (
@@ -755,7 +1155,7 @@ function Draft({ castaways, season, draftState, randomizeOrder, selectPosition, 
                 <Photo src={c.photo} alt={c.name} className="dc-photo" />
                 <div className="dc-info">
                   <div className="dc-name">{c.name}</div>
-                  {c.odds && <div className="dc-odds" style={{color: oddsColor(c.odds)}}>{c.odds}</div>}
+                  {showOdds && c.odds && <div className="dc-odds" style={{color: oddsColor(c.odds)}}>{c.odds}</div>}
                 </div>
                 {allPositionsPicked && !draftComplete && currentTeam && <button className="dc-pick-btn" onClick={(e) => {e.stopPropagation(); draftPick(c.id);}}>Pick for {currentTeam.name}</button>}
               </div>
@@ -776,7 +1176,7 @@ function Draft({ castaways, season, draftState, randomizeOrder, selectPosition, 
                   return (
                     <div key={i} className="pick-row">
                       {pick ? (
-                        <><Photo src={pick.photo} alt={pick.name} className="pick-photo-sm" /><span style={{flex:1}}>{pick.name}</span><span style={{fontSize:"0.58rem",color:oddsColor(pick.odds)}}>{pick.odds}</span></>
+                        <><Photo src={pick.photo} alt={pick.name} className="pick-photo-sm" /><span style={{flex:1}}>{pick.name}</span>{showOdds && <span style={{fontSize:"0.58rem",color:oddsColor(pick.odds)}}>{pick.odds}</span>}</>
                       ) : (
                         <span className="empty-pick">Round {i+1} — pending</span>
                       )}
@@ -792,7 +1192,7 @@ function Draft({ castaways, season, draftState, randomizeOrder, selectPosition, 
   );
 }
 
-function Admin({ castaways, nextElimOrder, season, eliminate, restore, resetSeason }) {
+function Admin({ castaways, nextElimOrder, season, eliminate, restore, resetSeason, showOdds, setShowOdds }) {
   const [confirmReset, setConfirmReset] = useState(false);
   const alive      = castaways.filter(c => !c.eliminationOrder);
   const eliminated = castaways.filter(c => c.eliminationOrder).sort((a,b) => b.eliminationOrder - a.eliminationOrder);
@@ -801,7 +1201,20 @@ function Admin({ castaways, nextElimOrder, season, eliminate, restore, resetSeas
     <div>
       <div className="page-title">Commissioner Panel</div>
       <div className="page-subtitle">Season {season.id} · {seasonOver ? "Season Complete" : `Next elimination #${nextElimOrder} · ${calcPoints(nextElimOrder, season.totalCastaways)} pts`}</div>
-      <div style={{marginBottom:"1.5rem",display:"flex",gap:"0.75rem",alignItems:"center"}}>
+      <div style={{marginBottom:"1.5rem",display:"flex",gap:"0.75rem",alignItems:"center",flexWrap:"wrap"}}>
+        {/* Odds toggle */}
+        <button
+          className="action-btn"
+          style={{
+            marginBottom: 0,
+            background: showOdds ? "rgba(200,146,42,0.12)" : "rgba(255,255,255,0.03)",
+            borderColor: showOdds ? "rgba(200,146,42,0.5)" : "rgba(255,255,255,0.1)",
+            color: showOdds ? "#c8922a" : "#aaa",
+          }}
+          onClick={() => setShowOdds(o => !o)}
+        >
+          {showOdds ? "👁 Odds Visible" : "🙈 Odds Hidden"}
+        </button>
         {!confirmReset ? (
           <button className="action-btn" style={{background:"rgba(200,60,60,0.08)",borderColor:"rgba(200,60,60,0.3)",color:"#cc6060",marginBottom:0}} onClick={() => setConfirmReset(true)}>
             ↺ Reset Season
