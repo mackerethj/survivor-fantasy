@@ -592,7 +592,7 @@ useEffect(() => {
             />
           )}
 
-          {page==="points"      && <Points season={season} />}
+          {page==="points" && <Points season={season} castaways={castaways} />}
           
           {page==="admin" && !adminUnlocked && (
             <div style={{maxWidth:"340px",margin:"4rem auto",padding:"2rem",background:"rgba(255,255,255,0.03)",border:"1px solid rgba(255,255,255,0.08)",borderRadius:"4px"}}>
@@ -1129,27 +1129,43 @@ function SeasonHistory({ season, onBack }) {
   );
 }
 
-function Points({ season }) {
+function Points({ season, castaways }) {
   const total = season.totalCastaways;
 
-  // calcPoints expects eliminationOrder (1 = first eliminated, total = winner)
-  // Users usually think in "finish place" (1st, 2nd, 3rd...)
-  // finishPlace = total - eliminationOrder + 1
+  // Map elimination order -> castaway
+  const elimMap = {};
+  castaways.forEach(c => {
+    if (c.eliminationOrder !== null && c.eliminationOrder !== undefined) {
+      elimMap[c.eliminationOrder] = c;
+    }
+  });
+
   const rows = Array.from({ length: total }, (_, i) => {
     const eliminationOrder = i + 1;
     const finishPlace = total - eliminationOrder + 1;
     const points = calcPoints(eliminationOrder, total);
-    return { finishPlace, eliminationOrder, points };
-  }).sort((a, b) => a.finishPlace - b.finishPlace); // 1st place at top
+    const castaway = elimMap[eliminationOrder];
+
+    return {
+      finishPlace,
+      eliminationOrder,
+      points,
+      castaway
+    };
+  }).sort((a, b) => a.finishPlace - b.finishPlace); // winner first
 
   return (
     <div>
       <div className="page-title">Points</div>
       <div className="page-subtitle">
-        Season {season.id} · Points by finish position · Winner is 1st place
+        Season {season.id} · Points by finish position
       </div>
 
-      <div style={{ border: "1px solid rgba(255,255,255,0.07)", borderRadius: "4px", overflow: "hidden" }}>
+      <div style={{
+        border: "1px solid rgba(255,255,255,0.07)",
+        borderRadius: "4px",
+        overflow: "hidden"
+      }}>
         <div
           style={{
             display: "grid",
@@ -1165,7 +1181,7 @@ function Points({ season }) {
         >
           <div>Finish</div>
           <div>Points</div>
-          <div>Elim. Order</div>
+          <div>Castaway</div>
         </div>
 
         {rows.map((r, idx) => (
@@ -1181,14 +1197,27 @@ function Points({ season }) {
               alignItems: "center",
             }}
           >
-            <div style={{ color: "#f0ebe0", fontFamily: "'Playfair Display', serif", fontWeight: 900 }}>
+            <div style={{
+              color: "#f0ebe0",
+              fontFamily: "'Playfair Display', serif",
+              fontWeight: 900
+            }}>
               {ordinal(r.finishPlace)}
             </div>
-            <div style={{ color: "#c8922a", fontFamily: "'Playfair Display', serif", fontWeight: 900 }}>
+
+            <div style={{
+              color: "#c8922a",
+              fontFamily: "'Playfair Display', serif",
+              fontWeight: 900
+            }}>
               {r.points}
             </div>
-            <div style={{ color: "#999", fontSize: "0.65rem" }}>
-              #{r.eliminationOrder} eliminated (1 = first out, {total} = winner)
+
+            <div style={{
+              color: r.castaway ? "#f0ebe0" : "#777",
+              fontSize: "0.68rem"
+            }}>
+              {r.castaway ? r.castaway.name : "—"}
             </div>
           </div>
         ))}
@@ -1202,6 +1231,8 @@ function ordinal(n) {
   const v = n % 100;
   return n + (s[(v - 20) % 10] || s[v] || s[0]);
 }
+
+
 
 function Leaderboard({ scores, season, castaways, showOdds }) {
   const eliminated = castaways.filter(c => c.eliminationOrder).length;
