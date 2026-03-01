@@ -1479,9 +1479,11 @@ function Draft({ castaways, season, draftState, randomizeOrder, selectPosition, 
         <div className="draft-phase">
           <div className="draft-phase-title">Step 1 — Roll for Draft Position Order</div>
 
-          {!randomOrder ? (
-  
-          ) : (
+      {!randomOrder ? (
+        <button className="action-btn primary" onClick={randomizeOrder}>
+        🎲 Roll Randomizer
+        </button>
+        ) : (
             <>
               <div style={{fontSize:"0.72rem",color:"#aaa",marginBottom:"1rem"}}>
                 Teams pick their draft position in this order. Each team chooses any available slot (1–4).
