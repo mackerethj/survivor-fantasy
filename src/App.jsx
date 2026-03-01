@@ -348,6 +348,11 @@ export default function App() {
       const draftRaw = localStorage.getItem("draft-state");
       const oddsRaw = localStorage.getItem("show-odds");
 
+      // NEW: page + season persistence
+      const pageRaw = localStorage.getItem("ui-page");
+      const seasonRaw = localStorage.getItem("ui-season");
+      const historyRaw = localStorage.getItem("ui-history-season");
+
       console.log("LS has keys?", {
         "castaways-state": !!castawaysRaw,
         "elim-state": !!elimRaw,
@@ -359,12 +364,27 @@ export default function App() {
       if (elimRaw) setNextElimBySeason(JSON.parse(elimRaw));
       if (draftRaw) setDraftStateBySeason(JSON.parse(draftRaw));
       if (oddsRaw) setShowOdds(JSON.parse(oddsRaw));
+
+        // NEW: restore UI
+    if (pageRaw) setPage(JSON.parse(pageRaw));
+    if (seasonRaw) setSelectedSeason(JSON.parse(seasonRaw));
+    if (historyRaw) setHistorySeason(JSON.parse(historyRaw));  
     } catch (e) {
       console.warn("Load from localStorage failed:", e);
     }
     setStorageLoaded(true);
   }, []);
+  
+useEffect(() => {
+  if (!storageLoaded) return;
+  try {
+    localStorage.setItem("ui-page", JSON.stringify(page));
+    localStorage.setItem("ui-season", JSON.stringify(selectedSeason));
+    localStorage.setItem("ui-history-season", JSON.stringify(historySeason));
+  } catch (e) {}
+}, [page, selectedSeason, historySeason, storageLoaded]);
 
+  
   // Persist whenever draft/castaway state changes (after initial load)
   useEffect(() => {
     if (!storageLoaded) return;
