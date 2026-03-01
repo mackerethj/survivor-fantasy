@@ -1332,10 +1332,6 @@ function Draft({ castaways, season, draftState, randomizeOrder, selectPosition, 
       <div className="page-title">Draft Board</div>
       <div className="page-subtitle">Season {season.id} · Snake Draft · {season.picksPerTeam} Rounds · {totalPicks} Picks · {season.undrafted} Undrafted</div>
 
-      <button className="action-btn" style={{background:"rgba(200,60,60,0.08)",borderColor:"rgba(200,60,60,0.3)",color:"#cc6060",marginBottom:"1.5rem"}} onClick={resetSeason}>
-        ↺ Reset Draft (temp)
-      </button>
-
       {preEliminated.length > 0 && (
         <div style={{marginBottom:"1.5rem",padding:"1rem 1.25rem",background:"rgba(255,255,255,0.02)",border:"1px solid rgba(255,255,255,0.07)",borderRadius:"4px"}}>
           <div style={{fontSize:"0.62rem",letterSpacing:"0.12em",textTransform:"uppercase",color:"#999",marginBottom:"0.75rem"}}>
