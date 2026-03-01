@@ -12,6 +12,18 @@ function calcPoints(eliminationOrder, totalCastaways) {
   return eliminationOrder - 2;
 }
 
+const LEAGUE_ID = "main";
+
+const [clientId] = useState(() => {
+  const k = "sf-client-id";
+  let v = sessionStorage.getItem(k);
+  if (!v) {
+    v = Math.random().toString(36).substring(2);
+    sessionStorage.setItem(k, v);
+  }
+  return v;
+});
+
 const TEAMS = [
   { id: 1, name: "Miloa", members: "Team Miller", color: "#c8922a" },
   { id: 2, name: "Jinga", members: "Team Mackereth", color: "#6a9fd8" },
