@@ -352,101 +352,88 @@ export default function App() {
   const [storageLoaded, setStorageLoaded] = useState(false);
 
   // Load persisted state on mount
-  useEffect(() => {
-    try {
-      console.log("ORIGIN:", window.location.origin);
+ useEffect(() => {
+  let channel;
 
-      const castawaysRaw = localStorage.getItem("castaways-state");
-      const elimRaw = localStorage.getItem("elim-state");
-      const draftRaw = localStorage.getItem("draft-state");
-      const oddsRaw = localStorage.getItem("show-odds");
+  const loadSeason = async () => {
+    setStorageLoaded(false);
 
-      // NEW: page + season persistence
-      const pageRaw = localStorage.getItem("ui-page");
-      const seasonRaw = localStorage.getItem("ui-season");
-      const historyRaw = localStorage.getItem("ui-history-season");
+    const { data } = await supabase
+      .from("season_state")
+      .select("*")
+      .eq("league_id", LEAGUE_ID)
+      .eq("season_id", selectedSeason)
+      .maybeSingle();
 
-      console.log("LS has keys?", {
-        "castaways-state": !!castawaysRaw,
-        "elim-state": !!elimRaw,
-        "draft-state": !!draftRaw,
-        "show-odds": !!oddsRaw,
+    if (data?.state) {
+      const s = data.state;
+
+      if (s.castaways) setCastawaysBySeason(prev => ({ ...prev, [selectedSeason]: s.castaways }));
+      if (s.draftState) setDraftStateBySeason(prev => ({ ...prev, [selectedSeason]: s.draftState }));
+      if (typeof s.nextElimOrder === "number") setNextElimBySeason(prev => ({ ...prev, [selectedSeason]: s.nextElimOrder }));
+      if (typeof s.showOdds === "boolean") setShowOdds(s.showOdds);
+
+      setStorageLoaded(true);
+    } else {
+      // initialize if not exists
+      const defaultState = {
+        castaways: buildCastaways(selectedSeason),
+        draftState: { randomOrder: null, draftPositions: {} },
+        nextElimOrder: selectedSeason !== 50 ? 19 : 1,
+        showOdds: false
+      };
+
+      await supabase.from("season_state").upsert({
+        league_id: LEAGUE_ID,
+        season_id: selectedSeason,
+        state: defaultState,
+        updated_by: clientId
       });
 
-      if (castawaysRaw) setCastawaysBySeason(JSON.parse(castawaysRaw));
-      if (elimRaw) setNextElimBySeason(JSON.parse(elimRaw));
-      if (draftRaw) setDraftStateBySeason(JSON.parse(draftRaw));
-      if (oddsRaw) setShowOdds(JSON.parse(oddsRaw));
+      setCastawaysBySeason(prev => ({ ...prev, [selectedSeason]: defaultState.castaways }));
+      setDraftStateBySeason(prev => ({ ...prev, [selectedSeason]: defaultState.draftState }));
+      setNextElimBySeason(prev => ({ ...prev, [selectedSeason]: defaultState.nextElimOrder }));
+      setShowOdds(defaultState.showOdds);
 
-        // NEW: restore UI
-    if (pageRaw) setPage(JSON.parse(pageRaw));
-    if (seasonRaw) setSelectedSeason(JSON.parse(seasonRaw));
-    if (historyRaw) setHistorySeason(JSON.parse(historyRaw));  
-    } catch (e) {
-      console.warn("Load from localStorage failed:", e);
+      setStorageLoaded(true);
     }
-    setStorageLoaded(true);
-  }, []);
-  
-useEffect(() => {
-  if (!storageLoaded) return;
-  try {
-    localStorage.setItem("ui-page", JSON.stringify(page));
-    localStorage.setItem("ui-season", JSON.stringify(selectedSeason));
-    localStorage.setItem("ui-history-season", JSON.stringify(historySeason));
-  } catch (e) {}
-}, [page, selectedSeason, historySeason, storageLoaded]);
+  };
 
-  
-  // Persist whenever draft/castaway state changes (after initial load)
-  useEffect(() => {
-    if (!storageLoaded) return;
-    try {
-      localStorage.setItem("draft-state", JSON.stringify(draftStateBySeason));
-      localStorage.setItem("castaways-state", JSON.stringify(castawaysBySeason));
-    } catch (e) {
-      console.warn("Save failed (draft/castaways):", e);
-    }
-  }, [draftStateBySeason, castawaysBySeason, storageLoaded]);
+  const subscribeSeason = async () => {
+    channel = supabase.channel(`season-${selectedSeason}`);
 
-  useEffect(() => {
-    if (!storageLoaded) return;
-    try {
-      localStorage.setItem("elim-state", JSON.stringify(nextElimBySeason));
-    } catch (e) {
-      console.warn("Save failed (elim):", e);
-    }
-  }, [nextElimBySeason, storageLoaded]);
+    channel.on(
+      "postgres_changes",
+      {
+        event: "*",
+        schema: "public",
+        table: "season_state",
+        filter: `league_id=eq.${LEAGUE_ID},season_id=eq.${selectedSeason}`
+      },
+      payload => {
+        const row = payload.new;
+        if (!row) return;
+        if (row.updated_by === clientId) return;
 
-  useEffect(() => {
-    if (!storageLoaded) return;
-    try {
-      localStorage.setItem("show-odds", JSON.stringify(showOdds));
-    } catch (e) {
-      console.warn("Save failed (show-odds):", e);
-    }
-  }, [showOdds, storageLoaded]);
+        const s = row.state || {};
 
-  const season = SEASONS.find(s => s.id === selectedSeason);
-  const castaways = castawaysBySeason[selectedSeason];
-  const nextElimOrder = nextElimBySeason[selectedSeason];
-  const draftState = draftStateBySeason[selectedSeason];
+        if (s.castaways) setCastawaysBySeason(prev => ({ ...prev, [selectedSeason]: s.castaways }));
+        if (s.draftState) setDraftStateBySeason(prev => ({ ...prev, [selectedSeason]: s.draftState }));
+        if (typeof s.nextElimOrder === "number") setNextElimBySeason(prev => ({ ...prev, [selectedSeason]: s.nextElimOrder }));
+        if (typeof s.showOdds === "boolean") setShowOdds(s.showOdds);
+      }
+    );
 
-  const showToast = (msg) => { setToast(msg); setTimeout(() => setToast(null), 3000); };
+    await channel.subscribe();
+  };
 
-  const setCastaways = useCallback((updater) => {
-    setCastawaysBySeason(prev => ({
-      ...prev,
-      [selectedSeason]: typeof updater === "function" ? updater(prev[selectedSeason]) : updater
-    }));
-  }, [selectedSeason]);
+  loadSeason().then(subscribeSeason);
 
-  const setDraftState = useCallback((updater) => {
-    setDraftStateBySeason(prev => ({
-      ...prev,
-      [selectedSeason]: typeof updater === "function" ? updater(prev[selectedSeason]) : updater
-    }));
-  }, [selectedSeason]);
+  return () => {
+    if (channel) supabase.removeChannel(channel);
+  };
+
+}, [selectedSeason]);
 
   if (!storageLoaded) return (
     <div style={{
