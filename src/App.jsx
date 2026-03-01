@@ -1,3 +1,4 @@
+import { supabase } from "./supabaseClient";
 import { useState, useCallback, useEffect } from "react";
 
 function calcPoints(eliminationOrder, totalCastaways) {
