@@ -435,6 +435,37 @@ export default function App() {
 
 }, [selectedSeason]);
 
+  useEffect(() => {
+  if (!storageLoaded) return;
+
+  const s = {
+    castaways: castawaysBySeason[selectedSeason],
+    draftState: draftStateBySeason[selectedSeason],
+    nextElimOrder: nextElimBySeason[selectedSeason],
+    showOdds
+  };
+
+  const t = setTimeout(async () => {
+    await supabase.from("season_state").upsert({
+      league_id: LEAGUE_ID,
+      season_id: selectedSeason,
+      state: s,
+      updated_by: clientId,
+      updated_at: new Date().toISOString()
+    });
+  }, 300);
+
+  return () => clearTimeout(t);
+
+}, [
+  storageLoaded,
+  castawaysBySeason,
+  draftStateBySeason,
+  nextElimBySeason,
+  showOdds,
+  selectedSeason
+]);
+
   if (!storageLoaded) return (
     <div style={{
       minHeight:"100vh",display:"flex",alignItems:"center",justifyContent:"center",
