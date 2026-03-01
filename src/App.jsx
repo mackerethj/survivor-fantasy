@@ -1,5 +1,5 @@
-import { supabase } from "./supabaseClient";
 import { useState, useCallback, useEffect } from "react";
+import { supabase } from "./supabaseClient";
 
 function calcPoints(eliminationOrder, totalCastaways) {
   if (eliminationOrder <= 2) return 0;
