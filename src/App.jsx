@@ -340,7 +340,32 @@ export default function App() {
   const [adminError, setAdminError] = useState(false);
   const [historySeason, setHistorySeason] = useState(null);
   const [storageLoaded, setStorageLoaded] = useState(false);
+    // ------------------------
+  // Derived "current season" helpers (fixes undefined vars)
+  // ------------------------
+  const season = SEASONS.find(s => s.id === selectedSeason) || SEASONS[0];
 
+  const castaways = castawaysBySeason[selectedSeason] || [];
+  const draftState = draftStateBySeason[selectedSeason] || { randomOrder: null, draftPositions: {} };
+  const nextElimOrder = nextElimBySeason[selectedSeason] ?? 1;
+
+  // Setter that only updates the current season's castaways
+  const setCastaways = (updater) => {
+    setCastawaysBySeason(prev => {
+      const current = prev[selectedSeason] || [];
+      const next = typeof updater === "function" ? updater(current) : updater;
+      return { ...prev, [selectedSeason]: next };
+    });
+  };
+
+  // Setter that only updates the current season's draft state
+  const setDraftState = (updater) => {
+    setDraftStateBySeason(prev => {
+      const current = prev[selectedSeason] || { randomOrder: null, draftPositions: {} };
+      const next = typeof updater === "function" ? updater(current) : updater;
+      return { ...prev, [selectedSeason]: next };
+    });
+  };
   const [clientId] = useState(() => {
   const k = "sf-client-id";
   let v = sessionStorage.getItem(k);
@@ -402,17 +427,22 @@ export default function App() {
   const subscribeSeason = async () => {
     channel = supabase.channel(`season-${selectedSeason}`);
 
-    channel.on(
+        channel.on(
       "postgres_changes",
       {
         event: "*",
         schema: "public",
         table: "season_state",
-        filter: `league_id=eq.${LEAGUE_ID},season_id=eq.${selectedSeason}`
+        filter: `league_id=eq.${LEAGUE_ID}`
       },
       payload => {
         const row = payload.new;
         if (!row) return;
+
+        // Only react to the current season
+        if (row.season_id !== selectedSeason) return;
+
+        // Ignore our own writes
         if (row.updated_by === clientId) return;
 
         const s = row.state || {};
@@ -433,7 +463,7 @@ export default function App() {
     if (channel) supabase.removeChannel(channel);
   };
 
-}, [selectedSeason]);
+}, [selectedSeason, clientId]);
 
   useEffect(() => {
   if (!storageLoaded) return;
