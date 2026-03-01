@@ -1533,7 +1533,6 @@ function Draft({ castaways, season, draftState, randomizeOrder, selectPosition, 
                 })}
               </div>
 
-              <button className="action-btn primary" style={{marginTop:"0.5rem"}} onClick={randomizeOrder}>↺ Re-roll Randomizer</button>
             </>
           )}
         </div>
