@@ -357,40 +357,36 @@ export default function App() {
 
   // Load persisted state on mount
   useEffect(() => {
-    async function loadFromStorage() {
-      try {
-        const [draftRes, castawaysRes, elimRes, oddsRes] = await Promise.all([
-          window.storage.get("draft-state"),
-          window.storage.get("castaways-state"),
-          window.storage.get("elim-state"),
-          window.storage.get("show-odds"),
-        ]);
-        if (castawaysRes) setCastawaysBySeason(JSON.parse(castawaysRes.value));
-        if (elimRes) setNextElimBySeason(JSON.parse(elimRes.value));
-        if (draftRes) setDraftStateBySeason(JSON.parse(draftRes.value));
-        if (oddsRes) setShowOdds(JSON.parse(oddsRes.value));
-      } catch(e) { /* first load, nothing saved yet */ }
-      setStorageLoaded(true);
-    }
-    if (window.storage) loadFromStorage();
-    else setStorageLoaded(true);
+    try {
+      const castawaysRaw = localStorage.getItem("castaways-state");
+      const elimRaw = localStorage.getItem("elim-state");
+      const draftRaw = localStorage.getItem("draft-state");
+      const oddsRaw = localStorage.getItem("show-odds");
+      if (castawaysRaw) setCastawaysBySeason(JSON.parse(castawaysRaw));
+      if (elimRaw) setNextElimBySeason(JSON.parse(elimRaw));
+      if (draftRaw) setDraftStateBySeason(JSON.parse(draftRaw));
+      if (oddsRaw) setShowOdds(JSON.parse(oddsRaw));
+    } catch(e) { /* first load or parse error */ }
+    setStorageLoaded(true);
   }, []);
 
-  // Persist whenever draft state changes (after initial load)
+  // Persist whenever draft/castaway state changes (after initial load)
   useEffect(() => {
-    if (!storageLoaded || !window.storage) return;
-    window.storage.set("draft-state", JSON.stringify(draftStateBySeason));
-    window.storage.set("castaways-state", JSON.stringify(castawaysBySeason));
+    if (!storageLoaded) return;
+    try {
+      localStorage.setItem("draft-state", JSON.stringify(draftStateBySeason));
+      localStorage.setItem("castaways-state", JSON.stringify(castawaysBySeason));
+    } catch(e) {}
   }, [draftStateBySeason, castawaysBySeason, storageLoaded]);
 
   useEffect(() => {
-    if (!storageLoaded || !window.storage) return;
-    window.storage.set("elim-state", JSON.stringify(nextElimBySeason));
+    if (!storageLoaded) return;
+    try { localStorage.setItem("elim-state", JSON.stringify(nextElimBySeason)); } catch(e) {}
   }, [nextElimBySeason, storageLoaded]);
 
   useEffect(() => {
-    if (!storageLoaded || !window.storage) return;
-    window.storage.set("show-odds", JSON.stringify(showOdds));
+    if (!storageLoaded) return;
+    try { localStorage.setItem("show-odds", JSON.stringify(showOdds)); } catch(e) {}
   }, [showOdds, storageLoaded]);
 
   const season = SEASONS.find(s => s.id === selectedSeason);
