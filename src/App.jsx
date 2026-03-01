@@ -1,4 +1,4 @@
-import { useState, useCallback } from "react";
+import { useState, useCallback, useEffect } from "react";
 
 function calcPoints(eliminationOrder, totalCastaways) {
   if (eliminationOrder <= 2) return 0;
@@ -346,7 +346,6 @@ export default function App() {
   const [selectedSeason, setSelectedSeason] = useState(50);
   const [castawaysBySeason, setCastawaysBySeason] = useState({ 50: buildCastaways(50), 46: buildCastaways(46), 45: buildCastaways(45) });
   const [nextElimBySeason, setNextElimBySeason] = useState({ 50: 1, 46: 19, 45: 19 });
-  // Draft state per season: randomOrder = order teams rolled, draftPositions = {teamId: positionIndex}
   const [draftStateBySeason, setDraftStateBySeason] = useState({ 50: { randomOrder: null, draftPositions: {} }, 46: { randomOrder: null, draftPositions: {} }, 45: { randomOrder: null, draftPositions: {} } });
   const [toast, setToast] = useState(null);
   const [showOdds, setShowOdds] = useState(false);
@@ -354,6 +353,45 @@ export default function App() {
   const [adminPassword, setAdminPassword] = useState("");
   const [adminError, setAdminError] = useState(false);
   const [historySeason, setHistorySeason] = useState(null);
+  const [storageLoaded, setStorageLoaded] = useState(false);
+
+  // Load persisted state on mount
+  useEffect(() => {
+    async function loadFromStorage() {
+      try {
+        const [draftRes, castawaysRes, elimRes, oddsRes] = await Promise.all([
+          window.storage.get("draft-state"),
+          window.storage.get("castaways-state"),
+          window.storage.get("elim-state"),
+          window.storage.get("show-odds"),
+        ]);
+        if (castawaysRes) setCastawaysBySeason(JSON.parse(castawaysRes.value));
+        if (elimRes) setNextElimBySeason(JSON.parse(elimRes.value));
+        if (draftRes) setDraftStateBySeason(JSON.parse(draftRes.value));
+        if (oddsRes) setShowOdds(JSON.parse(oddsRes.value));
+      } catch(e) { /* first load, nothing saved yet */ }
+      setStorageLoaded(true);
+    }
+    if (window.storage) loadFromStorage();
+    else setStorageLoaded(true);
+  }, []);
+
+  // Persist whenever draft state changes (after initial load)
+  useEffect(() => {
+    if (!storageLoaded || !window.storage) return;
+    window.storage.set("draft-state", JSON.stringify(draftStateBySeason));
+    window.storage.set("castaways-state", JSON.stringify(castawaysBySeason));
+  }, [draftStateBySeason, castawaysBySeason, storageLoaded]);
+
+  useEffect(() => {
+    if (!storageLoaded || !window.storage) return;
+    window.storage.set("elim-state", JSON.stringify(nextElimBySeason));
+  }, [nextElimBySeason, storageLoaded]);
+
+  useEffect(() => {
+    if (!storageLoaded || !window.storage) return;
+    window.storage.set("show-odds", JSON.stringify(showOdds));
+  }, [showOdds, storageLoaded]);
 
   const season = SEASONS.find(s => s.id === selectedSeason);
   const castaways = castawaysBySeason[selectedSeason];
@@ -369,6 +407,12 @@ export default function App() {
   const setDraftState = useCallback((updater) => {
     setDraftStateBySeason(prev => ({ ...prev, [selectedSeason]: typeof updater === "function" ? updater(prev[selectedSeason]) : updater }));
   }, [selectedSeason]);
+
+  if (!storageLoaded) return (
+    <div style={{minHeight:"100vh",display:"flex",alignItems:"center",justifyContent:"center",background:"#0a0a0a",color:"#c8922a",fontFamily:"'DM Mono',monospace",fontSize:"0.75rem",letterSpacing:"0.2em",textTransform:"uppercase"}}>
+      Loading…
+    </div>
+  );
 
   const resetSeason = () => {
     setCastawaysBySeason(prev => ({ ...prev, [selectedSeason]: buildCastaways(selectedSeason) }));
@@ -618,57 +662,6 @@ const S43_RESULTS = {
   ],
 };
 
-
-// Tribe totem SVGs (inline, for championship indicators)
-const TRIBE_TOTEMS = {
-  Miloa:  `<svg viewBox="0 0 130 160" fill="none" xmlns="http://www.w3.org/2000/svg"> <!-- CROSSED SPEARS crown --> <line x1="30" y1="5" x2="75" y2="40" stroke="#c8922a" stroke-width="3" stroke-linecap="round"/> <line x1="100" y1="5" x2="55" y2="40" stroke="#c8922a" stroke-width="3" stroke-linecap="round"/> <!-- spear tips --> <polygon points="30,5 24,12 36,10" fill="#c8922a"/> <polygon points="100,5 106,12 94,10" fill="#c8922a"/> <!-- spear butts --> <rect x="72" y="35" width="5" height="8" rx="1" fill="#c8922a" opacity="0.5" transform="rotate(35,74,39)"/> <rect x="52" y="35" width="5" height="8" rx="1" fill="#c8922a" opacity="0.5" transform="rotate(-35,54,39)"/> <!-- crown band --> <rect x="30" y="38" width="70" height="7" rx="2" fill="#c8922a" opacity="0.75"/> <rect x="32" y="40" width="66" height="3" rx="1" fill="#1a1208" opacity="0.6"/> <!-- FACE — wide square warrior, strong jaw --> <path d="M22 44 L22 105 Q22 130 65 138 Q108 130 108 105 L108 44 Q90 40 65 40 Q40 40 22 44Z" fill="#1a1208" stroke="#c8922a" stroke-width="2.5"/> <!-- Chiseled cheekbones — angled planes --> <path d="M22 70 L40 62 L40 90 L22 95Z" fill="#c8922a" fill-opacity="0.12"/> <path d="M108 70 L90 62 L90 90 L108 95Z" fill="#c8922a" fill-opacity="0.12"/> <!-- Heavy brow — single thick bar, chiseled --> <path d="M28 55 L102 55 L98 66 L32 66Z" fill="#c8922a" opacity="0.9"/> <path d="M55 55 L65 48 L75 55 L75 66 L55 66Z" fill="#1a1208"/> <!-- brow texture lines --> <line x1="34" y1="58" x2="52" y2="60" stroke="#1a1208" stroke-width="1" opacity="0.4"/> <line x1="78" y1="58" x2="96" y2="60" stroke="#1a1208" stroke-width="1" opacity="0.4"/> <!-- EYES — narrow angry warrior slits --> <path d="M30 76 L50 70 L68 76 L50 82Z" fill="#c8922a" opacity="0.95"/> <path d="M62 76 L82 70 L100 76 L82 82Z" fill="#c8922a" opacity="0.95"/> <!-- pupils — rectangular harsh --> <rect x="44" y="73" width="12" height="7" rx="1" fill="#0a0802"/> <rect x="76" y="73" width="12" height="7" rx="1" fill="#0a0802"/> <!-- war paint lines under eyes --> <line x1="34" y1="84" x2="44" y2="88" stroke="#c8922a" stroke-width="1.5" stroke-linecap="round" opacity="0.6"/> <line x1="86" y1="84" x2="96" y2="88" stroke="#c8922a" stroke-width="1.5" stroke-linecap="round" opacity="0.6"/> <line x1="36" y1="88" x2="44" y2="91" stroke="#c8922a" stroke-width="1" stroke-linecap="round" opacity="0.4"/> <line x1="86" y1="88" x2="94" y2="91" stroke="#c8922a" stroke-width="1" stroke-linecap="round" opacity="0.4"/> <!-- Flat wide nose --> <path d="M54 88 L54 100 Q54 106 65 106 Q76 106 76 100 L76 88 Q70 92 65 92 Q60 92 54 88Z" fill="#c8922a" opacity="0.75"/> <ellipse cx="56" cy="102" rx="5" ry="3" fill="#0a0802"/> <ellipse cx="74" cy="102" rx="5" ry="3" fill="#0a0802"/> <!-- TUSKS — warrior beast --> <path d="M36 115 Q28 122 30 132 Q35 128 42 118Z" fill="#c8922a" opacity="0.85"/> <path d="M94 115 Q102 122 100 132 Q95 128 88 118Z" fill="#c8922a" opacity="0.85"/> <!-- tusk ridge --> <line x1="30" y1="124" x2="34" y2="130" stroke="#f0c060" stroke-width="1" opacity="0.5"/> <line x1="100" y1="124" x2="96" y2="130" stroke="#f0c060" stroke-width="1" opacity="0.5"/> <!-- Grimace mouth — wide, asymmetric battle snarl --> <path d="M36 112 Q42 106 52 113 Q60 107 65 111 Q70 107 78 113 Q88 106 94 112 Q88 126 65 128 Q42 126 36 112Z" fill="#c8922a" opacity="0.85"/> <rect x="46" y="112" width="9" height="10" rx="1" fill="#0a0802"/> <rect x="61" y="112" width="8" height="10" rx="1" fill="#0a0802"/> <rect x="76" y="112" width="9" height="10" rx="1" fill="#0a0802"/> <!-- Ear gauges — warrior stretchers --> <ellipse cx="18" cy="84" rx="6" ry="10" fill="#c8922a" opacity="0.7" stroke="#c8922a" stroke-width="1"/> <ellipse cx="18" cy="84" rx="3" ry="5" fill="#1a1208" opacity="0.8"/> <ellipse cx="112" cy="84" rx="6" ry="10" fill="#c8922a" opacity="0.7" stroke="#c8922a" stroke-width="1"/> <ellipse cx="112" cy="84" rx="3" ry="5" fill="#1a1208" opacity="0.8"/> <!-- Base plinth — double tier --> <rect x="34" y="138" width="62" height="7" rx="2" fill="#c8922a" opacity="0.45"/> <rect x="26" y="145" width="78" height="5" rx="2" fill="#c8922a" opacity="0.25"/> <!-- plinth etching --> <line x1="40" y1="141" x2="90" y2="141" stroke="#f0c060" stroke-width="0.75" opacity="0.3"/> </svg>`,
-  Jinga:  `<svg viewBox="0 0 130 160" fill="none" xmlns="http://www.w3.org/2000/svg"> <!-- TENTACLE / wave headdress — sinuous --> <path d="M65 8 Q55 20 58 32 Q48 18 42 30 Q36 14 28 26 Q24 38 34 44" stroke="#6a9fd8" stroke-width="2.5" stroke-linecap="round" fill="none"/> <path d="M65 8 Q75 20 72 32 Q82 18 88 30 Q94 14 102 26 Q106 38 96 44" stroke="#6a9fd8" stroke-width="2.5" stroke-linecap="round" fill="none"/> <path d="M65 8 Q65 22 65 38" stroke="#6a9fd8" stroke-width="2" stroke-linecap="round" fill="none"/> <!-- tentacle tips --> <circle cx="34" cy="44" r="3" fill="#6a9fd8" opacity="0.8"/> <circle cx="96" cy="44" r="3" fill="#6a9fd8" opacity="0.8"/> <circle cx="65" cy="38" r="2.5" fill="#6a9fd8" opacity="0.8"/> <circle cx="28" cy="26" r="2" fill="#6a9fd8" opacity="0.5"/> <circle cx="102" cy="26" r="2" fill="#6a9fd8" opacity="0.5"/> <!-- wave collar band --> <path d="M30 44 Q48 38 65 42 Q82 38 100 44 Q90 52 65 50 Q40 52 30 44Z" fill="#6a9fd8" opacity="0.7"/> <!-- FACE — narrow elongated serpent --> <path d="M40 50 Q36 72 36 100 Q36 130 65 140 Q94 130 94 100 Q94 72 90 50 Q78 46 65 46 Q52 46 40 50Z" fill="#080f18" stroke="#6a9fd8" stroke-width="2.5"/> <!-- Scale texture on cheeks --> <path d="M40 68 Q44 64 48 68 Q44 72 40 68Z" fill="#6a9fd8" opacity="0.2"/> <path d="M42 76 Q46 72 50 76 Q46 80 42 76Z" fill="#6a9fd8" opacity="0.2"/> <path d="M40 84 Q44 80 48 84 Q44 88 40 84Z" fill="#6a9fd8" opacity="0.2"/> <path d="M82 68 Q86 64 90 68 Q86 72 82 68Z" fill="#6a9fd8" opacity="0.2"/> <path d="M80 76 Q84 72 88 76 Q84 80 80 76Z" fill="#6a9fd8" opacity="0.2"/> <path d="M82 84 Q86 80 90 84 Q86 88 82 84Z" fill="#6a9fd8" opacity="0.2"/> <!-- Thin arched brow — serpent elegant --> <path d="M40 60 Q52 54 65 56 Q78 54 90 60" stroke="#6a9fd8" stroke-width="3" stroke-linecap="round" fill="none"/> <!-- EYES — vertical slit serpent pupils --> <ellipse cx="52" cy="72" rx="10" ry="12" fill="#6a9fd8" opacity="0.9"/> <ellipse cx="78" cy="72" rx="10" ry="12" fill="#6a9fd8" opacity="0.9"/> <!-- vertical slit pupils --> <ellipse cx="52" cy="72" rx="3" ry="9" fill="#080f18"/> <ellipse cx="78" cy="72" rx="3" ry="9" fill="#080f18"/> <!-- iris ring --> <ellipse cx="52" cy="72" rx="7" ry="10" stroke="#a8d0f0" stroke-width="0.8" fill="none" opacity="0.4"/> <ellipse cx="78" cy="72" rx="7" ry="10" stroke="#a8d0f0" stroke-width="0.8" fill="none" opacity="0.4"/> <!-- eye shine --> <circle cx="54" cy="67" r="2" fill="#d0eeff" opacity="0.7"/> <circle cx="80" cy="67" r="2" fill="#d0eeff" opacity="0.7"/> <!-- Long narrow nose ridge --> <path d="M62 86 L62 104 Q62 108 65 108 Q68 108 68 104 L68 86 Q66 84 65 84 Q64 84 62 86Z" fill="#6a9fd8" opacity="0.6"/> <ellipse cx="61" cy="106" rx="3.5" ry="2" fill="#080f18"/> <ellipse cx="69" cy="106" rx="3.5" ry="2" fill="#080f18"/> <!-- FORKED TONGUE — serpent signature --> <path d="M65 118 L65 135" stroke="#6a9fd8" stroke-width="2.5" stroke-linecap="round"/> <path d="M65 135 L58 145" stroke="#6a9fd8" stroke-width="2" stroke-linecap="round"/> <path d="M65 135 L72 145" stroke="#6a9fd8" stroke-width="2" stroke-linecap="round"/> <!-- Thin mouth — serpent lips --> <path d="M44 114 Q54 108 65 112 Q76 108 86 114 Q78 122 65 122 Q52 122 44 114Z" fill="#6a9fd8" opacity="0.75"/> <rect x="55" y="114" width="20" height="6" rx="1" fill="#080f18"/> <!-- Fin ears — sea creature --> <path d="M36 70 Q20 75 22 90 Q24 100 34 96 Q30 85 36 78Z" fill="#6a9fd8" fill-opacity="0.6" stroke="#6a9fd8" stroke-width="1"/> <path d="M94 70 Q110 75 108 90 Q106 100 96 96 Q100 85 94 78Z" fill="#6a9fd8" fill-opacity="0.6" stroke="#6a9fd8" stroke-width="1"/> <!-- fin rays --> <line x1="24" y1="80" x2="32" y2="76" stroke="#a8d0f0" stroke-width="0.8" opacity="0.5"/> <line x1="23" y1="88" x2="32" y2="84" stroke="#a8d0f0" stroke-width="0.8" opacity="0.5"/> <line x1="106" y1="80" x2="98" y2="76" stroke="#a8d0f0" stroke-width="0.8" opacity="0.5"/> <line x1="107" y1="88" x2="98" y2="84" stroke="#a8d0f0" stroke-width="0.8" opacity="0.5"/> <!-- Base --> <rect x="36" y="140" width="58" height="7" rx="2" fill="#6a9fd8" opacity="0.4"/> <rect x="28" y="147" width="74" height="5" rx="2" fill="#6a9fd8" opacity="0.2"/> </svg>`,
-  Ojalu:  `<svg viewBox="0 0 130 160" fill="none" xmlns="http://www.w3.org/2000/svg"> <!-- ANTLER branches headdress --> <!-- left antler --> <path d="M45 42 Q38 30 32 18 Q28 10 24 6" stroke="#6db86d" stroke-width="2.5" stroke-linecap="round" fill="none"/> <path d="M38 30 Q30 24 22 24" stroke="#6db86d" stroke-width="2" stroke-linecap="round" fill="none"/> <path d="M32 18 Q26 14 20 16" stroke="#6db86d" stroke-width="1.5" stroke-linecap="round" fill="none"/> <path d="M38 30 Q34 22 38 14" stroke="#6db86d" stroke-width="1.5" stroke-linecap="round" fill="none"/> <!-- right antler --> <path d="M85 42 Q92 30 98 18 Q102 10 106 6" stroke="#6db86d" stroke-width="2.5" stroke-linecap="round" fill="none"/> <path d="M92 30 Q100 24 108 24" stroke="#6db86d" stroke-width="2" stroke-linecap="round" fill="none"/> <path d="M98 18 Q104 14 110 16" stroke="#6db86d" stroke-width="1.5" stroke-linecap="round" fill="none"/> <path d="M92 30 Q96 22 92 14" stroke="#6db86d" stroke-width="1.5" stroke-linecap="round" fill="none"/> <!-- center leaf burst --> <path d="M65 8 Q60 18 65 26 Q70 18 65 8Z" fill="#6db86d" opacity="0.8"/> <path d="M58 12 Q54 22 60 28 Q62 20 58 12Z" fill="#6db86d" opacity="0.5"/> <path d="M72 12 Q76 22 70 28 Q68 20 72 12Z" fill="#6db86d" opacity="0.5"/> <!-- antler buds --> <circle cx="24" cy="6" r="2.5" fill="#6db86d" opacity="0.8"/> <circle cx="106" cy="6" r="2.5" fill="#6db86d" opacity="0.8"/> <circle cx="22" cy="24" r="2" fill="#6db86d" opacity="0.6"/> <circle cx="108" cy="24" r="2" fill="#6db86d" opacity="0.6"/> <circle cx="20" cy="16" r="1.5" fill="#6db86d" opacity="0.5"/> <circle cx="110" cy="16" r="1.5" fill="#6db86d" opacity="0.5"/> <!-- antler collar --> <path d="M32 42 Q48 36 65 38 Q82 36 98 42 Q86 50 65 48 Q44 50 32 42Z" fill="#6db86d" opacity="0.65"/> <!-- FACE — wide and flat forest spirit --> <path d="M20 48 Q16 68 16 90 Q16 120 65 132 Q114 120 114 90 Q114 68 110 48 Q90 44 65 44 Q40 44 20 48Z" fill="#0d1f0d" stroke="#6db86d" stroke-width="2.5"/> <!-- Vine tattoos on forehead --> <path d="M28 56 Q36 50 44 56" stroke="#6db86d" stroke-width="1" fill="none" opacity="0.4"/> <path d="M86 56 Q94 50 102 56" stroke="#6db86d" stroke-width="1" fill="none" opacity="0.4"/> <circle cx="32" cy="53" r="1.5" fill="#6db86d" opacity="0.3"/> <circle cx="98" cy="53" r="1.5" fill="#6db86d" opacity="0.3"/> <!-- LOW flat brow ridge — barely above eyes --> <rect x="22" y="60" width="86" height="6" rx="2" fill="#6db86d" opacity="0.75"/> <rect x="60" y="60" width="10" height="6" fill="#0d1f0d"/> <!-- EYES — huge round disc eyes, signature Ojalu --> <circle cx="44" cy="80" r="18" fill="#6db86d" opacity="0.15" stroke="#6db86d" stroke-width="2.5"/> <circle cx="86" cy="80" r="18" fill="#6db86d" opacity="0.15" stroke="#6db86d" stroke-width="2.5"/> <!-- inner eye rings --> <circle cx="44" cy="80" r="12" fill="#6db86d" opacity="0.3"/> <circle cx="86" cy="80" r="12" fill="#6db86d" opacity="0.3"/> <!-- pupil --> <circle cx="44" cy="80" r="7" fill="#0d1f0d"/> <circle cx="86" cy="80" r="7" fill="#0d1f0d"/> <!-- iris flecks --> <circle cx="44" cy="80" r="4.5" fill="#6db86d" opacity="0.7"/> <circle cx="86" cy="80" r="4.5" fill="#6db86d" opacity="0.7"/> <circle cx="44" cy="80" r="2" fill="#0d1f0d"/> <circle cx="86" cy="80" r="2" fill="#0d1f0d"/> <!-- shine --> <circle cx="47" cy="75" r="3" fill="#c0ffc0" opacity="0.55"/> <circle cx="89" cy="75" r="3" fill="#c0ffc0" opacity="0.55"/> <circle cx="42" cy="77" r="1.2" fill="white" opacity="0.3"/> <circle cx="84" cy="77" r="1.2" fill="white" opacity="0.3"/> <!-- Mushroom/leaf nose — organic forest --> <path d="M58 100 Q56 108 65 110 Q74 108 72 100 Q70 94 65 92 Q60 94 58 100Z" fill="#6db86d" opacity="0.65"/> <ellipse cx="59" cy="108" rx="4.5" ry="2.5" fill="#0d1f0d"/> <ellipse cx="71" cy="108" rx="4.5" ry="2.5" fill="#0d1f0d"/> <!-- Mouth — wide organic grin --> <path d="M28 118 Q38 110 48 118 Q56 110 65 114 Q74 110 82 118 Q92 110 102 118 Q94 130 65 132 Q36 130 28 118Z" fill="#6db86d" opacity="0.75"/> <rect x="40" y="118" width="10" height="10" rx="2" fill="#0d1f0d"/> <rect x="57" y="118" width="16" height="10" rx="2" fill="#0d1f0d"/> <rect x="80" y="118" width="10" height="10" rx="2" fill="#0d1f0d"/> <!-- Vine chin tattoos --> <path d="M52 132 Q58 128 65 132 Q72 128 78 132" stroke="#6db86d" stroke-width="1.5" stroke-linecap="round" fill="none" opacity="0.5"/> <circle cx="52" cy="132" r="1.5" fill="#6db86d" opacity="0.4"/> <circle cx="78" cy="132" r="1.5" fill="#6db86d" opacity="0.4"/> <!-- Leaf ears — wide flat panels --> <path d="M16 72 Q4 80 6 96 Q8 108 18 104 Q12 92 18 82Z" fill="#6db86d" fill-opacity="0.6" stroke="#6db86d" stroke-width="1.5"/> <path d="M114 72 Q126 80 124 96 Q122 108 112 104 Q118 92 112 82Z" fill="#6db86d" fill-opacity="0.6" stroke="#6db86d" stroke-width="1.5"/> <!-- ear vein --> <line x1="8" y1="90" x2="16" y2="86" stroke="#c0ffc0" stroke-width="0.8" opacity="0.4"/> <line x1="122" y1="90" x2="114" y2="86" stroke="#c0ffc0" stroke-width="0.8" opacity="0.4"/> <!-- Base --> <rect x="36" y="132" width="58" height="7" rx="2" fill="#6db86d" opacity="0.4"/> <rect x="28" y="139" width="74" height="5" rx="2" fill="#6db86d" opacity="0.22"/> </svg>`,
-  Weloki: `<svg viewBox="0 0 130 160" fill="none" xmlns="http://www.w3.org/2000/svg"> <!-- CRESCENT MOON horns crown --> <path d="M65 6 Q44 8 36 22 Q30 36 40 46 Q50 32 65 30 Q80 32 90 46 Q100 36 94 22 Q86 8 65 6Z" fill="#c46ab0" fill-opacity="0.85"/> <!-- crescent inner shadow --> <path d="M65 10 Q48 12 42 24 Q38 34 46 42 Q52 30 65 28 Q78 30 84 42 Q92 34 88 24 Q82 12 65 10Z" fill="#18080f" opacity="0.6"/> <!-- moon star details --> <circle cx="65" cy="18" r="3" fill="#f0b0e8" opacity="0.8"/> <circle cx="50" cy="22" r="1.5" fill="#f0b0e8" opacity="0.5"/> <circle cx="80" cy="22" r="1.5" fill="#f0b0e8" opacity="0.5"/> <circle cx="56" cy="14" r="1" fill="#f0b0e8" opacity="0.4"/> <circle cx="74" cy="14" r="1" fill="#f0b0e8" opacity="0.4"/> <!-- crown collar --> <path d="M38 44 Q52 38 65 40 Q78 38 92 44 Q84 54 65 52 Q46 54 38 44Z" fill="#c46ab0" opacity="0.7"/> <!-- FACE — tall oval, elegant goddess --> <path d="M42 52 Q38 72 38 98 Q38 128 65 138 Q92 128 92 98 Q92 72 88 52 Q78 48 65 48 Q52 48 42 52Z" fill="#18080f" stroke="#c46ab0" stroke-width="2.5"/> <!-- INTRICATE FOREHEAD SPIRAL tattoo --> <path d="M65 56 Q72 56 74 62 Q74 68 68 70 Q62 70 60 64 Q60 58 65 56Z" stroke="#c46ab0" stroke-width="1.2" fill="none" opacity="0.6"/> <path d="M65 60 Q70 60 71 64 Q71 68 67 69 Q63 69 62 65 Q62 61 65 60Z" stroke="#c46ab0" stroke-width="0.8" fill="none" opacity="0.4"/> <circle cx="65" cy="64" r="1.5" fill="#c46ab0" opacity="0.5"/> <!-- flanking dots --> <circle cx="54" cy="60" r="1.5" fill="#c46ab0" opacity="0.4"/> <circle cx="76" cy="60" r="1.5" fill="#c46ab0" opacity="0.4"/> <circle cx="50" cy="66" r="1" fill="#c46ab0" opacity="0.3"/> <circle cx="80" cy="66" r="1" fill="#c46ab0" opacity="0.3"/> <!-- Arched elegant brow — thin single lines --> <path d="M44 72 Q54 65 65 67 Q76 65 86 72" stroke="#c46ab0" stroke-width="2.5" stroke-linecap="round" fill="none"/> <!-- EYES — long almond goddess eyes --> <path d="M42 84 Q54 74 66 84 Q54 92 42 84Z" fill="#c46ab0" opacity="0.9"/> <path d="M64 84 Q76 74 88 84 Q76 92 64 84Z" fill="#c46ab0" opacity="0.9"/> <!-- pupils — round soft --> <circle cx="54" cy="83" r="6" fill="#18080f"/> <circle cx="76" cy="83" r="6" fill="#18080f"/> <!-- iris --> <circle cx="54" cy="83" r="4" fill="#c46ab0" opacity="0.65"/> <circle cx="76" cy="83" r="4" fill="#c46ab0" opacity="0.65"/> <!-- pupil center --> <circle cx="54" cy="83" r="2" fill="#18080f"/> <circle cx="76" cy="83" r="2" fill="#18080f"/> <!-- double shine --> <circle cx="56" cy="80" r="2" fill="#f8d0f0" opacity="0.8"/> <circle cx="78" cy="80" r="2" fill="#f8d0f0" opacity="0.8"/> <circle cx="52" cy="82" r="1" fill="white" opacity="0.4"/> <circle cx="74" cy="82" r="1" fill="white" opacity="0.4"/> <!-- upper lash line --> <path d="M42 84 Q54 76 66 84" stroke="#c46ab0" stroke-width="1" fill="none" opacity="0.6"/> <path d="M64 84 Q76 76 88 84" stroke="#c46ab0" stroke-width="1" fill="none" opacity="0.6"/> <!-- Delicate nose --> <path d="M63 96 L63 106 Q63 109 65 109 Q67 109 67 106 L67 96 Q66 94 65 94 Q64 94 63 96Z" fill="#c46ab0" opacity="0.55"/> <ellipse cx="61" cy="108" rx="3" ry="2" fill="#18080f"/> <ellipse cx="69" cy="108" rx="3" ry="2" fill="#18080f"/> <!-- MOUTH — full lips, goddess-like --> <path d="M46 116 Q54 110 65 114 Q76 110 84 116 Q80 124 65 126 Q50 124 46 116Z" fill="#c46ab0" opacity="0.85"/> <!-- cupid's bow detail --> <path d="M46 116 Q55 112 65 115 Q75 112 84 116" stroke="#f0b0e8" stroke-width="0.8" fill="none" opacity="0.5"/> <!-- lower lip split --> <path d="M50 122 Q58 126 65 124 Q72 126 80 122" stroke="#18080f" stroke-width="1.5" fill="none" opacity="0.4"/> <!-- Cheek spiral tattoos — goddess marks --> <!-- left cheek --> <path d="M44 100 Q48 96 52 100 Q48 104 44 100Z" stroke="#c46ab0" stroke-width="1" fill="none" opacity="0.5"/> <path d="M44 100 Q50 94 54 100" stroke="#c46ab0" stroke-width="0.8" fill="none" opacity="0.3"/> <!-- right cheek --> <path d="M86 100 Q82 96 78 100 Q82 104 86 100Z" stroke="#c46ab0" stroke-width="1" fill="none" opacity="0.5"/> <path d="M86 100 Q80 94 76 100" stroke="#c46ab0" stroke-width="0.8" fill="none" opacity="0.3"/> <!-- chin triple dot marks --> <circle cx="60" cy="128" r="1.8" fill="#c46ab0" opacity="0.5"/> <circle cx="65" cy="130" r="1.8" fill="#c46ab0" opacity="0.5"/> <circle cx="70" cy="128" r="1.8" fill="#c46ab0" opacity="0.5"/> <!-- Elegant shell ears --> <path d="M38 78 Q24 84 26 100 Q28 112 38 108 Q32 98 36 88Z" fill="#c46ab0" fill-opacity="0.55" stroke="#c46ab0" stroke-width="1.5"/> <path d="M92 78 Q106 84 104 100 Q102 112 92 108 Q98 98 94 88Z" fill="#c46ab0" fill-opacity="0.55" stroke="#c46ab0" stroke-width="1.5"/> <!-- shell spiral inside ear --> <path d="M28 94 Q30 88 34 92 Q30 96 28 94Z" stroke="#f0b0e8" stroke-width="0.8" fill="none" opacity="0.5"/> <path d="M102 94 Q100 88 96 92 Q100 96 102 94Z" stroke="#f0b0e8" stroke-width="0.8" fill="none" opacity="0.5"/> <!-- Base — elegant two-tier --> <rect x="38" y="138" width="54" height="7" rx="3" fill="#c46ab0" opacity="0.4"/> <rect x="30" y="145" width="70" height="5" rx="2" fill="#c46ab0" opacity="0.22"/> <!-- base moon motif --> <path d="M52 141 Q65 138 78 141" stroke="#f0b0e8" stroke-width="0.8" fill="none" opacity="0.4"/> </svg>`,
-};
-
-// Championship record up to (but not including) each season
-// Key = season number, value = { teamName: count }
-function getChampionshipsBefore(season) {
-  const allSeasons = [
-    { season: 43, winner: "Jinga"  },
-    { season: 44, winner: "Jinga"  },
-    { season: 45, winner: "Miloa"  },
-    { season: 46, winner: "Weloki" },
-    { season: 47, winner: "Weloki" },
-    { season: 48, winner: "Jinga"  },
-    { season: 49, winner: "Jinga"  },
-  ];
-  const counts = {};
-  for (const s of allSeasons) {
-    if (s.season < season) {
-      counts[s.winner] = (counts[s.winner] || 0) + 1;
-    }
-  }
-  return counts;
-}
-
-// For history pages — championships AT END of that season (cumulative through that season)
-function getChampionshipsThrough(season) {
-  const allSeasons = [
-    { season: 43, winner: "Jinga"  },
-    { season: 44, winner: "Jinga"  },
-    { season: 45, winner: "Miloa"  },
-    { season: 46, winner: "Weloki" },
-    { season: 47, winner: "Weloki" },
-    { season: 48, winner: "Jinga"  },
-    { season: 49, winner: "Jinga"  },
-  ];
-  const counts = {};
-  for (const s of allSeasons) {
-    if (s.season <= season) {
-      counts[s.winner] = (counts[s.winner] || 0) + 1;
-    }
-  }
-  return counts;
-}
-
-// Season 46 historical results
 const S46_RESULTS = {
   season: 46,
   teamScores: [
@@ -699,7 +692,6 @@ const S46_RESULTS = {
   ],
 };
 
-// Season 47 historical results
 const S47_RESULTS = {
   season: 47,
   teamScores: [
@@ -729,6 +721,7 @@ const S47_RESULTS = {
     { place: 18, points: 0,  player: "Jon",       team: "NA",     teamColor: "#777" },
   ],
 };
+
 const S48_RESULTS = {
   season: 48,
   teamScores: [
@@ -739,25 +732,26 @@ const S48_RESULTS = {
   ],
   placements: [
     { place: 1,  points: 20, player: "Kyle",      team: "Miloa",  teamColor: "#c8922a" },
-    { place: 2,  points: 18, player: "Joe",       team: "Jinga",  teamColor: "#6a9fd8" },
-    { place: 3,  points: 16, player: "Eva",       team: "Ojalu",  teamColor: "#6db86d" },
-    { place: 4,  points: 14, player: "Kamilla",   team: "Jinga",  teamColor: "#6a9fd8" },
-    { place: 5,  points: 13, player: "Mitch",     team: "Weloki", teamColor: "#c46ab0" },
-    { place: 6,  points: 12, player: "Shauhin",   team: "Weloki", teamColor: "#c46ab0" },
-    { place: 7,  points: 11, player: "Mary",      team: "Miloa",  teamColor: "#c8922a" },
-    { place: 8,  points: 10, player: "Star",      team: "Ojalu",  teamColor: "#6db86d" },
-    { place: 9,  points: 9,  player: "David",     team: "Jinga",  teamColor: "#6a9fd8" },
-    { place: 10, points: 8,  player: "Chrissy",   team: "Ojalu",  teamColor: "#6db86d" },
-    { place: 11, points: 7,  player: "Cedrek",    team: "Weloki", teamColor: "#c46ab0" },
-    { place: 12, points: 6,  player: "Sai",       team: "NA",     teamColor: "#777" },
-    { place: 13, points: 5,  player: "Charity",   team: "Weloki", teamColor: "#c46ab0" },
-    { place: 14, points: 4,  player: "Bianca",    team: "Jinga",  teamColor: "#6a9fd8" },
-    { place: 15, points: 3,  player: "Thomas",    team: "Miloa",  teamColor: "#c8922a" },
-    { place: 16, points: 2,  player: "Justin",    team: "Miloa",  teamColor: "#c8922a" },
-    { place: 17, points: 1,  player: "Kevin",     team: "Ojalu",  teamColor: "#6db86d" },
+    { place: 2,  points: 18, player: "Genevieve", team: "Jinga",  teamColor: "#6a9fd8" },
+    { place: 3,  points: 14, player: "Kenzie",    team: "Weloki", teamColor: "#c46ab0" },
+    { place: 4,  points: 13, player: "Kamilla",   team: "Ojalu",  teamColor: "#6db86d" },
+    { place: 5,  points: 12, player: "Eva",       team: "Weloki", teamColor: "#c46ab0" },
+    { place: 6,  points: 11, player: "Tiff",      team: "Jinga",  teamColor: "#6a9fd8" },
+    { place: 7,  points: 10, player: "Joe",       team: "Ojalu",  teamColor: "#6db86d" },
+    { place: 8,  points: 9,  player: "Saiounia",  team: "Miloa",  teamColor: "#c8922a" },
+    { place: 9,  points: 8,  player: "Shauhin",   team: "Jinga",  teamColor: "#6a9fd8" },
+    { place: 10, points: 7,  player: "David",     team: "Ojalu",  teamColor: "#6db86d" },
+    { place: 11, points: 6,  player: "Charity",   team: "Weloki", teamColor: "#c46ab0" },
+    { place: 12, points: 5,  player: "Cedrek",    team: "Miloa",  teamColor: "#c8922a" },
+    { place: 13, points: 4,  player: "Mary",      team: "Jinga",  teamColor: "#6a9fd8" },
+    { place: 14, points: 3,  player: "Teeny",     team: "Weloki", teamColor: "#c46ab0" },
+    { place: 15, points: 2,  player: "Kevin",     team: "Ojalu",  teamColor: "#6db86d" },
+    { place: 16, points: 2,  player: "Bianca",    team: "Miloa",  teamColor: "#c8922a" },
+    { place: 17, points: 2,  player: "Chrissy",   team: "Ojalu",  teamColor: "#6db86d" },
     { place: 18, points: 0,  player: "Stephanie", team: "NA",     teamColor: "#777" },
   ],
 };
+
 const S49_RESULTS = {
   season: 49,
   teamScores: [
@@ -768,36 +762,203 @@ const S49_RESULTS = {
   ],
   placements: [
     { place: 1,  points: 20, player: "Savannah",  team: "Jinga",  teamColor: "#6a9fd8" },
-    { place: 2,  points: 18, player: "Sophi B",   team: "Jinga",  teamColor: "#6a9fd8" },
-    { place: 3,  points: 16, player: "Sage",      team: "Ojalu",  teamColor: "#6db86d" },
-    { place: 4,  points: 14, player: "Rizo",      team: "Weloki", teamColor: "#c46ab0" },
-    { place: 5,  points: 13, player: "Kristina",  team: "Weloki", teamColor: "#c46ab0" },
-    { place: 6,  points: 12, player: "Steven",    team: "Jinga",  teamColor: "#6a9fd8" },
-    { place: 7,  points: 11, player: "Sophie S",  team: "Jinga",  teamColor: "#6a9fd8" },
-    { place: 8,  points: 10, player: "Javan",     team: "Ojalu",  teamColor: "#6db86d" },
-    { place: 9,  points: 9,  player: "Alex",      team: "Weloki", teamColor: "#c46ab0" },
-    { place: 10, points: 8,  player: "MC",        team: "Ojalu",  teamColor: "#6db86d" },
-    { place: 11, points: 7,  player: "Nate",      team: "Miloa",  teamColor: "#c8922a" },
-    { place: 12, points: 6,  player: "Shannon",   team: "Ojalu",  teamColor: "#6db86d" },
-    { place: 13, points: 5,  player: "Jason",     team: "Miloa",  teamColor: "#c8922a" },
-    { place: 14, points: 4,  player: "Matt",      team: "Miloa",  teamColor: "#c8922a" },
-    { place: 15, points: 3,  player: "Jeremiah",  team: "Miloa",  teamColor: "#c8922a" },
-    { place: 16, points: 2,  player: "Jake",      team: "Weloki", teamColor: "#c46ab0" },
-    { place: 17, points: 1,  player: "Annie",     team: "NA",     teamColor: "#777" },
+    { place: 2,  points: 18, player: "Sam",       team: "Ojalu",  teamColor: "#6db86d" },
+    { place: 3,  points: 14, player: "Dee",       team: "Weloki", teamColor: "#c46ab0" },
+    { place: 4,  points: 13, player: "Tiff",      team: "Jinga",  teamColor: "#6a9fd8" },
+    { place: 5,  points: 12, player: "Eva",       team: "Ojalu",  teamColor: "#6db86d" },
+    { place: 6,  points: 11, player: "Kamilla",   team: "Weloki", teamColor: "#c46ab0" },
+    { place: 7,  points: 10, player: "Rachel",    team: "Jinga",  teamColor: "#6a9fd8" },
+    { place: 8,  points: 9,  player: "Kyle",      team: "Miloa",  teamColor: "#c8922a" },
+    { place: 9,  points: 8,  player: "Hunter",    team: "Ojalu",  teamColor: "#6db86d" },
+    { place: 10, points: 7,  player: "Soda",      team: "Miloa",  teamColor: "#c8922a" },
+    { place: 11, points: 6,  player: "Kenzie",    team: "Weloki", teamColor: "#c46ab0" },
+    { place: 12, points: 5,  player: "Shauhin",   team: "Jinga",  teamColor: "#6a9fd8" },
+    { place: 13, points: 4,  player: "Venus",     team: "Miloa",  teamColor: "#c8922a" },
+    { place: 14, points: 3,  player: "Q",         team: "Ojalu",  teamColor: "#6db86d" },
+    { place: 15, points: 2,  player: "Teeny",     team: "Miloa",  teamColor: "#c8922a" },
+    { place: 16, points: 2,  player: "Maria",     team: "Weloki", teamColor: "#c46ab0" },
+    { place: 17, points: 1,  player: "Randen",    team: "NA",     teamColor: "#777" },
     { place: 18, points: 0,  player: "Nicole",    team: "NA",     teamColor: "#777" },
   ],
 };
 
-function TribeTotem({ team, size = 28 }) {
-  const svg = TRIBE_TOTEMS[team];
-  if (!svg) return null;
+
+
+const SEASON_WINNERS = [
+  { season: 43, winner: "Jinga"  },
+  { season: 44, winner: "Jinga"  },
+  { season: 45, winner: "Miloa"  },
+  { season: 46, winner: "Weloki" },
+  { season: 47, winner: "Weloki" },
+  { season: 48, winner: "Jinga"  },
+  { season: 49, winner: "Jinga"  },
+];
+
+function getChampionshipsThrough(season) {
+  const counts = {};
+  for (const s of SEASON_WINNERS) {
+    if (s.season <= season) counts[s.winner] = (counts[s.winner] || 0) + 1;
+  }
+  return counts;
+}
+
+function TotemMiloa({ size = 28 }) {
+  const s = size, h = Math.round(size * 1.23);
   return (
-    <span
-      title={`${team} championship`}
-      style={{ display:"inline-block", width:size, height:Math.round(size*1.23), verticalAlign:"middle" }}
-      dangerouslySetInnerHTML={{ __html: svg.replace('<svg ', '<svg style="width:100%;height:100%" ') }}
-    />
+    <svg width={s} height={h} viewBox="0 0 130 160" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <line x1="30" y1="5" x2="75" y2="40" stroke="#c8922a" strokeWidth="3" strokeLinecap="round"/>
+      <line x1="100" y1="5" x2="55" y2="40" stroke="#c8922a" strokeWidth="3" strokeLinecap="round"/>
+      <polygon points="30,5 24,12 36,10" fill="#c8922a"/>
+      <polygon points="100,5 106,12 94,10" fill="#c8922a"/>
+      <rect x="30" y="38" width="70" height="7" rx="2" fill="#c8922a" opacity="0.75"/>
+      <path d="M22 44 L22 105 Q22 130 65 138 Q108 130 108 105 L108 44 Q90 40 65 40 Q40 40 22 44Z" fill="#1a1208" stroke="#c8922a" strokeWidth="2.5"/>
+      <path d="M28 55 L102 55 L98 66 L32 66Z" fill="#c8922a" opacity="0.9"/>
+      <path d="M55 55 L65 48 L75 55 L75 66 L55 66Z" fill="#1a1208"/>
+      <path d="M30 76 L50 70 L68 76 L50 82Z" fill="#c8922a" opacity="0.95"/>
+      <path d="M62 76 L82 70 L100 76 L82 82Z" fill="#c8922a" opacity="0.95"/>
+      <rect x="44" y="73" width="12" height="7" rx="1" fill="#0a0802"/>
+      <rect x="76" y="73" width="12" height="7" rx="1" fill="#0a0802"/>
+      <path d="M54 88 L54 100 Q54 106 65 106 Q76 106 76 100 L76 88 Q70 92 65 92 Q60 92 54 88Z" fill="#c8922a" opacity="0.75"/>
+      <ellipse cx="56" cy="102" rx="5" ry="3" fill="#0a0802"/>
+      <ellipse cx="74" cy="102" rx="5" ry="3" fill="#0a0802"/>
+      <path d="M36 115 Q28 122 30 132 Q35 128 42 118Z" fill="#c8922a" opacity="0.85"/>
+      <path d="M94 115 Q102 122 100 132 Q95 128 88 118Z" fill="#c8922a" opacity="0.85"/>
+      <path d="M36 112 Q42 106 52 113 Q60 107 65 111 Q70 107 78 113 Q88 106 94 112 Q88 126 65 128 Q42 126 36 112Z" fill="#c8922a" opacity="0.85"/>
+      <rect x="46" y="112" width="9" height="10" rx="1" fill="#0a0802"/>
+      <rect x="61" y="112" width="8" height="10" rx="1" fill="#0a0802"/>
+      <rect x="76" y="112" width="9" height="10" rx="1" fill="#0a0802"/>
+      <ellipse cx="18" cy="84" rx="6" ry="10" fill="#c8922a" opacity="0.7" stroke="#c8922a" strokeWidth="1"/>
+      <ellipse cx="18" cy="84" rx="3" ry="5" fill="#1a1208" opacity="0.8"/>
+      <ellipse cx="112" cy="84" rx="6" ry="10" fill="#c8922a" opacity="0.7" stroke="#c8922a" strokeWidth="1"/>
+      <ellipse cx="112" cy="84" rx="3" ry="5" fill="#1a1208" opacity="0.8"/>
+      <rect x="34" y="138" width="62" height="7" rx="2" fill="#c8922a" opacity="0.45"/>
+      <rect x="26" y="145" width="78" height="5" rx="2" fill="#c8922a" opacity="0.25"/>
+    </svg>
   );
+}
+
+function TotemJinga({ size = 28 }) {
+  const s = size, h = Math.round(size * 1.23);
+  return (
+    <svg width={s} height={h} viewBox="0 0 130 160" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <path d="M65 8 Q55 20 58 32 Q48 18 42 30 Q36 14 28 26 Q24 38 34 44" stroke="#6a9fd8" strokeWidth="2.5" strokeLinecap="round" fill="none"/>
+      <path d="M65 8 Q75 20 72 32 Q82 18 88 30 Q94 14 102 26 Q106 38 96 44" stroke="#6a9fd8" strokeWidth="2.5" strokeLinecap="round" fill="none"/>
+      <path d="M65 8 Q65 22 65 38" stroke="#6a9fd8" strokeWidth="2" strokeLinecap="round" fill="none"/>
+      <circle cx="34" cy="44" r="3" fill="#6a9fd8" opacity="0.8"/>
+      <circle cx="96" cy="44" r="3" fill="#6a9fd8" opacity="0.8"/>
+      <circle cx="65" cy="38" r="2.5" fill="#6a9fd8" opacity="0.8"/>
+      <path d="M30 44 Q48 38 65 42 Q82 38 100 44 Q90 52 65 50 Q40 52 30 44Z" fill="#6a9fd8" opacity="0.7"/>
+      <path d="M40 50 Q36 72 36 100 Q36 130 65 140 Q94 130 94 100 Q94 72 90 50 Q78 46 65 46 Q52 46 40 50Z" fill="#080f18" stroke="#6a9fd8" strokeWidth="2.5"/>
+      <path d="M40 60 Q52 54 65 56 Q78 54 90 60" stroke="#6a9fd8" strokeWidth="3" strokeLinecap="round" fill="none"/>
+      <ellipse cx="52" cy="72" rx="10" ry="12" fill="#6a9fd8" opacity="0.9"/>
+      <ellipse cx="78" cy="72" rx="10" ry="12" fill="#6a9fd8" opacity="0.9"/>
+      <ellipse cx="52" cy="72" rx="3" ry="9" fill="#080f18"/>
+      <ellipse cx="78" cy="72" rx="3" ry="9" fill="#080f18"/>
+      <circle cx="54" cy="67" r="2" fill="#d0eeff" opacity="0.7"/>
+      <circle cx="80" cy="67" r="2" fill="#d0eeff" opacity="0.7"/>
+      <path d="M62 86 L62 104 Q62 108 65 108 Q68 108 68 104 L68 86 Q66 84 65 84 Q64 84 62 86Z" fill="#6a9fd8" opacity="0.6"/>
+      <ellipse cx="61" cy="106" rx="3.5" ry="2" fill="#080f18"/>
+      <ellipse cx="69" cy="106" rx="3.5" ry="2" fill="#080f18"/>
+      <path d="M65 118 L65 135" stroke="#6a9fd8" strokeWidth="2.5" strokeLinecap="round"/>
+      <path d="M65 135 L58 145" stroke="#6a9fd8" strokeWidth="2" strokeLinecap="round"/>
+      <path d="M65 135 L72 145" stroke="#6a9fd8" strokeWidth="2" strokeLinecap="round"/>
+      <path d="M44 114 Q54 108 65 112 Q76 108 86 114 Q78 122 65 122 Q52 122 44 114Z" fill="#6a9fd8" opacity="0.75"/>
+      <rect x="55" y="114" width="20" height="6" rx="1" fill="#080f18"/>
+      <path d="M36 70 Q20 75 22 90 Q24 100 34 96 Q30 85 36 78Z" fill="#6a9fd8" fillOpacity="0.6" stroke="#6a9fd8" strokeWidth="1"/>
+      <path d="M94 70 Q110 75 108 90 Q106 100 96 96 Q100 85 94 78Z" fill="#6a9fd8" fillOpacity="0.6" stroke="#6a9fd8" strokeWidth="1"/>
+      <rect x="36" y="140" width="58" height="7" rx="2" fill="#6a9fd8" opacity="0.4"/>
+      <rect x="28" y="147" width="74" height="5" rx="2" fill="#6a9fd8" opacity="0.2"/>
+    </svg>
+  );
+}
+
+function TotemOjalu({ size = 28 }) {
+  const s = size, h = Math.round(size * 1.23);
+  return (
+    <svg width={s} height={h} viewBox="0 0 130 160" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <path d="M45 42 Q38 30 32 18 Q28 10 24 6" stroke="#6db86d" strokeWidth="2.5" strokeLinecap="round" fill="none"/>
+      <path d="M38 30 Q30 24 22 24" stroke="#6db86d" strokeWidth="2" strokeLinecap="round" fill="none"/>
+      <path d="M32 18 Q26 14 20 16" stroke="#6db86d" strokeWidth="1.5" strokeLinecap="round" fill="none"/>
+      <path d="M85 42 Q92 30 98 18 Q102 10 106 6" stroke="#6db86d" strokeWidth="2.5" strokeLinecap="round" fill="none"/>
+      <path d="M92 30 Q100 24 108 24" stroke="#6db86d" strokeWidth="2" strokeLinecap="round" fill="none"/>
+      <path d="M98 18 Q104 14 110 16" stroke="#6db86d" strokeWidth="1.5" strokeLinecap="round" fill="none"/>
+      <path d="M65 8 Q60 18 65 26 Q70 18 65 8Z" fill="#6db86d" opacity="0.8"/>
+      <circle cx="24" cy="6" r="2.5" fill="#6db86d" opacity="0.8"/>
+      <circle cx="106" cy="6" r="2.5" fill="#6db86d" opacity="0.8"/>
+      <path d="M32 42 Q48 36 65 38 Q82 36 98 42 Q86 50 65 48 Q44 50 32 42Z" fill="#6db86d" opacity="0.65"/>
+      <path d="M20 48 Q16 68 16 90 Q16 120 65 132 Q114 120 114 90 Q114 68 110 48 Q90 44 65 44 Q40 44 20 48Z" fill="#0d1f0d" stroke="#6db86d" strokeWidth="2.5"/>
+      <rect x="22" y="60" width="86" height="6" rx="2" fill="#6db86d" opacity="0.75"/>
+      <rect x="60" y="60" width="10" height="6" fill="#0d1f0d"/>
+      <circle cx="44" cy="80" r="18" fill="#6db86d" opacity="0.15" stroke="#6db86d" strokeWidth="2.5"/>
+      <circle cx="86" cy="80" r="18" fill="#6db86d" opacity="0.15" stroke="#6db86d" strokeWidth="2.5"/>
+      <circle cx="44" cy="80" r="12" fill="#6db86d" opacity="0.3"/>
+      <circle cx="86" cy="80" r="12" fill="#6db86d" opacity="0.3"/>
+      <circle cx="44" cy="80" r="7" fill="#0d1f0d"/>
+      <circle cx="86" cy="80" r="7" fill="#0d1f0d"/>
+      <circle cx="44" cy="80" r="4.5" fill="#6db86d" opacity="0.7"/>
+      <circle cx="86" cy="80" r="4.5" fill="#6db86d" opacity="0.7"/>
+      <circle cx="44" cy="80" r="2" fill="#0d1f0d"/>
+      <circle cx="86" cy="80" r="2" fill="#0d1f0d"/>
+      <circle cx="47" cy="75" r="3" fill="#c0ffc0" opacity="0.55"/>
+      <circle cx="89" cy="75" r="3" fill="#c0ffc0" opacity="0.55"/>
+      <path d="M58 100 Q56 108 65 110 Q74 108 72 100 Q70 94 65 92 Q60 94 58 100Z" fill="#6db86d" opacity="0.65"/>
+      <ellipse cx="59" cy="108" rx="4.5" ry="2.5" fill="#0d1f0d"/>
+      <ellipse cx="71" cy="108" rx="4.5" ry="2.5" fill="#0d1f0d"/>
+      <path d="M28 118 Q38 110 48 118 Q56 110 65 114 Q74 110 82 118 Q92 110 102 118 Q94 130 65 132 Q36 130 28 118Z" fill="#6db86d" opacity="0.75"/>
+      <rect x="40" y="118" width="10" height="10" rx="2" fill="#0d1f0d"/>
+      <rect x="57" y="118" width="16" height="10" rx="2" fill="#0d1f0d"/>
+      <rect x="80" y="118" width="10" height="10" rx="2" fill="#0d1f0d"/>
+      <path d="M16 72 Q4 80 6 96 Q8 108 18 104 Q12 92 18 82Z" fill="#6db86d" fillOpacity="0.6" stroke="#6db86d" strokeWidth="1.5"/>
+      <path d="M114 72 Q126 80 124 96 Q122 108 112 104 Q118 92 112 82Z" fill="#6db86d" fillOpacity="0.6" stroke="#6db86d" strokeWidth="1.5"/>
+      <rect x="36" y="132" width="58" height="7" rx="2" fill="#6db86d" opacity="0.4"/>
+      <rect x="28" y="139" width="74" height="5" rx="2" fill="#6db86d" opacity="0.22"/>
+    </svg>
+  );
+}
+
+function TotemWeloki({ size = 28 }) {
+  const s = size, h = Math.round(size * 1.23);
+  return (
+    <svg width={s} height={h} viewBox="0 0 130 160" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <path d="M65 6 Q44 8 36 22 Q30 36 40 46 Q50 32 65 30 Q80 32 90 46 Q100 36 94 22 Q86 8 65 6Z" fill="#c46ab0" fillOpacity="0.85"/>
+      <path d="M65 10 Q48 12 42 24 Q38 34 46 42 Q52 30 65 28 Q78 30 84 42 Q92 34 88 24 Q82 12 65 10Z" fill="#18080f" opacity="0.6"/>
+      <circle cx="65" cy="18" r="3" fill="#f0b0e8" opacity="0.8"/>
+      <circle cx="50" cy="22" r="1.5" fill="#f0b0e8" opacity="0.5"/>
+      <circle cx="80" cy="22" r="1.5" fill="#f0b0e8" opacity="0.5"/>
+      <path d="M38 44 Q52 38 65 40 Q78 38 92 44 Q84 54 65 52 Q46 54 38 44Z" fill="#c46ab0" opacity="0.7"/>
+      <path d="M42 52 Q38 72 38 98 Q38 128 65 138 Q92 128 92 98 Q92 72 88 52 Q78 48 65 48 Q52 48 42 52Z" fill="#18080f" stroke="#c46ab0" strokeWidth="2.5"/>
+      <path d="M44 72 Q54 65 65 67 Q76 65 86 72" stroke="#c46ab0" strokeWidth="2.5" strokeLinecap="round" fill="none"/>
+      <path d="M42 84 Q54 74 66 84 Q54 92 42 84Z" fill="#c46ab0" opacity="0.9"/>
+      <path d="M64 84 Q76 74 88 84 Q76 92 64 84Z" fill="#c46ab0" opacity="0.9"/>
+      <circle cx="54" cy="83" r="6" fill="#18080f"/>
+      <circle cx="76" cy="83" r="6" fill="#18080f"/>
+      <circle cx="54" cy="83" r="4" fill="#c46ab0" opacity="0.65"/>
+      <circle cx="76" cy="83" r="4" fill="#c46ab0" opacity="0.65"/>
+      <circle cx="54" cy="83" r="2" fill="#18080f"/>
+      <circle cx="76" cy="83" r="2" fill="#18080f"/>
+      <circle cx="56" cy="80" r="2" fill="#f8d0f0" opacity="0.8"/>
+      <circle cx="78" cy="80" r="2" fill="#f8d0f0" opacity="0.8"/>
+      <path d="M63 96 L63 106 Q63 109 65 109 Q67 109 67 106 L67 96 Q66 94 65 94 Q64 94 63 96Z" fill="#c46ab0" opacity="0.55"/>
+      <ellipse cx="61" cy="108" rx="3" ry="2" fill="#18080f"/>
+      <ellipse cx="69" cy="108" rx="3" ry="2" fill="#18080f"/>
+      <path d="M46 116 Q54 110 65 114 Q76 110 84 116 Q80 124 65 126 Q50 124 46 116Z" fill="#c46ab0" opacity="0.85"/>
+      <circle cx="60" cy="128" r="1.8" fill="#c46ab0" opacity="0.5"/>
+      <circle cx="65" cy="130" r="1.8" fill="#c46ab0" opacity="0.5"/>
+      <circle cx="70" cy="128" r="1.8" fill="#c46ab0" opacity="0.5"/>
+      <path d="M38 78 Q24 84 26 100 Q28 112 38 108 Q32 98 36 88Z" fill="#c46ab0" fillOpacity="0.55" stroke="#c46ab0" strokeWidth="1.5"/>
+      <path d="M92 78 Q106 84 104 100 Q102 112 92 108 Q98 98 94 88Z" fill="#c46ab0" fillOpacity="0.55" stroke="#c46ab0" strokeWidth="1.5"/>
+      <rect x="38" y="138" width="54" height="7" rx="3" fill="#c46ab0" opacity="0.4"/>
+      <rect x="30" y="145" width="70" height="5" rx="2" fill="#c46ab0" opacity="0.22"/>
+    </svg>
+  );
+}
+
+const TOTEM_MAP = { Miloa: TotemMiloa, Jinga: TotemJinga, Ojalu: TotemOjalu, Weloki: TotemWeloki };
+
+function TribeTotem({ team, size = 28 }) {
+  const Component = TOTEM_MAP[team];
+  if (!Component) return null;
+  return <Component size={size} />;
 }
 
 function SeasonHistory({ season, onBack }) {
