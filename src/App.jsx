@@ -476,7 +476,7 @@ export default function App() {
         <header className="header">
           <div className="logo">SURVIVOR<span>FANTASY</span></div>
           <nav className="nav">
-            {["leaderboard","castaways","history","draft","points","admin"].map(p => (
+            {["leaderboard","points","castaways","draft","history","admin"].map(p => (
               <button key={p} className={`nav-btn ${page === p ? "active" : ""}`} onClick={() => setPage(p)}>
                 {p}
               </button>
