@@ -13,10 +13,11 @@ function calcPoints(eliminationOrder, totalCastaways) {
 }
 
 const TEAMS = [
-  { id: 1, name: "Miloa",  members: "Team Miller",    color: "#c8922a" },
-  { id: 2, name: "Jinga",  members: "Team Mackereth", color: "#6a9fd8" },
-  { id: 3, name: "Ojalu",  members: "Team Lestan",    color: "#6db86d" },
-  { id: 4, name: "Weloki", members: "Team Wells",     color: "#c46ab0" },
+  { id: 1, name: "Miloa",   members: "Team Miller",    color: "#c8922a" },
+  { id: 2, name: "Jinga",   members: "Team Mackereth", color: "#6a9fd8" },
+  { id: 3, name: "Ojalu",   members: "Team Lestan",    color: "#6db86d" },
+  { id: 4, name: "Weloki",  members: "Team Wells",     color: "#c46ab0" },
+  { id: 5, name: "Nochoso", members: "The Unchosen",   color: "#888888" },
 ];
 
 const SEASONS = [
@@ -35,22 +36,22 @@ const TRIBE_COLORS = { Vatu: "#a855c8", Kalo: "#2ab8a0", Cila: "#e8782a" };
 // draftedBy: 1=Miloa, 2=Jinga, 3=Ojalu, 4=Weloki, null=undrafted
 // Draft locked — do not modify picks here
 const S50_CASTAWAYS = [
-  { name: "Angelina Keeley",         tribe: "Vatu", bio: "3rd place, S37 David vs. Goliath",                                    odds: "+4000", photo: "https://entertainmentnow.com/wp-content/uploads/2026/01/survivor-season-50-cast-spoilers-first-photos-angelina-keeley.jpg",         draftedBy: null },
+  { name: "Angelina Keeley",         tribe: "Vatu", bio: "3rd place, S37 David vs. Goliath",                                    odds: "+4000", photo: "https://entertainmentnow.com/wp-content/uploads/2026/01/survivor-season-50-cast-spoilers-first-photos-angelina-keeley.jpg",         draftedBy: 5    },
   { name: "Aubry Bracco",            tribe: "Vatu", bio: "Runner-up S32 Kaoh Rong · S34 Game Changers · S38 Edge of Extinction", odds: "-250",  photo: "https://entertainmentnow.com/wp-content/uploads/2026/01/survivor-season-50-cast-spoilers-first-photos-aubry-bracco.jpg",            draftedBy: 4    },
   { name: 'Benjamin "Coach" Wade',   tribe: "Kalo", bio: "Runner-up S23 South Pacific · S18 Tocantins · S20 Heroes vs. Villains",odds: "+3500", photo: "https://entertainmentnow.com/wp-content/uploads/2026/01/survivor-season-50-cast-spoilers-first-photos-benjamin-coach-wade.jpg",   draftedBy: 1    },
   { name: "Charlie Davis",           tribe: "Kalo", bio: "Runner-up S46",                                                        odds: "+2500", photo: "https://entertainmentnow.com/wp-content/uploads/2026/01/survivor-season-50-cast-spoilers-first-photos-charlie-davis.jpg",           draftedBy: 4    },
-  { name: "Chrissy Hofbeck",         tribe: "Kalo", bio: "Runner-up S35 Heroes vs. Healers vs. Hustlers",                        odds: "+3000", photo: "https://entertainmentnow.com/wp-content/uploads/2026/01/survivor-season-50-cast-spoilers-first-photos-chrissy-hofbeck.jpg",         draftedBy: null },
+  { name: "Chrissy Hofbeck",         tribe: "Kalo", bio: "Runner-up S35 Heroes vs. Healers vs. Hustlers",                        odds: "+3000", photo: "https://entertainmentnow.com/wp-content/uploads/2026/01/survivor-season-50-cast-spoilers-first-photos-chrissy-hofbeck.jpg",         draftedBy: 5    },
   { name: "Christian Hubicki",       tribe: "Cila", bio: "7th place S37 David vs. Goliath",                                      odds: "+800",  photo: "https://entertainmentnow.com/wp-content/uploads/2026/01/survivor-season-50-cast-spoilers-first-photos-christian-hubicki.jpg",       draftedBy: 1    },
   { name: "Cirie Fields",            tribe: "Cila", bio: "5x player · S12 Panama · S16 Micronesia · S20 HvV · S34 Game Changers",odds: "+1200", photo: "https://entertainmentnow.com/wp-content/uploads/2026/01/survivor-season-50-cast-spoilers-first-photos-cirie-fields.jpg",            draftedBy: 4    },
   { name: "Colby Donaldson",         tribe: "Vatu", bio: "Runner-up S2 Australian Outback · S8 All-Stars · S20 Heroes vs. Villains",odds:"+5000",photo: "https://entertainmentnow.com/wp-content/uploads/2026/01/survivor-season-50-cast-spoilers-first-photos-colby-donaldson.jpg",         draftedBy: 2    },
   { name: "Dee Valladares",          tribe: "Kalo", bio: "WINNER S45 ★",                                                         odds: "+2000", photo: "https://entertainmentnow.com/wp-content/uploads/2026/01/survivor-season-50-cast-spoilers-first-photos-dee-valladares.jpg",          draftedBy: 3    },
   { name: "Emily Flippen",           tribe: "Cila", bio: "7th place S45",                                                        odds: "+2500", photo: "https://entertainmentnow.com/wp-content/uploads/2026/01/survivor-season-50-cast-spoilers-first-photos-emily-flippen.jpg",           draftedBy: 1    },
   { name: "Genevieve Mushaluk",      tribe: "Vatu", bio: "5th place S47",                                                        odds: "+2000", photo: "https://entertainmentnow.com/wp-content/uploads/2026/01/survivor-season-50-cast-spoilers-first-photos-genevieve-mushaluk.jpg",      draftedBy: 4    },
-  { name: "Jenna Lewis-Dougherty",   tribe: "Cila", bio: "S1 Borneo · Final 3 S8 All-Stars",                                     odds: "+4000", photo: "https://entertainmentnow.com/wp-content/uploads/2026/01/survivor-season-50-cast-spoilers-first-photos-jenna-lewis-dougherty.jpg",   draftedBy: null },
+  { name: "Jenna Lewis-Dougherty",   tribe: "Cila", bio: "S1 Borneo · Final 3 S8 All-Stars",                                     odds: "+4000", photo: "https://entertainmentnow.com/wp-content/uploads/2026/01/survivor-season-50-cast-spoilers-first-photos-jenna-lewis-dougherty.jpg",   draftedBy: 5    },
   { name: "Joe Hunter",              tribe: "Cila", bio: "3rd place S48",                                                        odds: "+700",  photo: "https://entertainmentnow.com/wp-content/uploads/2026/01/survivor-season-50-cast-spoilers-first-photos-joe-hunter.jpg",              draftedBy: 3    },
   { name: "Jonathan Young",          tribe: "Kalo", bio: "4th place S42",                                                        odds: "+900",  photo: "https://entertainmentnow.com/wp-content/uploads/2026/01/survivor-season-50-cast-spoilers-first-photos-jonathan-young.jpg",          draftedBy: 2    },
   { name: "Kamilla Karthigesu",      tribe: "Kalo", bio: "4th place S48",                                                        odds: "+2500", photo: "https://entertainmentnow.com/wp-content/uploads/2026/01/survivor-season-50-cast-spoilers-first-photos-kamilla-karthigesu.jpg",      draftedBy: 3    },
-  { name: "Kyle Fraser",             tribe: "Vatu", bio: "WINNER S48 ★",                                                         odds: "+2000", photo: "https://entertainmentnow.com/wp-content/uploads/2026/01/survivor-season-50-cast-spoilers-first-photos-kyle-fraser.jpg",             draftedBy: null },
+  { name: "Kyle Fraser",             tribe: "Vatu", bio: "WINNER S48 ★",                                                         odds: "+2000", photo: "https://entertainmentnow.com/wp-content/uploads/2026/01/survivor-season-50-cast-spoilers-first-photos-kyle-fraser.jpg",             draftedBy: 5    },
   { name: "Mike White",              tribe: "Kalo", bio: "Runner-up S37 David vs. Goliath · Creator of The White Lotus",         odds: "+3000", photo: "https://entertainmentnow.com/wp-content/uploads/2026/01/survivor-season-50-cast-spoilers-first-photos-mike-white.jpg",              draftedBy: 1    },
   { name: "Ozzy Lusth",              tribe: "Cila", bio: "Runner-up S13 Cook Islands · 4x player total",                         odds: "+3500", photo: "https://entertainmentnow.com/wp-content/uploads/2026/01/survivor-season-50-cast-spoilers-first-photos-ozzy-lutsh.jpg",              draftedBy: 2    },
   { name: "Q Burdette",              tribe: "Vatu", bio: "8th place S46",                                                        odds: "+3000", photo: "https://entertainmentnow.com/wp-content/uploads/2026/01/survivor-season-50-cast-spoilers-first-photos-quintavius-q-burdette.jpg",   draftedBy: 3    },
@@ -296,6 +297,7 @@ function getChampionshipsThrough(season) {
 const EP1_ELIMINATIONS = {
   "Jenna Lewis-Dougherty": 1,  // Episode 1 boot
   "Kyle Fraser": 2,            // Episode 1 medevac
+  "Savannah Louie": 3,         // Episode 2 boot
 };
 
 function buildCastawaysForSeason50() {
@@ -307,13 +309,18 @@ function buildCastawaysForSeason50() {
   }));
 }
 
-// Re-apply locked draft assignments on top of any saved state
-// draftedBy is always locked; eliminationOrder stays as saved (admin edits it weekly)
+// Re-apply locked draft assignments + enforce known eliminations on top of saved state
 function applyLockedDraft(castaways) {
   return castaways.map(c => {
     const master = S50_CASTAWAYS.find(m => m.name === c.name);
     if (!master) return c;
-    return { ...c, draftedBy: master.draftedBy ?? null };
+    const lockedElim = EP1_ELIMINATIONS[c.name];
+    return {
+      ...c,
+      draftedBy: master.draftedBy ?? null,
+      // Enforce known eliminations so stale localStorage never shows wrong scores
+      eliminationOrder: lockedElim ?? c.eliminationOrder,
+    };
   });
 }
 
@@ -436,6 +443,9 @@ const CSS = `
 `;
 
 export default function App() {
+  const [splashDismissed, setSplashDismissed] = useState(() => {
+    try { return localStorage.getItem("sf_splash_ep2_v2") === "1"; } catch { return false; }
+  });
   const [page, setPage] = useState("leaderboard");
   const [historySeason, setHistorySeason] = useState(49);
   const [toast, setToast] = useState(null);
@@ -464,10 +474,54 @@ export default function App() {
   const scores = useMemo(() => {
     return TEAMS.map(team => {
       const picks = castaways.filter(c => c.draftedBy === team.id);
-      const total = picks.reduce((sum, c) => sum + (c.eliminationOrder ? calcPoints(c.eliminationOrder, season50.totalCastaways) : 0), 0);
+      const total = picks.reduce((sum, c) => sum + (c.eliminationOrder ? calcPoints(c.eliminationOrder, season50.totalCastaways) : 2), 0);
       return { ...team, picks, total };
     }).sort((a, b) => b.total - a.total);
   }, [castaways, season50]);
+
+  const dismissSplash = () => {
+    try { localStorage.setItem("sf_splash_ep2_v2", "1"); } catch {}
+    setSplashDismissed(true);
+  };
+
+  if (!splashDismissed) {
+    return (
+      <>
+        <style>{CSS}</style>
+        <div style={{
+          minHeight: "100vh", background: "#0a0a0a", display: "flex",
+          flexDirection: "column", alignItems: "center", justifyContent: "center",
+          padding: "2rem", textAlign: "center",
+        }}>
+          <div style={{ fontSize: "2.8rem", marginBottom: "1rem" }}>🏝️</div>
+          <div style={{
+            fontFamily: "'Playfair Display', serif", fontSize: "1rem",
+            letterSpacing: "0.25em", textTransform: "uppercase",
+            color: "#c8922a", marginBottom: "0.5rem",
+          }}>Fantasy Survivor · Season 50</div>
+          <div style={{
+            fontFamily: "'Playfair Display', serif", fontWeight: 900,
+            fontSize: "clamp(1.6rem, 5vw, 2.4rem)", color: "#f0ebe0",
+            lineHeight: 1.2, marginBottom: "1.25rem",
+          }}>Scores have been updated<br/>for Episode 2</div>
+          <div style={{ fontSize: "0.78rem", color: "#999", marginBottom: "2.5rem", maxWidth: 360, lineHeight: 1.6 }}>
+            Watch Episode 2 before continuing to avoid spoilers.
+          </div>
+          <button onClick={dismissSplash} style={{
+            background: "rgba(200,146,42,0.12)", border: "1px solid rgba(200,146,42,0.5)",
+            color: "#c8922a", fontFamily: "'DM Mono', monospace", fontSize: "0.8rem",
+            letterSpacing: "0.12em", textTransform: "uppercase", padding: "0.85rem 2.5rem",
+            borderRadius: "2px", cursor: "pointer",
+          }}
+          onMouseEnter={e => e.target.style.background="rgba(200,146,42,0.22)"}
+          onMouseLeave={e => e.target.style.background="rgba(200,146,42,0.12)"}
+          >
+            Click to Continue →
+          </button>
+        </div>
+      </>
+    );
+  }
 
   return (
     <>
@@ -548,7 +602,7 @@ function Leaderboard({ season, scores, castaways, showOdds }) {
               <div style={{ flex: 1 }}>
                 <div className="lb-tribe" style={{ color: team.color }}>
                   {team.name}
-                  <span style={{ fontSize: "0.63rem", color: "#999", fontWeight: 400, marginLeft: "0.4rem" }}>{team.members}</span>
+                  <span style={{ fontSize: "0.63rem", color: "#999", fontWeight: 400, marginLeft: "0.4rem" }}>{team.members}{team.name === "Miloa" ? " 😂 lol" : ""}</span>
                   {(champs[team.name] || 0) > 0 && (
                     <span style={{ fontSize: "0.58rem", color: "#c8922a", marginLeft: "0.5rem", opacity: 0.75 }}>{"★".repeat(champs[team.name])}</span>
                   )}
@@ -563,7 +617,7 @@ function Leaderboard({ season, scores, castaways, showOdds }) {
                     <span key={c.id} className={`c-tag ${c.eliminationOrder ? "eliminated" : "alive"}`}>
                       {c.name}{c.eliminationOrder
                         ? ` · ${calcPoints(c.eliminationOrder, season.totalCastaways)}pt`
-                        : (showOdds && c.odds ? ` · ${c.odds}` : "")}
+                        : (showOdds && c.odds ? ` · ${c.odds} · 2pt` : " · 2pt")}
                     </span>
                   ))}
                   {team.picks.length === 0 && <span style={{ fontSize: "0.65rem", color: "#aaa" }}>No picks — set on Draft page</span>}
@@ -676,14 +730,18 @@ function History({ historySeason, setHistorySeason }) {
             <table className="hist-table">
               <thead><tr><th>Finish</th><th>Castaway</th><th>Team</th><th style={{ textAlign:"right" }}>Pts</th></tr></thead>
               <tbody>
-                {[...data.placements].sort((a,b) => b.place - a.place).map(p => (
+                {[...data.placements].sort((a,b) => b.place - a.place).map(p => {
+                  const total = SEASONS.find(s => s.id === historySeason)?.totalCastaways || 18;
+                  const finishPos = total - p.place + 1;
+                  return (
                   <tr key={p.place}>
-                    <td style={{ color:"#f0ebe0", fontFamily:"'Playfair Display',serif", fontWeight:900 }}>{ordinal(p.place)}</td>
+                    <td style={{ color:"#f0ebe0", fontFamily:"'Playfair Display',serif", fontWeight:900 }}>{ordinal(finishPos)}</td>
                     <td style={{ color:"#f0ebe0" }}>{p.player}</td>
                     <td style={{ color: p.team==="NA" ? "#555" : p.teamColor }}>{p.team==="NA" ? "—" : p.team}</td>
                     <td style={{ color:"#c8922a", textAlign:"right", fontFamily:"'Playfair Display',serif", fontWeight:900 }}>{p.points}</td>
                   </tr>
-                ))}
+                  );
+                })}
               </tbody>
             </table>
           </div>
