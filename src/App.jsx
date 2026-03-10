@@ -530,7 +530,7 @@ export default function App() {
         <header className="header">
           <div className="logo">SURVIVOR<span>FANTASY</span></div>
           <nav className="nav">
-            {["leaderboard","points","castaways","draft","history","recap","admin"].map(p => (
+            {["leaderboard","recap","points","castaways","draft","history","admin"].map(p => (
               <button key={p} className={`nav-btn ${page === p ? "active" : ""}`} onClick={() => setPage(p)}>
                 {p}
               </button>
@@ -849,7 +849,7 @@ const S50_EPISODES = [
       { holder: "Cirie Fields", type: "Extra Vote", status: "active", note: "Ozzy gave Cirie his Extra Vote — the first advantage of Cirie's entire Survivor career — after she campaigned to protect him from the vote." },
       { holder: "Savannah Louie", type: "Block-a-Vote", status: "used", note: "Won on the Journey in Episode 1 but never successfully deployed — her tribemates suspected she had it, and she was voted out 6-1 before she could use it." },
     ],
-    recap: "Episode 2 kept the chaos at Cila front and center as the tribe returned to Tribal Council for the second straight week. Season 49 winner Savannah Louie was on thin ice from the start — her tribemates never bought her story about returning from the Journey empty-handed in the premiere, and her Block-a-Vote was an open secret. A feud between Rick Devens and Joe Hunter over honesty and strategy briefly put Joe's name in the mix, but Cirie masterfully steered the vote toward Savannah, framing it as a chance to flush her advantage and remove a proven winner in one move. Savannah was voted out 6-1 in a unanimous decision, making her the second person voted out and third eliminated overall. Elsewhere, Christian Hubicki found Cila's Billie Eilish Boomerang Idol and gifted it to Aubry Bracco, and in a touching moment of alliance-building, Ozzy handed Cirie his Extra Vote — the first advantage in her long Survivor career.",
+    recap: "Episode 2 kept the chaos at Cila front and center as the tribe returned to Tribal Council for the second straight week. Season 49 winner Savannah Louie was on thin ice from the start — her tribemates never bought her story about returning from the Journey empty-handed in the premiere, and her Block-a-Vote was an open secret. A feud between Rick Devens and Joe Hunter over honesty and strategy briefly put Joe's name in the mix, but Cirie masterfully steered the vote toward Savannah, framing it as a chance to flush her advantage and remove a proven winner in one move. Savannah was voted out 6-1 in a unanimous decision, making her the second person voted out and third eliminated overall. Elsewhere, Christian Hubicki found Cila's Billie Eilish Boomerang Idol and gifted it to Aubry Bracco, and in a touching moment of alliance-building, Ozzy handed Cirie his Extra Vote — the first advantage in her long Survivor career. The episode ended on a brilliantly chaotic note courtesy of Rick Devens, who hatched a scheme to plant a fake idol at Tribal Council using the packaging from Christian's Boomerang Idol. To pull it off, Christian provided the distraction — intentionally face-planting on his way out of Tribal, crumpling to the ground over absolutely nothing before somehow getting \"lost\" leaving the set, while Rick snuck the fake idol behind a rock near the fire. The plan nearly unraveled when Rick immediately turned to Jeff Probst with a barely-concealed grin, all but announcing what he'd just done.",
   },
   {
     number: 1,
