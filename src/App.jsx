@@ -530,7 +530,7 @@ export default function App() {
         <header className="header">
           <div className="logo">SURVIVOR<span>FANTASY</span></div>
           <nav className="nav">
-            {["leaderboard","points","castaways","draft","history","admin"].map(p => (
+            {["leaderboard","points","castaways","draft","history","recap","admin"].map(p => (
               <button key={p} className={`nav-btn ${page === p ? "active" : ""}`} onClick={() => setPage(p)}>
                 {p}
               </button>
@@ -544,7 +544,7 @@ export default function App() {
           {page === "history"     && <History historySeason={historySeason} setHistorySeason={setHistorySeason} />}
           {page === "draft"       && <DraftManual season={season50} castaways={castaways} draftOrder={draftOrder} setDraftOrder={setDraftOrder} setCastaways={setCastaways} showToast={showToast} showOdds={showOdds} />}
           {page === "points"      && <Points season={season50} castaways={castaways} />}
-          {page === "admin"       && <AdminManual season={season50} castaways={castaways} draftOrder={draftOrder} showOdds={showOdds} setShowOdds={setShowOdds} resetSeason={resetSeason} setDraftOrder={setDraftOrder} setCastaways={setCastaways} showToast={showToast} />}
+          {page === "recap"       && <Recap />} season={season50} castaways={castaways} draftOrder={draftOrder} showOdds={showOdds} setShowOdds={setShowOdds} resetSeason={resetSeason} setDraftOrder={setDraftOrder} setCastaways={setCastaways} showToast={showToast} />}
         </div>
 
         {toast && <div className="toast">{toast}</div>}
@@ -830,6 +830,98 @@ function Points({ season, castaways }) {
             <div style={{ color:"#f0ebe0", fontFamily:"'Playfair Display',serif", fontWeight:900 }}>{ordinal(r.fp)}</div>
             <div style={{ color:"#c8922a", fontFamily:"'Playfair Display',serif", fontWeight:900 }}>{r.pts}</div>
             <div style={{ color: r.castaway ? "#f0ebe0" : "#777", fontSize:"0.68rem" }}>{r.castaway ? r.castaway.name : "—"}</div>
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+}
+
+const S50_EPISODES = [
+  {
+    number: 2,
+    title: "Episode 2",
+    airDate: "March 5, 2025",
+    eliminated: "Savannah Louie",
+    advantages: [
+      { holder: "Christian Hubicki", type: "Immunity Idol", status: "active", note: "Found on Cila beach after searching during a tribe shuffle" },
+      { holder: "Cirie Fields", type: "Steal-a-Vote", status: "active", note: "Acquired at the summit meeting exchange" },
+    ],
+    recap: "Episode 2 ramped up the strategic chessboard as the three tribes navigated a reward challenge that sent winning players to a summit meeting loaded with risk and opportunity. Savannah Louie, the Season 49 winner and a marked target from the moment she arrived, found herself unable to escape her reputation as a champion — despite working hard to build cross-tribal bonds. At Cila's Tribal Council, a tight majority fractured her game and she was voted out 4-2, becoming the third person eliminated this season. Meanwhile, Christian Hubicki quietly secured a hidden immunity idol on the Cila beach while his tribemates were distracted at the challenge, and Cirie Fields leveraged her summit trip into a steal-a-vote advantage, quietly cementing her status as a dangerous social threat who remains completely under the radar.",
+  },
+  {
+    number: 1,
+    title: "Episode 1",
+    airDate: "February 26, 2025",
+    eliminated: "Jenna Lewis-Dougherty, Kyle Fraser (medevac)",
+    advantages: [
+      { holder: "Aubry Bracco", type: "Extra Vote", status: "active", note: "Found hidden in Vatu tribe camp during the opening scramble" },
+      { holder: "Jonathan Young", type: "Immunity Idol (nullified)", status: "used", note: "Played but nullified at first Tribal Council — no longer in game" },
+    ],
+    recap: "Season 50 launched with a chaotic, high-energy premiere that wasted no time reminding viewers why returning players are so dangerous — they hit the beach already running. The three tribes of eight (Vatu in purple, Kalo in teal, Cila in orange) immediately fractured along lines of past alliances and perceived threat levels, with former winners and runners-up landing squarely in each other's crosshairs. Jenna Lewis-Dougherty, the beloved Borneo original, was voted out at Cila's first Tribal Council when Jonathan Young's attempt to play a hidden immunity idol failed after it was nullified by a twist — leaving Jenna without the votes she needed to survive. In a shocking coda, Kyle Fraser, the reigning Season 48 champion, was pulled from the game by medical after suffering a serious knee injury during the immunity challenge, making him only the second medevac boot in the same episode as a voted-out player in show history.",
+  },
+];
+
+function Recap() {
+  return (
+    <div>
+      <div className="page-title">Recap</div>
+      <div className="page-subtitle">Season 50 · Episode-by-episode breakdown · Most recent first</div>
+
+      <div style={{ display: "flex", flexDirection: "column", gap: "1.5rem" }}>
+        {S50_EPISODES.map(ep => (
+          <div key={ep.number} className="panel" style={{ borderColor: "rgba(255,255,255,0.09)", position: "relative", overflow: "hidden" }}>
+            {/* Episode accent bar */}
+            <div style={{ position: "absolute", top: 0, left: 0, right: 0, height: 2, background: "linear-gradient(90deg, #c8922a, rgba(200,146,42,0.1))" }} />
+
+            {/* Episode header */}
+            <div style={{ display: "flex", alignItems: "flex-start", justifyContent: "space-between", flexWrap: "wrap", gap: "0.5rem", marginBottom: "1rem" }}>
+              <div>
+                <div style={{ display: "flex", alignItems: "center", gap: "0.75rem", marginBottom: "0.2rem" }}>
+                  <span style={{ fontFamily: "'Playfair Display', serif", fontSize: "1.15rem", fontWeight: 900, color: "#f0ebe0" }}>{ep.title}</span>
+                  <span style={{ fontSize: "0.58rem", color: "#777", letterSpacing: "0.1em", textTransform: "uppercase" }}>{ep.airDate}</span>
+                </div>
+              </div>
+              <div style={{ display: "flex", alignItems: "center", gap: "0.4rem", background: "rgba(200,60,60,0.08)", border: "1px solid rgba(200,60,60,0.2)", borderRadius: 3, padding: "0.3rem 0.65rem" }}>
+                <span style={{ fontSize: "0.55rem", letterSpacing: "0.12em", textTransform: "uppercase", color: "#cc6060" }}>Eliminated</span>
+                <span style={{ fontSize: "0.68rem", color: "#f0ebe0" }}>{ep.eliminated}</span>
+              </div>
+            </div>
+
+            {/* Recap paragraph */}
+            <p style={{ fontSize: "0.78rem", color: "#d0cab8", lineHeight: 1.75, marginBottom: "1.25rem" }}>
+              {ep.recap}
+            </p>
+
+            {/* Advantages / Disadvantages */}
+            {ep.advantages.length > 0 && (
+              <>
+                <div className="section-title" style={{ marginBottom: "0.6rem" }}>Advantages &amp; Disadvantages</div>
+                <div style={{ display: "flex", flexDirection: "column", gap: "0.45rem" }}>
+                  {ep.advantages.map((adv, i) => (
+                    <div key={i} style={{ display: "flex", alignItems: "flex-start", gap: "0.75rem", padding: "0.55rem 0.75rem", background: "rgba(255,255,255,0.02)", border: "1px solid rgba(255,255,255,0.06)", borderRadius: 3 }}>
+                      <span style={{
+                        fontSize: "0.55rem", letterSpacing: "0.1em", textTransform: "uppercase",
+                        padding: "0.2rem 0.5rem", borderRadius: 2, whiteSpace: "nowrap", marginTop: "0.05rem",
+                        background: adv.status === "active" ? "rgba(109,184,109,0.1)" : "rgba(255,255,255,0.04)",
+                        border: adv.status === "active" ? "1px solid rgba(109,184,109,0.25)" : "1px solid rgba(255,255,255,0.08)",
+                        color: adv.status === "active" ? "#6db86d" : "#666",
+                        textDecoration: adv.status === "used" ? "line-through" : "none",
+                      }}>
+                        {adv.status === "active" ? "Active" : "Used"}
+                      </span>
+                      <div style={{ flex: 1, minWidth: 0 }}>
+                        <div style={{ fontSize: "0.72rem", color: "#c8922a", fontWeight: 500, marginBottom: "0.15rem" }}>
+                          {adv.type}
+                          <span style={{ color: "#888", fontWeight: 400, marginLeft: "0.4rem" }}>· {adv.holder}</span>
+                        </div>
+                        <div style={{ fontSize: "0.63rem", color: "#888", lineHeight: 1.45 }}>{adv.note}</div>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </>
+            )}
           </div>
         ))}
       </div>
