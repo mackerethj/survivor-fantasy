@@ -824,16 +824,20 @@ function Points({ season, castaways }) {
       <div className="page-title">Points</div>
       <div className="page-subtitle">Season {season.id} · Points by finish position</div>
       <div style={{ border:"1px solid rgba(255,255,255,0.07)", borderRadius:4, overflow:"hidden" }}>
-        <div style={{ display:"grid", gridTemplateColumns:"6rem 7rem 1fr", background:"rgba(255,255,255,0.04)", padding:"0.6rem 1rem", fontSize:"0.58rem", letterSpacing:"0.1em", textTransform:"uppercase", color:"#999", borderBottom:"1px solid rgba(255,255,255,0.07)" }}>
-          <div>Finish</div><div>Points</div><div>Castaway</div>
+        <div style={{ display:"grid", gridTemplateColumns:"6rem 7rem 1fr 6rem", background:"rgba(255,255,255,0.04)", padding:"0.6rem 1rem", fontSize:"0.58rem", letterSpacing:"0.1em", textTransform:"uppercase", color:"#bbb", borderBottom:"1px solid rgba(255,255,255,0.07)" }}>
+          <div>Finish</div><div>Points</div><div>Castaway</div><div>Team</div>
         </div>
-        {rows.map((r, idx) => (
-          <div key={r.fp} style={{ display:"grid", gridTemplateColumns:"6rem 7rem 1fr", padding:"0.55rem 1rem", fontSize:"0.72rem", borderBottom: idx < rows.length-1 ? "1px solid rgba(255,255,255,0.04)" : "none", background: idx%2===0 ? "rgba(255,255,255,0.01)" : "transparent", alignItems:"center" }}>
-            <div style={{ color:"#f0ebe0", fontFamily:"'Playfair Display',serif", fontWeight:900 }}>{ordinal(r.fp)}</div>
-            <div style={{ color:"#c8922a", fontFamily:"'Playfair Display',serif", fontWeight:900 }}>{r.pts}</div>
-            <div style={{ color: r.castaway ? "#f0ebe0" : "#777", fontSize:"0.68rem" }}>{r.castaway ? r.castaway.name : "—"}</div>
-          </div>
-        ))}
+        {rows.map((r, idx) => {
+          const team = r.castaway ? TEAMS.find(t => t.id === r.castaway.draftedBy) : null;
+          return (
+            <div key={r.fp} style={{ display:"grid", gridTemplateColumns:"6rem 7rem 1fr 6rem", padding:"0.55rem 1rem", fontSize:"0.72rem", borderBottom: idx < rows.length-1 ? "1px solid rgba(255,255,255,0.04)" : "none", background: idx%2===0 ? "rgba(255,255,255,0.01)" : "transparent", alignItems:"center" }}>
+              <div style={{ color:"#f0ebe0", fontFamily:"'Playfair Display',serif", fontWeight:900 }}>{ordinal(r.fp)}</div>
+              <div style={{ color:"#c8922a", fontFamily:"'Playfair Display',serif", fontWeight:900 }}>{r.pts}</div>
+              <div style={{ color: r.castaway ? "#f0ebe0" : "#777", fontSize:"0.68rem" }}>{r.castaway ? r.castaway.name : "—"}</div>
+              <div style={{ color: team ? team.color : "#555", fontSize:"0.65rem" }}>{team ? team.name : "—"}</div>
+            </div>
+          );
+        })}
       </div>
     </div>
   );
