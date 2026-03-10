@@ -817,7 +817,7 @@ function Points({ season, castaways }) {
   const rows = Array.from({ length: total }, (_, i) => {
     const eo = i + 1, fp = total - eo + 1, pts = calcPoints(eo, total);
     return { fp, eo, pts, castaway: elimMap[eo] };
-  }).sort((a,b) => a.fp - b.fp);
+  }).sort((a,b) => b.fp - a.fp);
 
   return (
     <div>
