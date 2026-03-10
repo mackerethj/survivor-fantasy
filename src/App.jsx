@@ -544,7 +544,8 @@ export default function App() {
           {page === "history"     && <History historySeason={historySeason} setHistorySeason={setHistorySeason} />}
           {page === "draft"       && <DraftManual season={season50} castaways={castaways} draftOrder={draftOrder} setDraftOrder={setDraftOrder} setCastaways={setCastaways} showToast={showToast} showOdds={showOdds} />}
           {page === "points"      && <Points season={season50} castaways={castaways} />}
-          {page === "recap"       && <Recap />} season={season50} castaways={castaways} draftOrder={draftOrder} showOdds={showOdds} setShowOdds={setShowOdds} resetSeason={resetSeason} setDraftOrder={setDraftOrder} setCastaways={setCastaways} showToast={showToast} />}
+          {page === "recap"       && <Recap />}
+          {page === "admin"       && <AdminManual season={season50} castaways={castaways} draftOrder={draftOrder} showOdds={showOdds} setShowOdds={setShowOdds} resetSeason={resetSeason} setDraftOrder={setDraftOrder} setCastaways={setCastaways} showToast={showToast} />}
         </div>
 
         {toast && <div className="toast">{toast}</div>}
@@ -841,24 +842,28 @@ const S50_EPISODES = [
   {
     number: 2,
     title: "Episode 2",
-    airDate: "March 5, 2025",
+    airDate: "March 4, 2026",
     eliminated: "Savannah Louie",
     advantages: [
-      { holder: "Christian Hubicki", type: "Immunity Idol", status: "active", note: "Found on Cila beach after searching during a tribe shuffle" },
-      { holder: "Cirie Fields", type: "Steal-a-Vote", status: "active", note: "Acquired at the summit meeting exchange" },
+      { holder: "Christian Hubicki", type: "Billie Eilish Boomerang Idol → gifted to Aubry Bracco", status: "active", note: "Christian found Cila's Boomerang Idol and gave it to Aubry, bringing her to tears. Like Ozzy's, it returns to the finder if the recipient is voted out with it." },
+      { holder: "Cirie Fields", type: "Extra Vote", status: "active", note: "Ozzy gave Cirie his Extra Vote — the first advantage of Cirie's entire Survivor career — after she campaigned to protect him from the vote." },
+      { holder: "Savannah Louie", type: "Block-a-Vote", status: "used", note: "Won on the Journey in Episode 1 but never successfully deployed — her tribemates suspected she had it, and she was voted out 6-1 before she could use it." },
     ],
-    recap: "Episode 2 ramped up the strategic chessboard as the three tribes navigated a reward challenge that sent winning players to a summit meeting loaded with risk and opportunity. Savannah Louie, the Season 49 winner and a marked target from the moment she arrived, found herself unable to escape her reputation as a champion — despite working hard to build cross-tribal bonds. At Cila's Tribal Council, a tight majority fractured her game and she was voted out 4-2, becoming the third person eliminated this season. Meanwhile, Christian Hubicki quietly secured a hidden immunity idol on the Cila beach while his tribemates were distracted at the challenge, and Cirie Fields leveraged her summit trip into a steal-a-vote advantage, quietly cementing her status as a dangerous social threat who remains completely under the radar.",
+    recap: "Episode 2 kept the chaos at Cila front and center as the tribe returned to Tribal Council for the second straight week. Season 49 winner Savannah Louie was on thin ice from the start — her tribemates never bought her story about returning from the Journey empty-handed in the premiere, and her Block-a-Vote was an open secret. A feud between Rick Devens and Joe Hunter over honesty and strategy briefly put Joe's name in the mix, but Cirie masterfully steered the vote toward Savannah, framing it as a chance to flush her advantage and remove a proven winner in one move. Savannah was voted out 6-1 in a unanimous decision, making her the second person voted out and third eliminated overall. Elsewhere, Christian Hubicki found Cila's Billie Eilish Boomerang Idol and gifted it to Aubry Bracco, and in a touching moment of alliance-building, Ozzy handed Cirie his Extra Vote — the first advantage in her long Survivor career.",
   },
   {
     number: 1,
     title: "Episode 1",
-    airDate: "February 26, 2025",
+    airDate: "February 25, 2026",
     eliminated: "Jenna Lewis-Dougherty, Kyle Fraser (medevac)",
     advantages: [
-      { holder: "Aubry Bracco", type: "Extra Vote", status: "active", note: "Found hidden in Vatu tribe camp during the opening scramble" },
-      { holder: "Jonathan Young", type: "Immunity Idol (nullified)", status: "used", note: "Played but nullified at first Tribal Council — no longer in game" },
+      { holder: "Ozzy Lusth", type: "Billie Eilish Boomerang Idol (received from Genevieve)", status: "active", note: "Genevieve (Vatu) found the first Boomerang Idol — a fully-powered idol good through Final Five — and sent it to Ozzy. If Ozzy is voted out holding it, the idol returns to Genevieve." },
+      { holder: "Ozzy Lusth", type: "Extra Vote", status: "active", note: "Won on Exile Island after Coach stole the supplies key, forcing Ozzy into a negotiation where he traded his extra vote offer to Q — but Ozzy actually got the Extra Vote from Q in the deal." },
+      { holder: "Savannah Louie", type: "Block-a-Vote", status: "used", note: "Won the Journey stacking challenge against Colby. Fans voted for 'dynamic' advantages, awarding her a secret Block-a-Vote she hid from her tribe — though nobody believed she returned empty-handed." },
+      { holder: "Colby Donaldson", type: "Lost Vote (disadvantage)", status: "used", note: "Lost the Journey stacking challenge to Savannah, forfeiting his vote at the next Tribal Council." },
+      { holder: "Q Burdette", type: "Lost Vote (disadvantage)", status: "used", note: "Sent to Exile Island with Coach after the supplies challenge. Coach took the supplies key, leaving Q to trade away his vote to Ozzy in exchange for camp supplies." },
     ],
-    recap: "Season 50 launched with a chaotic, high-energy premiere that wasted no time reminding viewers why returning players are so dangerous — they hit the beach already running. The three tribes of eight (Vatu in purple, Kalo in teal, Cila in orange) immediately fractured along lines of past alliances and perceived threat levels, with former winners and runners-up landing squarely in each other's crosshairs. Jenna Lewis-Dougherty, the beloved Borneo original, was voted out at Cila's first Tribal Council when Jonathan Young's attempt to play a hidden immunity idol failed after it was nullified by a twist — leaving Jenna without the votes she needed to survive. In a shocking coda, Kyle Fraser, the reigning Season 48 champion, was pulled from the game by medical after suffering a serious knee injury during the immunity challenge, making him only the second medevac boot in the same episode as a voted-out player in show history.",
+    recap: "The three-hour Season 50 premiere wasted no time living up to its 'Epic Party' title, kicking off with 24 returning legends hitting the beach with old rivalries instantly reigniting and new ones forming by sunset. The fan-voted 'dynamic advantages' flooded the game with trinkets immediately: Genevieve found the celebrity-endorsed Billie Eilish Boomerang Idol and sent it straight to Ozzy, banking on history repeating itself after he was previously voted out with an idol. On Exile Island, Coach's decision to steal the supplies key reignited his long-running beef with Ozzy, and a negotiation ended with Ozzy landing an Extra Vote while Q returned to camp voteless. A Journey saw Savannah beat Colby in a stacking challenge, earning a Block-a-Vote while Colby lost his vote. At Cila's Tribal Council, Jenna Lewis-Dougherty came in too hot — openly campaigning against Cirie on Day 1 — and her own tribemates turned the target back on her, voting her out 7-1. The episode closed on a somber note when Kyle Fraser was medically evacuated with a ruptured Achilles tendon, becoming the first Survivor winner ever to be medevac'd.",
   },
 ];
 
