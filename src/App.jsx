@@ -367,31 +367,31 @@ const CSS = `
   .logo { font-family: 'Playfair Display', serif; font-size: 1.3rem; font-weight: 900; color: #c8922a; letter-spacing: 0.05em; white-space: nowrap; }
   .logo span { color: #f0ebe0; font-weight: 700; }
   .nav { display: flex; gap: 0.25rem; flex-wrap: wrap; }
-  .nav-btn { background: none; border: 1px solid transparent; color: #888; padding: 0.4rem 0.75rem; font-family: 'DM Mono', monospace; font-size: 0.68rem; cursor: pointer; letter-spacing: 0.08em; text-transform: uppercase; transition: all 0.2s; border-radius: 2px; white-space: nowrap; }
+  .nav-btn { background: none; border: 1px solid transparent; color: #bbb; padding: 0.4rem 0.75rem; font-family: 'DM Mono', monospace; font-size: 0.68rem; cursor: pointer; letter-spacing: 0.08em; text-transform: uppercase; transition: all 0.2s; border-radius: 2px; white-space: nowrap; }
   .nav-btn:hover { color: #f0ebe0; border-color: rgba(180,120,40,0.3); }
   .nav-btn.active { color: #c8922a; border-color: rgba(200,146,42,0.5); background: rgba(200,146,42,0.06); }
   .container { max-width: 1200px; margin: 0 auto; padding: 1.5rem; }
   .season-bar { display: flex; align-items: center; gap: 0.5rem; margin-bottom: 2rem; padding-bottom: 1.25rem; border-bottom: 1px solid rgba(255,255,255,0.07); flex-wrap: wrap; }
-  .season-label { font-size: 0.62rem; color: #999; letter-spacing: 0.1em; text-transform: uppercase; margin-right: 0.5rem; }
-  .season-btn { font-family: 'DM Mono', monospace; font-size: 0.65rem; padding: 0.35rem 0.75rem; border-radius: 2px; cursor: pointer; letter-spacing: 0.08em; text-transform: uppercase; border: 1px solid rgba(255,255,255,0.1); background: none; color: #aaa; transition: all 0.15s; }
+  .season-label { font-size: 0.62rem; color: #bbb; letter-spacing: 0.1em; text-transform: uppercase; margin-right: 0.5rem; }
+  .season-btn { font-family: 'DM Mono', monospace; font-size: 0.65rem; padding: 0.35rem 0.75rem; border-radius: 2px; cursor: pointer; letter-spacing: 0.08em; text-transform: uppercase; border: 1px solid rgba(255,255,255,0.1); background: none; color: #ccc; transition: all 0.15s; }
   .season-btn.active { background: rgba(200,146,42,0.1); border-color: rgba(200,146,42,0.4); color: #c8922a; }
   .season-btn:hover:not(.active) { color: #f0ebe0; border-color: rgba(255,255,255,0.2); }
   .page-title { font-family: 'Playfair Display', serif; font-size: 2rem; font-weight: 900; color: #f0ebe0; margin-bottom: 0.3rem; }
-  .page-subtitle { font-size: 0.68rem; color: #999; letter-spacing: 0.1em; text-transform: uppercase; margin-bottom: 2rem; }
-  .section-title { font-size: 0.65rem; letter-spacing: 0.12em; text-transform: uppercase; color: #999; margin-bottom: 1rem; padding-bottom: 0.5rem; border-bottom: 1px solid rgba(255,255,255,0.06); }
+  .page-subtitle { font-size: 0.68rem; color: #bbb; letter-spacing: 0.1em; text-transform: uppercase; margin-bottom: 2rem; }
+  .section-title { font-size: 0.65rem; letter-spacing: 0.12em; text-transform: uppercase; color: #bbb; margin-bottom: 1rem; padding-bottom: 0.5rem; border-bottom: 1px solid rgba(255,255,255,0.06); }
   .leaderboard { display: flex; flex-direction: column; gap: 1rem; }
   .lb-card { background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.07); border-radius: 4px; padding: 1.25rem 1.5rem; display: grid; grid-template-columns: 2.5rem 1fr auto; align-items: center; gap: 1.5rem; }
   .lb-card.first { border-color: rgba(200,146,42,0.4); background: rgba(200,146,42,0.06); }
-  .lb-rank { font-family: 'Playfair Display', serif; font-size: 1.5rem; font-weight: 900; color: #2a2a2a; }
+  .lb-rank { font-family: 'Playfair Display', serif; font-size: 1.5rem; font-weight: 900; color: #555; }
   .lb-card.first .lb-rank { color: #c8922a; }
   .lb-tribe { font-size: 1rem; font-weight: 500; margin-bottom: 0.15rem; }
   .lb-tags { display: flex; flex-wrap: wrap; gap: 0.3rem; }
   .c-tag { font-size: 0.6rem; padding: 0.15rem 0.45rem; border-radius: 2px; letter-spacing: 0.05em; text-transform: uppercase; }
   .c-tag.alive { background: rgba(80,180,80,0.1); color: #6db86d; border: 1px solid rgba(80,180,80,0.2); }
-  .c-tag.eliminated { background: rgba(255,255,255,0.03); color: #888; border: 1px solid rgba(255,255,255,0.07); text-decoration: line-through; }
+  .c-tag.eliminated { background: rgba(255,255,255,0.03); color: #aaa; border: 1px solid rgba(255,255,255,0.07); text-decoration: line-through; }
   .lb-score { text-align: right; }
   .lb-pts { font-family: 'Playfair Display', serif; font-size: 2.2rem; font-weight: 900; color: #c8922a; line-height: 1; }
-  .lb-pts-label { font-size: 0.58rem; color: #888; letter-spacing: 0.1em; text-transform: uppercase; margin-top: 0.1rem; }
+  .lb-pts-label { font-size: 0.58rem; color: #bbb; letter-spacing: 0.1em; text-transform: uppercase; margin-top: 0.1rem; }
   .castaways-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(160px,1fr)); gap: 0.75rem; margin-bottom: 2rem; }
   .castaway-card { background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.07); border-radius: 4px; overflow: hidden; position: relative; transition: border-color 0.2s; }
   .castaway-card::after { content:''; position:absolute; top:0; left:0; right:0; height:2px; }
@@ -403,15 +403,15 @@ const CSS = `
   .c-photo-placeholder { width: 100%; aspect-ratio: 3/4; background: #111; display: flex; align-items: center; justify-content: center; font-size: 1.5rem; color: #bbb; }
   .c-info { padding: 0.65rem 0.75rem; }
   .c-name { font-size: 0.75rem; font-weight: 500; margin-bottom: 0.15rem; line-height: 1.3; }
-  .c-bio { font-size: 0.56rem; color: #aaa; margin-bottom: 0.35rem; line-height: 1.4; }
+  .c-bio { font-size: 0.56rem; color: #ccc; margin-bottom: 0.35rem; line-height: 1.4; }
   .c-row { display: flex; justify-content: space-between; align-items: center; margin-top: 0.25rem; }
   .c-status { font-size: 0.58rem; letter-spacing: 0.08em; text-transform: uppercase; }
   .c-status.alive { color: #6db86d; }
-  .c-status.eliminated { color: #999; }
-  .c-status.undrafted { color: #888; }
+  .c-status.eliminated { color: #bbb; }
+  .c-status.undrafted { color: #aaa; }
   .c-pts { font-family: 'Playfair Display', serif; font-size: 1rem; color: #c8922a; font-weight: 900; margin-top: 0.15rem; }
   .divider { height: 1px; background: rgba(255,255,255,0.06); margin: 1.5rem 0; }
-  .action-btn { font-family: 'DM Mono', monospace; font-size: 0.68rem; padding: 0.5rem 1rem; border-radius: 2px; cursor: pointer; letter-spacing: 0.08em; text-transform: uppercase; transition: all 0.15s; border: 1px solid; margin-bottom: 1rem; background: rgba(255,255,255,0.03); border-color: rgba(255,255,255,0.1); color: #aaa; }
+  .action-btn { font-family: 'DM Mono', monospace; font-size: 0.68rem; padding: 0.5rem 1rem; border-radius: 2px; cursor: pointer; letter-spacing: 0.08em; text-transform: uppercase; transition: all 0.15s; border: 1px solid; margin-bottom: 1rem; background: rgba(255,255,255,0.03); border-color: rgba(255,255,255,0.1); color: #ccc; }
   .action-btn.primary { background: rgba(200,146,42,0.15); border-color: rgba(200,146,42,0.4); color: #c8922a; }
   .action-btn.primary:hover { background: rgba(200,146,42,0.25); }
   .action-btn.danger { background: rgba(200,60,60,0.08); border-color: rgba(200,60,60,0.3); color: #cc6060; }
@@ -421,13 +421,13 @@ const CSS = `
   .grid2 { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; }
   .select, .input { background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.12); color: #f0ebe0; border-radius: 3px; padding: 0.55rem 0.65rem; font-family: 'DM Mono', monospace; font-size: 0.75rem; outline: none; }
   .row { display:flex; gap:0.75rem; align-items:center; flex-wrap:wrap; }
-  .hint { font-size:0.65rem; color:#777; line-height:1.4; }
+  .hint { font-size:0.65rem; color:#bbb; line-height:1.4; }
   .hist-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px,1fr)); gap: 1rem; margin-bottom: 1.5rem; }
   .hist-card { background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.07); border-radius: 4px; padding: 1rem 1.25rem; }
   .hist-card.champ { border-color: rgba(200,146,42,0.4); background: rgba(200,146,42,0.06); }
   .hist-score { font-family: 'Playfair Display', serif; font-size: 1.8rem; font-weight: 900; }
   .hist-table { width: 100%; border-collapse: collapse; font-size: 0.7rem; }
-  .hist-table th { text-align: left; color: #999; font-size: 0.58rem; letter-spacing: 0.08em; text-transform: uppercase; padding: 0.4rem 0.75rem; border-bottom: 1px solid rgba(255,255,255,0.07); font-weight: 400; }
+  .hist-table th { text-align: left; color: #bbb; font-size: 0.58rem; letter-spacing: 0.08em; text-transform: uppercase; padding: 0.4rem 0.75rem; border-bottom: 1px solid rgba(255,255,255,0.07); font-weight: 400; }
   .hist-table td { padding: 0.45rem 0.75rem; border-bottom: 1px solid rgba(255,255,255,0.04); }
   .hist-table tr:last-child td { border-bottom: none; }
   .hist-table tr:hover td { background: rgba(255,255,255,0.02); }
@@ -597,9 +597,10 @@ function Leaderboard({ season, scores, castaways, showOdds }) {
         {scores.map((team, i) => {
           const oddsDisplay = teamOddsSummary(team.picks);
           const proj = projectedPts(team.picks, season.totalCastaways);
+          const rank = i === 0 ? 1 : (scores[i].total < scores[i-1].total ? i + 1 : scores.findIndex(s => s.total === team.total) + 1);
           return (
-            <div key={team.id} className={`lb-card ${i === 0 ? "first" : ""}`}>
-              <div className="lb-rank">{i + 1}</div>
+            <div key={team.id} className={`lb-card ${rank === 1 ? "first" : ""}`}>
+              <div className="lb-rank">{rank}</div>
               <div style={{ flex: 1 }}>
                 <div className="lb-tribe" style={{ color: team.color }}>
                   {team.name}
@@ -625,7 +626,7 @@ function Leaderboard({ season, scores, castaways, showOdds }) {
                 </div>
               </div>
               <div className="lb-score">
-                <div className="lb-pts" style={{ color: i === 0 ? "#c8922a" : team.color }}>{team.total}</div>
+                <div className="lb-pts" style={{ color: rank === 1 ? "#c8922a" : team.color }}>{team.total}</div>
                 <div className="lb-pts-label">points</div>
                 {showOdds && (
                   <div style={{ fontSize: "0.58rem", color: "#777", marginTop: "0.25rem" }}>
