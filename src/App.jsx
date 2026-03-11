@@ -850,9 +850,8 @@ const S50_EPISODES = [
     airDate: "March 4, 2026",
     eliminated: "Savannah Louie",
     advantages: [
-      { holder: "Christian Hubicki", type: "Billie Eilish Boomerang Idol → gifted to Aubry Bracco", status: "active", note: "Christian found Cila's Boomerang Idol and gave it to Aubry, bringing her to tears. Like Ozzy's, it returns to the finder if the recipient is voted out with it." },
-      { holder: "Cirie Fields", type: "Extra Vote", status: "active", note: "Ozzy gave Cirie his Extra Vote — the first advantage of Cirie's entire Survivor career — after she campaigned to protect him from the vote." },
-      { holder: "Savannah Louie", type: "Block-a-Vote", status: "used", note: "Won on the Journey in Episode 1 but never successfully deployed — her tribemates suspected she had it, and she was voted out 6-1 before she could use it." },
+      { holder: "Aubry Bracco", kind: "advantage", type: "Idol", status: "active", note: "Christian found Cila's Boomerang Idol and gave it to Aubry, bringing her to tears. Like Ozzy's, it returns to the finder if the recipient is voted out with it." },
+      { holder: "Cirie Fields", kind: "advantage", type: "Extra Vote", status: "active", note: "Ozzy gave Cirie his Extra Vote — the first advantage of Cirie's entire Survivor career — after she campaigned to protect him from the vote." },
     ],
     recap: "Episode 2 kept the chaos at Cila front and center as the tribe returned to Tribal Council for the second straight week. Season 49 winner Savannah Louie was on thin ice from the start — her tribemates never bought her story about returning from the Journey empty-handed in the premiere, and her Block-a-Vote was an open secret. A feud between Rick Devens and Joe Hunter over honesty and strategy briefly put Joe's name in the mix, but Cirie masterfully steered the vote toward Savannah, framing it as a chance to flush her advantage and remove a proven winner in one move. Savannah was voted out 6-1 in a unanimous decision, making her the second person voted out and third eliminated overall. Elsewhere, Christian Hubicki found Cila's Billie Eilish Boomerang Idol and gifted it to Aubry Bracco, and in a touching moment of alliance-building, Ozzy handed Cirie his Extra Vote — the first advantage in her long Survivor career. The episode ended on a brilliantly chaotic note courtesy of Rick Devens, who hatched a scheme to plant a fake idol at Tribal Council using the packaging from Christian's Boomerang Idol. To pull it off, Christian provided the distraction — intentionally face-planting on his way out of Tribal, crumpling to the ground over absolutely nothing before somehow getting \"lost\" leaving the set, while Rick snuck the fake idol behind a rock near the fire. The plan nearly unraveled when Rick immediately turned to Jeff Probst with a barely-concealed grin, all but announcing what he'd just done.",
   },
@@ -862,11 +861,11 @@ const S50_EPISODES = [
     airDate: "February 25, 2026",
     eliminated: "Jenna Lewis-Dougherty, Kyle Fraser (medevac)",
     advantages: [
-      { holder: "Ozzy Lusth", type: "Billie Eilish Boomerang Idol (received from Genevieve)", status: "active", note: "Genevieve (Vatu) found the first Boomerang Idol — a fully-powered idol good through Final Five — and sent it to Ozzy. If Ozzy is voted out holding it, the idol returns to Genevieve." },
-      { holder: "Ozzy Lusth", type: "Extra Vote", status: "active", note: "Won on Exile Island after Coach stole the supplies key, forcing Ozzy into a negotiation where he traded his extra vote offer to Q — but Ozzy actually got the Extra Vote from Q in the deal." },
-      { holder: "Savannah Louie", type: "Block-a-Vote", status: "used", note: "Won the Journey stacking challenge against Colby. Fans voted for 'dynamic' advantages, awarding her a secret Block-a-Vote she hid from her tribe — though nobody believed she returned empty-handed." },
-      { holder: "Colby Donaldson", type: "Lost Vote (disadvantage)", status: "used", note: "Lost the Journey stacking challenge to Savannah, forfeiting his vote at the next Tribal Council." },
-      { holder: "Q Burdette", type: "Lost Vote (disadvantage)", status: "used", note: "Sent to Exile Island with Coach after the supplies challenge. Coach took the supplies key, leaving Q to trade away his vote to Ozzy in exchange for camp supplies." },
+      { holder: "Ozzy Lusth", kind: "advantage", type: "Idol", status: "active", note: "Genevieve (Vatu) found the first Boomerang Idol — a fully-powered idol good through Final Five — and sent it to Ozzy. If Ozzy is voted out holding it, the idol returns to Genevieve." },
+      { holder: "Ozzy Lusth", kind: "advantage", type: "Extra Vote", status: "active", note: "Won on Exile Island after Coach stole the supplies key, forcing Ozzy into a negotiation where he traded his extra vote offer to Q — but Ozzy actually got the Extra Vote from Q in the deal." },
+      { holder: "Colby Donaldson", kind: "disadvantage", type: "Lost Vote", status: "active", note: "Lost the Journey stacking challenge to Savannah, forfeiting his vote at the next Tribal Council." },
+      { holder: "Q Burdette", kind: "disadvantage", type: "Lost Vote", status: "active", note: "Sent to Exile Island with Coach after the supplies challenge. Coach took the supplies key, leaving Q to trade away his vote to Ozzy in exchange for camp supplies." },
+      { holder: "Savannah Louie", kind: "advantage", type: "Block-a-Vote", status: "voted-out", note: "Won the Journey stacking challenge against Colby but never successfully deployed — her tribemates suspected she had it, and she was voted out in Episode 2 before she could use it." },
     ],
     recap: "The three-hour Season 50 premiere wasted no time living up to its 'Epic Party' title, kicking off with 24 returning legends hitting the beach with old rivalries instantly reigniting and new ones forming by sunset. The fan-voted 'dynamic advantages' flooded the game with trinkets immediately: Genevieve found the celebrity-endorsed Billie Eilish Boomerang Idol and sent it straight to Ozzy, banking on history repeating itself after he was previously voted out with an idol. On Exile Island, Coach's decision to steal the supplies key reignited his long-running beef with Ozzy, and a negotiation ended with Ozzy landing an Extra Vote while Q returned to camp voteless. A Journey saw Savannah beat Colby in a stacking challenge, earning a Block-a-Vote while Colby lost his vote. At Cila's Tribal Council, Jenna Lewis-Dougherty came in too hot — openly campaigning against Cirie on Day 1 — and her own tribemates turned the target back on her, voting her out 7-1. The episode closed on a somber note when Kyle Fraser was medically evacuated with a ruptured Achilles tendon, becoming the first Survivor winner ever to be medevac'd.",
   },
@@ -878,60 +877,56 @@ function Recap() {
       <div className="page-title">Recap</div>
       <div className="page-subtitle">Season 50 · Episode-by-episode breakdown · Most recent first</div>
 
+      {/* Advantages & Disadvantages table */}
+      <div className="section-title">Advantages &amp; Disadvantages</div>
+      <div style={{ border: "1px solid rgba(255,255,255,0.07)", borderRadius: 4, overflow: "hidden", marginBottom: "2rem" }}>
+        <div style={{ display: "grid", gridTemplateColumns: "6rem 6rem 1fr 7rem 2fr", background: "rgba(255,255,255,0.04)", padding: "0.6rem 1rem", fontSize: "0.58rem", letterSpacing: "0.1em", textTransform: "uppercase", color: "#bbb", borderBottom: "1px solid rgba(255,255,255,0.07)" }}>
+          <div>Status</div><div>Episode</div><div>Castaway</div><div>Type</div><div>Description</div>
+        </div>
+        {S50_EPISODES.flatMap(ep =>
+          ep.advantages.map((adv, i) => ({ ...adv, epTitle: ep.title, epNum: ep.number, i }))
+        ).map((adv, idx, arr) => (
+          <div key={`${adv.epNum}-${adv.i}`} style={{ display: "grid", gridTemplateColumns: "6rem 6rem 1fr 7rem 2fr", padding: "0.6rem 1rem", fontSize: "0.7rem", borderBottom: idx < arr.length - 1 ? "1px solid rgba(255,255,255,0.04)" : "none", background: idx % 2 === 0 ? "rgba(255,255,255,0.01)" : "transparent", alignItems: "center", gap: "0.5rem" }}>
+            <div>
+              <span style={{
+                fontSize: "0.55rem", letterSpacing: "0.08em", textTransform: "uppercase",
+                padding: "0.2rem 0.5rem", borderRadius: 2,
+                background: adv.status === "active" ? "rgba(109,184,109,0.1)" : adv.status === "voted-out" ? "rgba(200,146,42,0.08)" : "rgba(255,255,255,0.04)",
+                border: adv.status === "active" ? "1px solid rgba(109,184,109,0.25)" : adv.status === "voted-out" ? "1px solid rgba(200,146,42,0.25)" : "1px solid rgba(255,255,255,0.08)",
+                color: adv.status === "active" ? "#6db86d" : adv.status === "voted-out" ? "#c8922a" : "#777",
+              }}>
+                {adv.status === "active" ? "Active" : adv.status === "voted-out" ? "Voted Out" : "Used"}
+              </span>
+            </div>
+            <div style={{ color: "#a78bda", fontSize: "0.65rem" }}>{adv.epTitle}</div>
+            <div style={{ color: "#f0ebe0", fontSize: "0.68rem" }}>{adv.holder}</div>
+            <div style={{ fontSize: "0.65rem", color: adv.kind === "disadvantage" ? "#e07060" : "#6ab4d8" }}>
+              {adv.kind === "disadvantage" ? "⬇ " : "⬆ "}{adv.type}
+            </div>
+            <div style={{ color: "#bbb", fontSize: "0.65rem", lineHeight: 1.45 }}>{adv.note}</div>
+          </div>
+        ))}
+      </div>
+
+      {/* Episode recaps */}
+      <div className="section-title">Episodes</div>
       <div style={{ display: "flex", flexDirection: "column", gap: "1.5rem" }}>
         {S50_EPISODES.map(ep => (
           <div key={ep.number} className="panel" style={{ borderColor: "rgba(255,255,255,0.09)", position: "relative", overflow: "hidden" }}>
-            {/* Episode accent bar */}
             <div style={{ position: "absolute", top: 0, left: 0, right: 0, height: 2, background: "linear-gradient(90deg, #c8922a, rgba(200,146,42,0.1))" }} />
-
-            {/* Episode header */}
             <div style={{ display: "flex", alignItems: "flex-start", justifyContent: "space-between", flexWrap: "wrap", gap: "0.5rem", marginBottom: "1rem" }}>
-              <div>
-                <div style={{ display: "flex", alignItems: "center", gap: "0.75rem", marginBottom: "0.2rem" }}>
-                  <span style={{ fontFamily: "'Playfair Display', serif", fontSize: "1.15rem", fontWeight: 900, color: "#f0ebe0" }}>{ep.title}</span>
-                  <span style={{ fontSize: "0.58rem", color: "#777", letterSpacing: "0.1em", textTransform: "uppercase" }}>{ep.airDate}</span>
-                </div>
+              <div style={{ display: "flex", alignItems: "center", gap: "0.75rem" }}>
+                <span style={{ fontFamily: "'Playfair Display', serif", fontSize: "1.15rem", fontWeight: 900, color: "#f0ebe0" }}>{ep.title}</span>
+                <span style={{ fontSize: "0.58rem", color: "#bbb", letterSpacing: "0.1em", textTransform: "uppercase" }}>{ep.airDate}</span>
               </div>
               <div style={{ display: "flex", alignItems: "center", gap: "0.4rem", background: "rgba(200,60,60,0.08)", border: "1px solid rgba(200,60,60,0.2)", borderRadius: 3, padding: "0.3rem 0.65rem" }}>
                 <span style={{ fontSize: "0.55rem", letterSpacing: "0.12em", textTransform: "uppercase", color: "#cc6060" }}>Eliminated</span>
                 <span style={{ fontSize: "0.68rem", color: "#f0ebe0" }}>{ep.eliminated}</span>
               </div>
             </div>
-
-            {/* Recap paragraph */}
-            <p style={{ fontSize: "0.78rem", color: "#d0cab8", lineHeight: 1.75, marginBottom: "1.25rem" }}>
+            <p style={{ fontSize: "0.78rem", color: "#d0cab8", lineHeight: 1.75 }}>
               {ep.recap}
             </p>
-
-            {/* Advantages / Disadvantages */}
-            {ep.advantages.length > 0 && (
-              <>
-                <div className="section-title" style={{ marginBottom: "0.6rem" }}>Advantages &amp; Disadvantages</div>
-                <div style={{ display: "flex", flexDirection: "column", gap: "0.45rem" }}>
-                  {ep.advantages.map((adv, i) => (
-                    <div key={i} style={{ display: "flex", alignItems: "flex-start", gap: "0.75rem", padding: "0.55rem 0.75rem", background: "rgba(255,255,255,0.02)", border: "1px solid rgba(255,255,255,0.06)", borderRadius: 3 }}>
-                      <span style={{
-                        fontSize: "0.55rem", letterSpacing: "0.1em", textTransform: "uppercase",
-                        padding: "0.2rem 0.5rem", borderRadius: 2, whiteSpace: "nowrap", marginTop: "0.05rem",
-                        background: adv.status === "active" ? "rgba(109,184,109,0.1)" : "rgba(255,255,255,0.04)",
-                        border: adv.status === "active" ? "1px solid rgba(109,184,109,0.25)" : "1px solid rgba(255,255,255,0.08)",
-                        color: adv.status === "active" ? "#6db86d" : "#666",
-                        textDecoration: adv.status === "used" ? "line-through" : "none",
-                      }}>
-                        {adv.status === "active" ? "Active" : "Used"}
-                      </span>
-                      <div style={{ flex: 1, minWidth: 0 }}>
-                        <div style={{ fontSize: "0.72rem", color: "#c8922a", fontWeight: 500, marginBottom: "0.15rem" }}>
-                          {adv.type}
-                          <span style={{ color: "#888", fontWeight: 400, marginLeft: "0.4rem" }}>· {adv.holder}</span>
-                        </div>
-                        <div style={{ fontSize: "0.63rem", color: "#888", lineHeight: 1.45 }}>{adv.note}</div>
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              </>
-            )}
           </div>
         ))}
       </div>
