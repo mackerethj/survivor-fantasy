@@ -824,17 +824,23 @@ function Points({ season, castaways }) {
       <div className="page-title">Points</div>
       <div className="page-subtitle">Season {season.id} · Points by finish position</div>
       <div style={{ border:"1px solid rgba(255,255,255,0.07)", borderRadius:4, overflow:"hidden" }}>
-        <div style={{ display:"grid", gridTemplateColumns:"6rem 7rem 1fr 6rem", background:"rgba(255,255,255,0.04)", padding:"0.6rem 1rem", fontSize:"0.58rem", letterSpacing:"0.1em", textTransform:"uppercase", color:"#bbb", borderBottom:"1px solid rgba(255,255,255,0.07)" }}>
-          <div>Finish</div><div>Points</div><div>Castaway</div><div>Team</div>
-        </div>
         {rows.map((r, idx) => {
           const team = r.castaway ? TEAMS.find(t => t.id === r.castaway.draftedBy) : null;
+          const hasCastaway = !!r.castaway;
           return (
-            <div key={r.fp} style={{ display:"grid", gridTemplateColumns:"6rem 7rem 1fr 6rem", padding:"0.55rem 1rem", fontSize:"0.72rem", borderBottom: idx < rows.length-1 ? "1px solid rgba(255,255,255,0.04)" : "none", background: idx%2===0 ? "rgba(255,255,255,0.01)" : "transparent", alignItems:"center" }}>
-              <div style={{ color:"#f0ebe0", fontFamily:"'Playfair Display',serif", fontWeight:900 }}>{ordinal(r.fp)}</div>
-              <div style={{ color:"#c8922a", fontFamily:"'Playfair Display',serif", fontWeight:900 }}>{r.pts}</div>
-              <div style={{ color: r.castaway ? "#f0ebe0" : "#777", fontSize:"0.68rem" }}>{r.castaway ? r.castaway.name : "—"}</div>
-              <div style={{ color: team ? team.color : "#555", fontSize:"0.65rem" }}>{team ? team.name : "—"}</div>
+            <div key={r.fp} style={{ padding:"0.65rem 1rem", borderBottom: idx < rows.length-1 ? "1px solid rgba(255,255,255,0.04)" : "none", background: idx%2===0 ? "rgba(255,255,255,0.01)" : "transparent" }}>
+              {/* Top line: finish + points + castaway name */}
+              <div style={{ display:"flex", alignItems:"baseline", gap:"0.6rem", flexWrap:"wrap" }}>
+                <span style={{ color:"#f0ebe0", fontFamily:"'Playfair Display',serif", fontWeight:900, fontSize:"0.85rem", minWidth:"3rem" }}>{ordinal(r.fp)}</span>
+                <span style={{ color:"#c8922a", fontFamily:"'Playfair Display',serif", fontWeight:900, fontSize:"0.85rem", minWidth:"2.5rem" }}>{r.pts} pts</span>
+                <span style={{ color: hasCastaway ? "#f0ebe0" : "#444", fontSize:"0.78rem" }}>{hasCastaway ? r.castaway.name : "—"}</span>
+              </div>
+              {/* Bottom line: team (only if castaway exists) */}
+              {hasCastaway && (
+                <div style={{ marginTop:"0.2rem", paddingLeft:"0.1rem" }}>
+                  <span style={{ fontSize:"0.62rem", color: team ? team.color : "#555" }}>{team ? team.name : "Undrafted"}</span>
+                </div>
+              )}
             </div>
           );
         })}
@@ -877,33 +883,33 @@ function Recap() {
       <div className="page-title">Recap</div>
       <div className="page-subtitle">Season 50 · Episode-by-episode breakdown · Most recent first</div>
 
-      {/* Advantages & Disadvantages table */}
+      {/* Advantages & Disadvantages — mobile-friendly cards */}
       <div className="section-title">Advantages &amp; Disadvantages</div>
-      <div style={{ border: "1px solid rgba(255,255,255,0.07)", borderRadius: 4, overflow: "hidden", marginBottom: "2rem" }}>
-        <div style={{ display: "grid", gridTemplateColumns: "6rem 6rem 1fr 7rem 2fr", background: "rgba(255,255,255,0.04)", padding: "0.6rem 1rem", fontSize: "0.58rem", letterSpacing: "0.1em", textTransform: "uppercase", color: "#bbb", borderBottom: "1px solid rgba(255,255,255,0.07)" }}>
-          <div>Status</div><div>Episode</div><div>Castaway</div><div>Type</div><div>Description</div>
-        </div>
+      <div style={{ display: "flex", flexDirection: "column", gap: "0.5rem", marginBottom: "2rem" }}>
         {S50_EPISODES.flatMap(ep =>
           ep.advantages.map((adv, i) => ({ ...adv, epTitle: ep.title, epNum: ep.number, i }))
-        ).map((adv, idx, arr) => (
-          <div key={`${adv.epNum}-${adv.i}`} style={{ display: "grid", gridTemplateColumns: "6rem 6rem 1fr 7rem 2fr", padding: "0.6rem 1rem", fontSize: "0.7rem", borderBottom: idx < arr.length - 1 ? "1px solid rgba(255,255,255,0.04)" : "none", background: idx % 2 === 0 ? "rgba(255,255,255,0.01)" : "transparent", alignItems: "center", gap: "0.5rem" }}>
-            <div>
+        ).map((adv, idx) => (
+          <div key={`${adv.epNum}-${adv.i}`} style={{ display: "flex", flexDirection: "column", gap: "0.35rem", padding: "0.75rem 1rem", background: idx % 2 === 0 ? "rgba(255,255,255,0.02)" : "transparent", border: "1px solid rgba(255,255,255,0.06)", borderRadius: 4 }}>
+            {/* Top row: status + episode + type */}
+            <div style={{ display: "flex", alignItems: "center", gap: "0.5rem", flexWrap: "wrap" }}>
               <span style={{
                 fontSize: "0.55rem", letterSpacing: "0.08em", textTransform: "uppercase",
-                padding: "0.2rem 0.5rem", borderRadius: 2,
-                background: adv.status === "active" ? "rgba(109,184,109,0.1)" : adv.status === "voted-out" ? "rgba(200,146,42,0.08)" : "rgba(255,255,255,0.04)",
-                border: adv.status === "active" ? "1px solid rgba(109,184,109,0.25)" : adv.status === "voted-out" ? "1px solid rgba(200,146,42,0.25)" : "1px solid rgba(255,255,255,0.08)",
-                color: adv.status === "active" ? "#6db86d" : adv.status === "voted-out" ? "#c8922a" : "#777",
+                padding: "0.2rem 0.5rem", borderRadius: 2, whiteSpace: "nowrap",
+                background: adv.status === "active" ? "rgba(109,184,109,0.1)" : adv.status === "voted-out" ? "rgba(200,60,60,0.08)" : "rgba(255,255,255,0.04)",
+                border: adv.status === "active" ? "1px solid rgba(109,184,109,0.25)" : adv.status === "voted-out" ? "1px solid rgba(200,60,60,0.25)" : "1px solid rgba(255,255,255,0.08)",
+                color: adv.status === "active" ? "#6db86d" : adv.status === "voted-out" ? "#cc6060" : "#777",
               }}>
                 {adv.status === "active" ? "Active" : adv.status === "voted-out" ? "Voted Out" : "Used"}
               </span>
+              <span style={{ fontSize: "0.6rem", color: "#a78bda" }}>{adv.epTitle}</span>
+              <span style={{ fontSize: "0.6rem", color: adv.kind === "disadvantage" ? "#c8922a" : "#6ab4d8" }}>
+                {adv.kind === "disadvantage" ? "⬇ " : "⬆ "}{adv.type}
+              </span>
             </div>
-            <div style={{ color: "#a78bda", fontSize: "0.65rem" }}>{adv.epTitle}</div>
-            <div style={{ color: "#f0ebe0", fontSize: "0.68rem" }}>{adv.holder}</div>
-            <div style={{ fontSize: "0.65rem", color: adv.kind === "disadvantage" ? "#e07060" : "#6ab4d8" }}>
-              {adv.kind === "disadvantage" ? "⬇ " : "⬆ "}{adv.type}
-            </div>
-            <div style={{ color: "#bbb", fontSize: "0.65rem", lineHeight: 1.45 }}>{adv.note}</div>
+            {/* Castaway name */}
+            <div style={{ fontSize: "0.75rem", color: "#f0ebe0", fontWeight: 500 }}>{adv.holder}</div>
+            {/* Description */}
+            <div style={{ fontSize: "0.65rem", color: "#bbb", lineHeight: 1.5 }}>{adv.note}</div>
           </div>
         ))}
       </div>
