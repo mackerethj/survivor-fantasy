@@ -444,7 +444,7 @@ const CSS = `
 
 export default function App() {
   const [splashDismissed, setSplashDismissed] = useState(() => {
-    try { return localStorage.getItem("sf_splash_ep2_v3") === "1"; } catch { return false; }
+    try { return localStorage.getItem("sf_splash_ep2_v4") === "1"; } catch { return false; }
   });
   const [page, setPage] = useState("leaderboard");
   const [historySeason, setHistorySeason] = useState(49);
@@ -480,7 +480,7 @@ export default function App() {
   }, [castaways, season50]);
 
   const dismissSplash = () => {
-    try { localStorage.setItem("sf_splash_ep2_v2", "1"); } catch {}
+    try { localStorage.setItem("sf_splash_ep2_v4", "1"); } catch {}
     setSplashDismissed(true);
   };
 
