@@ -1,6 +1,22 @@
+
+
+Ran a command, viewed a file
+Ran a command, viewed a file
+Claude's response could not be fully generated
+
+
+On the Recap page, move the advantages/disadvantages that are no longer active to the bottom of the list.  For Q's, instead of Used, put Applied Episode 3
+
+Claude is AI and can make mistakes. Please double-check responses.
+Page · JSX
+Copy
+
 // src/App.jsx
 import { useEffect, useMemo, useState } from "react";
-
+ 
+// ⬇️ Bump this each time you commit/publish to force the splash page to reappear for everyone
+const SPLASH_VERSION = "ep3_v1";
+ 
 function calcPoints(eliminationOrder, totalCastaways) {
   if (!eliminationOrder || eliminationOrder <= 2) return 0;
   const lastThreeStart = totalCastaways - 2;
@@ -11,7 +27,7 @@ function calcPoints(eliminationOrder, totalCastaways) {
   }
   return eliminationOrder - 2;
 }
-
+ 
 const TEAMS = [
   { id: 1, name: "Miloa",   members: "Team Miller",    color: "#c8922a" },
   { id: 2, name: "Jinga",   members: "Team Mackereth", color: "#6a9fd8" },
@@ -19,7 +35,7 @@ const TEAMS = [
   { id: 4, name: "Weloki",  members: "Team Wells",     color: "#c46ab0" },
   { id: 5, name: "Nochoso", members: "The Unchosen",   color: "#888888" },
 ];
-
+ 
 const SEASONS = [
   { id: 50, label: "Season 50", totalCastaways: 24, current: true },
   { id: 49, label: "Season 49", totalCastaways: 18 },
@@ -30,40 +46,40 @@ const SEASONS = [
   { id: 44, label: "Season 44", totalCastaways: 18 },
   { id: 43, label: "Season 43", totalCastaways: 18 },
 ];
-
+ 
 const TRIBE_COLORS = { Vatu: "#a855c8", Kalo: "#2ab8a0", Cila: "#e8782a" };
-
+ 
 // draftedBy: 1=Miloa, 2=Jinga, 3=Ojalu, 4=Weloki, null=undrafted
 // Draft locked — do not modify picks here
 const S50_CASTAWAYS = [
-  { name: "Angelina Keeley",         tribe: "Vatu", bio: "3rd place, S37 David vs. Goliath",                                    odds: "+4000", photo: "https://entertainmentnow.com/wp-content/uploads/2026/01/survivor-season-50-cast-spoilers-first-photos-angelina-keeley.jpg",         draftedBy: 5    },
-  { name: "Aubry Bracco",            tribe: "Vatu", bio: "Runner-up S32 Kaoh Rong · S34 Game Changers · S38 Edge of Extinction", odds: "-250",  photo: "https://entertainmentnow.com/wp-content/uploads/2026/01/survivor-season-50-cast-spoilers-first-photos-aubry-bracco.jpg",            draftedBy: 4    },
-  { name: 'Benjamin "Coach" Wade',   tribe: "Kalo", bio: "Runner-up S23 South Pacific · S18 Tocantins · S20 Heroes vs. Villains",odds: "+3500", photo: "https://entertainmentnow.com/wp-content/uploads/2026/01/survivor-season-50-cast-spoilers-first-photos-benjamin-coach-wade.jpg",   draftedBy: 1    },
-  { name: "Charlie Davis",           tribe: "Kalo", bio: "Runner-up S46",                                                        odds: "+2500", photo: "https://entertainmentnow.com/wp-content/uploads/2026/01/survivor-season-50-cast-spoilers-first-photos-charlie-davis.jpg",           draftedBy: 4    },
-  { name: "Chrissy Hofbeck",         tribe: "Kalo", bio: "Runner-up S35 Heroes vs. Healers vs. Hustlers",                        odds: "+3000", photo: "https://entertainmentnow.com/wp-content/uploads/2026/01/survivor-season-50-cast-spoilers-first-photos-chrissy-hofbeck.jpg",         draftedBy: 5    },
-  { name: "Christian Hubicki",       tribe: "Cila", bio: "7th place S37 David vs. Goliath",                                      odds: "+800",  photo: "https://entertainmentnow.com/wp-content/uploads/2026/01/survivor-season-50-cast-spoilers-first-photos-christian-hubicki.jpg",       draftedBy: 1    },
-  { name: "Cirie Fields",            tribe: "Cila", bio: "5x player · S12 Panama · S16 Micronesia · S20 HvV · S34 Game Changers",odds: "+1200", photo: "https://entertainmentnow.com/wp-content/uploads/2026/01/survivor-season-50-cast-spoilers-first-photos-cirie-fields.jpg",            draftedBy: 4    },
-  { name: "Colby Donaldson",         tribe: "Vatu", bio: "Runner-up S2 Australian Outback · S8 All-Stars · S20 Heroes vs. Villains",odds:"+5000",photo: "https://entertainmentnow.com/wp-content/uploads/2026/01/survivor-season-50-cast-spoilers-first-photos-colby-donaldson.jpg",         draftedBy: 2    },
-  { name: "Dee Valladares",          tribe: "Kalo", bio: "WINNER S45 ★",                                                         odds: "+2000", photo: "https://entertainmentnow.com/wp-content/uploads/2026/01/survivor-season-50-cast-spoilers-first-photos-dee-valladares.jpg",          draftedBy: 3    },
-  { name: "Emily Flippen",           tribe: "Cila", bio: "7th place S45",                                                        odds: "+2500", photo: "https://entertainmentnow.com/wp-content/uploads/2026/01/survivor-season-50-cast-spoilers-first-photos-emily-flippen.jpg",           draftedBy: 1    },
-  { name: "Genevieve Mushaluk",      tribe: "Vatu", bio: "5th place S47",                                                        odds: "+2000", photo: "https://entertainmentnow.com/wp-content/uploads/2026/01/survivor-season-50-cast-spoilers-first-photos-genevieve-mushaluk.jpg",      draftedBy: 4    },
-  { name: "Jenna Lewis-Dougherty",   tribe: "Cila", bio: "S1 Borneo · Final 3 S8 All-Stars",                                     odds: "+4000", photo: "https://entertainmentnow.com/wp-content/uploads/2026/01/survivor-season-50-cast-spoilers-first-photos-jenna-lewis-dougherty.jpg",   draftedBy: 5    },
-  { name: "Joe Hunter",              tribe: "Cila", bio: "3rd place S48",                                                        odds: "+700",  photo: "https://entertainmentnow.com/wp-content/uploads/2026/01/survivor-season-50-cast-spoilers-first-photos-joe-hunter.jpg",              draftedBy: 3    },
-  { name: "Jonathan Young",          tribe: "Kalo", bio: "4th place S42",                                                        odds: "+900",  photo: "https://entertainmentnow.com/wp-content/uploads/2026/01/survivor-season-50-cast-spoilers-first-photos-jonathan-young.jpg",          draftedBy: 2    },
-  { name: "Kamilla Karthigesu",      tribe: "Kalo", bio: "4th place S48",                                                        odds: "+2500", photo: "https://entertainmentnow.com/wp-content/uploads/2026/01/survivor-season-50-cast-spoilers-first-photos-kamilla-karthigesu.jpg",      draftedBy: 3    },
-  { name: "Kyle Fraser",             tribe: "Vatu", bio: "WINNER S48 ★",                                                         odds: "+2000", photo: "https://entertainmentnow.com/wp-content/uploads/2026/01/survivor-season-50-cast-spoilers-first-photos-kyle-fraser.jpg",             draftedBy: 5    },
-  { name: "Mike White",              tribe: "Kalo", bio: "Runner-up S37 David vs. Goliath · Creator of The White Lotus",         odds: "+3000", photo: "https://entertainmentnow.com/wp-content/uploads/2026/01/survivor-season-50-cast-spoilers-first-photos-mike-white.jpg",              draftedBy: 1    },
-  { name: "Ozzy Lusth",              tribe: "Cila", bio: "Runner-up S13 Cook Islands · 4x player total",                         odds: "+3500", photo: "https://entertainmentnow.com/wp-content/uploads/2026/01/survivor-season-50-cast-spoilers-first-photos-ozzy-lutsh.jpg",              draftedBy: 2    },
-  { name: "Q Burdette",              tribe: "Vatu", bio: "8th place S46",                                                        odds: "+3000", photo: "https://entertainmentnow.com/wp-content/uploads/2026/01/survivor-season-50-cast-spoilers-first-photos-quintavius-q-burdette.jpg",   draftedBy: 3    },
-  { name: "Rick Devens",             tribe: "Cila", bio: "4th place S38 Edge of Extinction",                                     odds: "+2500", photo: "https://entertainmentnow.com/wp-content/uploads/2026/01/survivor-season-50-cast-spoilers-first-photos-rick-devens.jpg",             draftedBy: 4    },
-  { name: "Rizo Velovic",            tribe: "Vatu", bio: "4th place S49",                                                        odds: "+3000", photo: "https://entertainmentnow.com/wp-content/uploads/2026/01/survivor-season-50-cast-spoilers-first-photos-rizo-velovic.jpg",            draftedBy: 2    },
-  { name: "Savannah Louie",          tribe: "Cila", bio: "WINNER S49 ★",                                                         odds: "+2500", photo: "https://entertainmentnow.com/wp-content/uploads/2026/01/survivor-season-50-cast-spoilers-first-photos-savannah-louie.jpg",          draftedBy: 1    },
-  { name: "Stephenie LaGrossa",      tribe: "Vatu", bio: "Runner-up S11 Guatemala · S10 Palau · S20 Heroes vs. Villains",        odds: "+4000", photo: "https://entertainmentnow.com/wp-content/uploads/2026/01/survivor-season-50-cast-spoilers-first-photos-stephanie-lagrossa-kendrick.jpg", draftedBy: 3 },
-  { name: "Tiffany Ervin",           tribe: "Kalo", bio: "8th place S46",                                                        odds: "+3500", photo: "https://entertainmentnow.com/wp-content/uploads/2026/01/survivor-season-50-cast-spoilers-first-photos-tiffany-ervin.jpg",           draftedBy: 2    },
+  { name: "Angelina Keeley",         tribe: "Vatu", origTribe: "Kalo", bio: "3rd place, S37 David vs. Goliath",                                    odds: "+4000", photo: "https://entertainmentnow.com/wp-content/uploads/2026/01/survivor-season-50-cast-spoilers-first-photos-angelina-keeley.jpg",         draftedBy: 5    },
+  { name: "Aubry Bracco",            tribe: "Kalo", origTribe: "Vatu", bio: "Runner-up S32 Kaoh Rong · S34 Game Changers · S38 Edge of Extinction", odds: "-250",  photo: "https://entertainmentnow.com/wp-content/uploads/2026/01/survivor-season-50-cast-spoilers-first-photos-aubry-bracco.jpg",            draftedBy: 4    },
+  { name: 'Benjamin "Coach" Wade',   tribe: "Kalo", origTribe: "Kalo", bio: "Runner-up S23 South Pacific · S18 Tocantins · S20 Heroes vs. Villains",odds: "+3500", photo: "https://entertainmentnow.com/wp-content/uploads/2026/01/survivor-season-50-cast-spoilers-first-photos-benjamin-coach-wade.jpg",   draftedBy: 1    },
+  { name: "Charlie Davis",           tribe: "Cila", origTribe: "Kalo", bio: "Runner-up S46",                                                        odds: "+2500", photo: "https://entertainmentnow.com/wp-content/uploads/2026/01/survivor-season-50-cast-spoilers-first-photos-charlie-davis.jpg",           draftedBy: 4    },
+  { name: "Chrissy Hofbeck",         tribe: "Kalo", origTribe: "Kalo", bio: "Runner-up S35 Heroes vs. Healers vs. Hustlers",                        odds: "+3000", photo: "https://entertainmentnow.com/wp-content/uploads/2026/01/survivor-season-50-cast-spoilers-first-photos-chrissy-hofbeck.jpg",         draftedBy: 5    },
+  { name: "Christian Hubicki",       tribe: "Vatu", origTribe: "Cila", bio: "7th place S37 David vs. Goliath",                                      odds: "+800",  photo: "https://entertainmentnow.com/wp-content/uploads/2026/01/survivor-season-50-cast-spoilers-first-photos-christian-hubicki.jpg",       draftedBy: 1    },
+  { name: "Cirie Fields",            tribe: "Cila", origTribe: "Cila", bio: "5x player · S12 Panama · S16 Micronesia · S20 HvV · S34 Game Changers",odds: "+1200", photo: "https://entertainmentnow.com/wp-content/uploads/2026/01/survivor-season-50-cast-spoilers-first-photos-cirie-fields.jpg",            draftedBy: 4    },
+  { name: "Colby Donaldson",         tribe: "Kalo", origTribe: "Vatu", bio: "Runner-up S2 Australian Outback · S8 All-Stars · S20 Heroes vs. Villains",odds:"+5000",photo: "https://entertainmentnow.com/wp-content/uploads/2026/01/survivor-season-50-cast-spoilers-first-photos-colby-donaldson.jpg",         draftedBy: 2    },
+  { name: "Dee Valladares",          tribe: "Cila", origTribe: "Kalo", bio: "WINNER S45 ★",                                                         odds: "+2000", photo: "https://entertainmentnow.com/wp-content/uploads/2026/01/survivor-season-50-cast-spoilers-first-photos-dee-valladares.jpg",          draftedBy: 3    },
+  { name: "Emily Flippen",           tribe: "Vatu", origTribe: "Cila", bio: "7th place S45",                                                        odds: "+2500", photo: "https://entertainmentnow.com/wp-content/uploads/2026/01/survivor-season-50-cast-spoilers-first-photos-emily-flippen.jpg",           draftedBy: 1    },
+  { name: "Genevieve Mushaluk",      tribe: "Kalo", origTribe: "Vatu", bio: "5th place S47",                                                        odds: "+2000", photo: "https://entertainmentnow.com/wp-content/uploads/2026/01/survivor-season-50-cast-spoilers-first-photos-genevieve-mushaluk.jpg",      draftedBy: 4    },
+  { name: "Jenna Lewis-Dougherty",   tribe: "Cila", origTribe: "Cila", bio: "S1 Borneo · Final 3 S8 All-Stars",                                     odds: "+4000", photo: "https://entertainmentnow.com/wp-content/uploads/2026/01/survivor-season-50-cast-spoilers-first-photos-jenna-lewis-dougherty.jpg",   draftedBy: 5    },
+  { name: "Joe Hunter",              tribe: "Kalo", origTribe: "Cila", bio: "3rd place S48",                                                        odds: "+700",  photo: "https://entertainmentnow.com/wp-content/uploads/2026/01/survivor-season-50-cast-spoilers-first-photos-joe-hunter.jpg",              draftedBy: 3    },
+  { name: "Jonathan Young",          tribe: "Cila", origTribe: "Kalo", bio: "4th place S42",                                                        odds: "+900",  photo: "https://entertainmentnow.com/wp-content/uploads/2026/01/survivor-season-50-cast-spoilers-first-photos-jonathan-young.jpg",          draftedBy: 2    },
+  { name: "Kamilla Karthigesu",      tribe: "Cila", origTribe: "Kalo", bio: "4th place S48",                                                        odds: "+2500", photo: "https://entertainmentnow.com/wp-content/uploads/2026/01/survivor-season-50-cast-spoilers-first-photos-kamilla-karthigesu.jpg",      draftedBy: 3    },
+  { name: "Kyle Fraser",             tribe: "Vatu", origTribe: "Vatu", bio: "WINNER S48 ★",                                                         odds: "+2000", photo: "https://entertainmentnow.com/wp-content/uploads/2026/01/survivor-season-50-cast-spoilers-first-photos-kyle-fraser.jpg",             draftedBy: 5    },
+  { name: "Mike White",              tribe: "Vatu", origTribe: "Kalo", bio: "Runner-up S37 David vs. Goliath · Creator of The White Lotus",         odds: "+3000", photo: "https://entertainmentnow.com/wp-content/uploads/2026/01/survivor-season-50-cast-spoilers-first-photos-mike-white.jpg",              draftedBy: 1    },
+  { name: "Ozzy Lusth",              tribe: "Vatu", origTribe: "Cila", bio: "Runner-up S13 Cook Islands · 4x player total",                         odds: "+3500", photo: "https://entertainmentnow.com/wp-content/uploads/2026/01/survivor-season-50-cast-spoilers-first-photos-ozzy-lutsh.jpg",              draftedBy: 2    },
+  { name: "Q Burdette",              tribe: "Vatu", origTribe: "Vatu", bio: "8th place S46",                                                        odds: "+3000", photo: "https://entertainmentnow.com/wp-content/uploads/2026/01/survivor-season-50-cast-spoilers-first-photos-quintavius-q-burdette.jpg",   draftedBy: 3    },
+  { name: "Rick Devens",             tribe: "Cila", origTribe: "Cila", bio: "4th place S38 Edge of Extinction",                                     odds: "+2500", photo: "https://entertainmentnow.com/wp-content/uploads/2026/01/survivor-season-50-cast-spoilers-first-photos-rick-devens.jpg",             draftedBy: 4    },
+  { name: "Rizo Velovic",            tribe: "Cila", origTribe: "Vatu", bio: "4th place S49",                                                        odds: "+3000", photo: "https://entertainmentnow.com/wp-content/uploads/2026/01/survivor-season-50-cast-spoilers-first-photos-rizo-velovic.jpg",            draftedBy: 2    },
+  { name: "Savannah Louie",          tribe: "Cila", origTribe: "Cila", bio: "WINNER S49 ★",                                                         odds: "+2500", photo: "https://entertainmentnow.com/wp-content/uploads/2026/01/survivor-season-50-cast-spoilers-first-photos-savannah-louie.jpg",          draftedBy: 1    },
+  { name: "Stephenie LaGrossa",      tribe: "Vatu", origTribe: "Vatu", bio: "Runner-up S11 Guatemala · S10 Palau · S20 Heroes vs. Villains",        odds: "+4000", photo: "https://entertainmentnow.com/wp-content/uploads/2026/01/survivor-season-50-cast-spoilers-first-photos-stephanie-lagrossa-kendrick.jpg", draftedBy: 3 },
+  { name: "Tiffany Ervin",           tribe: "Kalo", origTribe: "Vatu", bio: "8th place S46",                                                        odds: "+3500", photo: "https://entertainmentnow.com/wp-content/uploads/2026/01/survivor-season-50-cast-spoilers-first-photos-tiffany-ervin.jpg",           draftedBy: 2    },
 ];
-
+ 
 const ADMIN_PASSWORD = "Ottffsse9";
-
+ 
 const S43_RESULTS = {
   season: 43,
   teamScores: [
@@ -93,7 +109,7 @@ const S43_RESULTS = {
     { place: 1,  points: 0,  player: "Morriah", team: "NA",     teamColor: "#777" },
   ],
 };
-
+ 
 const S44_RESULTS = {
   season: 44,
   teamScores: [
@@ -123,7 +139,7 @@ const S44_RESULTS = {
     { place: 1,  points: 0,  player: "Bruce",    team: "NA",     teamColor: "#777" },
   ],
 };
-
+ 
 const S45_RESULTS = {
   season: 45,
   teamScores: [
@@ -153,7 +169,7 @@ const S45_RESULTS = {
     { place: 1,  points: 0,  player: "Hanna",   team: "NA",     teamColor: "#777" },
   ],
 };
-
+ 
 const S46_RESULTS = {
   season: 46,
   teamScores: [
@@ -183,7 +199,7 @@ const S46_RESULTS = {
     { place: 1,  points: 0,  player: "David",   team: "NA",     teamColor: "#777" },
   ],
 };
-
+ 
 const S47_RESULTS = {
   season: 47,
   teamScores: [
@@ -213,7 +229,7 @@ const S47_RESULTS = {
     { place: 1,  points: 0,  player: "Jon",       team: "NA",     teamColor: "#777" },
   ],
 };
-
+ 
 const S48_RESULTS = {
   season: 48,
   teamScores: [
@@ -243,7 +259,7 @@ const S48_RESULTS = {
     { place: 1,  points: 0,  player: "Stephanie", team: "NA",     teamColor: "#777" },
   ],
 };
-
+ 
 const S49_RESULTS = {
   season: 49,
   teamScores: [
@@ -273,9 +289,9 @@ const S49_RESULTS = {
     { place: 1,  points: 0,  player: "Nicole",   team: "NA",     teamColor: "#777" },
   ],
 };
-
+ 
 const HISTORICAL = { 43: S43_RESULTS, 44: S44_RESULTS, 45: S45_RESULTS, 46: S46_RESULTS, 47: S47_RESULTS, 48: S48_RESULTS, 49: S49_RESULTS };
-
+ 
 const SEASON_WINNERS = [
   { season: 43, winner: "Jinga"  },
   { season: 44, winner: "Jinga"  },
@@ -285,7 +301,7 @@ const SEASON_WINNERS = [
   { season: 48, winner: "Jinga"  },
   { season: 49, winner: "Jinga"  },
 ];
-
+ 
 function getChampionshipsThrough(season) {
   const counts = {};
   for (const s of SEASON_WINNERS) {
@@ -293,22 +309,23 @@ function getChampionshipsThrough(season) {
   }
   return counts;
 }
-
+ 
 const EP1_ELIMINATIONS = {
   "Jenna Lewis-Dougherty": 1,  // Episode 1 boot
   "Kyle Fraser": 2,            // Episode 1 medevac
   "Savannah Louie": 3,         // Episode 2 boot
+  "Q Burdette": 4,             // Episode 3 boot
 };
-
+ 
 function buildCastawaysForSeason50() {
   return S50_CASTAWAYS.map((c, idx) => ({
-    id: idx + 1, name: c.name, tribe: c.tribe || "", bio: c.bio || "",
+    id: idx + 1, name: c.name, tribe: c.tribe || "", origTribe: c.origTribe || "", bio: c.bio || "",
     odds: c.odds || "", photo: c.photo || "",
     draftedBy: c.draftedBy ?? null,
     eliminationOrder: EP1_ELIMINATIONS[c.name] ?? null,
   }));
 }
-
+ 
 // Re-apply locked draft assignments + enforce known eliminations on top of saved state
 function applyLockedDraft(castaways) {
   return castaways.map(c => {
@@ -318,12 +335,15 @@ function applyLockedDraft(castaways) {
     return {
       ...c,
       draftedBy: master.draftedBy ?? null,
+      // Always pull tribe + origTribe from master so stale localStorage never shows old values
+      tribe: master.tribe || c.tribe,
+      origTribe: master.origTribe || c.origTribe || "",
       // Enforce known eliminations so stale localStorage never shows wrong scores
       eliminationOrder: lockedElim ?? c.eliminationOrder,
     };
   });
 }
-
+ 
 const STORAGE_KEY = "sf_v2_state";
 function loadState() {
   try { const r = localStorage.getItem(STORAGE_KEY); return r ? JSON.parse(r) : null; } catch { return null; }
@@ -331,7 +351,7 @@ function loadState() {
 function saveState(s) {
   try { localStorage.setItem(STORAGE_KEY, JSON.stringify(s)); } catch {}
 }
-
+ 
 function oddsColor(odds) {
   if (!odds) return "#555";
   if (odds.startsWith("-")) return "#c8922a";
@@ -341,23 +361,23 @@ function oddsColor(odds) {
   if (n <= 2500) return "#6a9fd8";
   return "#aaa";
 }
-
+ 
 function proxyPhoto(url) {
   if (!url) return "";
   return "https://images.weserv.nl/?url=" + encodeURIComponent(url) + "&w=400&output=jpg";
 }
-
+ 
 function Photo({ src, alt, className }) {
   const [err, setErr] = useState(false);
   if (!src || err) return <div className={className + "-placeholder"}><span>👤</span></div>;
   return <img src={proxyPhoto(src)} alt={alt} className={className} onError={() => setErr(true)} loading="lazy" />;
 }
-
+ 
 function ordinal(n) {
   const s = ["th","st","nd","rd"], v = n % 100;
   return n + (s[(v-20)%10] || s[v] || s[0]);
 }
-
+ 
 const CSS = `
   @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;900&family=DM+Mono:wght@400;500&display=swap');
   * { box-sizing: border-box; margin: 0; padding: 0; }
@@ -441,49 +461,49 @@ const CSS = `
     .lb-pts { font-size: 1.6rem; }
   }
 `;
-
+ 
 export default function App() {
   const [splashDismissed, setSplashDismissed] = useState(() => {
-    try { return localStorage.getItem("sf_splash_ep2_v4") === "1"; } catch { return false; }
+    try { return localStorage.getItem(`sf_splash_${SPLASH_VERSION}`) === "1"; } catch { return false; }
   });
   const [page, setPage] = useState("leaderboard");
   const [historySeason, setHistorySeason] = useState(49);
   const [toast, setToast] = useState(null);
   const [showOdds, setShowOdds] = useState(false);
-
+ 
   const [castaways, setCastawaysRaw] = useState(() => {
     const saved = loadState();
     if (saved?.castaways?.length) return applyLockedDraft(saved.castaways);
     return buildCastawaysForSeason50();
   });
-
+ 
   const [draftOrder, setDraftOrderRaw] = useState(() => {
     const saved = loadState();
     return saved?.draftOrder || TEAMS.map(t => t.id);
   });
-
+ 
   useEffect(() => { saveState({ castaways, draftOrder, showOdds }); }, [castaways, draftOrder, showOdds]);
-
+ 
   const setCastaways = (fn) => setCastawaysRaw(prev => typeof fn === "function" ? fn(prev) : fn);
   const setDraftOrder = (o) => setDraftOrderRaw(o);
   const showToast = (msg) => { setToast(msg); setTimeout(() => setToast(null), 2500); };
   const resetSeason = () => { setCastawaysRaw(buildCastawaysForSeason50()); setDraftOrderRaw(TEAMS.map(t => t.id)); setShowOdds(false); showToast("Season 50 reset."); };
-
+ 
   const season50 = SEASONS.find(s => s.id === 50);
-
+ 
   const scores = useMemo(() => {
     return TEAMS.map(team => {
       const picks = castaways.filter(c => c.draftedBy === team.id);
-      const total = picks.reduce((sum, c) => sum + (c.eliminationOrder ? calcPoints(c.eliminationOrder, season50.totalCastaways) : 2), 0);
+      const total = picks.reduce((sum, c) => sum + (c.eliminationOrder ? calcPoints(c.eliminationOrder, season50.totalCastaways) : 3), 0);
       return { ...team, picks, total };
     }).sort((a, b) => b.total - a.total);
   }, [castaways, season50]);
-
+ 
   const dismissSplash = () => {
-    try { localStorage.setItem("sf_splash_ep2_v4", "1"); } catch {}
+    try { localStorage.setItem(`sf_splash_${SPLASH_VERSION}`, "1"); } catch {}
     setSplashDismissed(true);
   };
-
+ 
   if (!splashDismissed) {
     return (
       <>
@@ -509,9 +529,9 @@ export default function App() {
             fontFamily: "'Playfair Display', serif", fontWeight: 900,
             fontSize: "clamp(1.6rem, 5vw, 2.4rem)", color: "#f0ebe0",
             lineHeight: 1.2, marginBottom: "1.25rem",
-          }}>Scores have been updated<br/>for Episode 2</div>
+          }}>Scores have been updated<br/>for Episode 3</div>
           <div style={{ fontSize: "0.78rem", color: "#999", marginBottom: "2.5rem", maxWidth: 360, lineHeight: 1.6 }}>
-            Watch Episode 2 before continuing to avoid spoilers.
+            Watch Episode 3 before continuing to avoid spoilers.
           </div>
           <button onClick={dismissSplash} style={{
             background: "rgba(200,146,42,0.12)", border: "1px solid rgba(200,146,42,0.5)",
@@ -529,7 +549,7 @@ export default function App() {
       </>
     );
   }
-
+ 
   return (
     <>
       <style>{CSS}</style>
@@ -544,7 +564,7 @@ export default function App() {
             ))}
           </nav>
         </header>
-
+ 
         <div className="container">
           {page === "leaderboard" && <Leaderboard season={season50} scores={scores} castaways={castaways} showOdds={showOdds} />}
           {page === "castaways"   && <Castaways   season={season50} castaways={castaways} showOdds={showOdds} />}
@@ -554,13 +574,13 @@ export default function App() {
           {page === "recap"       && <Recap />}
           {page === "admin"       && <AdminManual season={season50} castaways={castaways} draftOrder={draftOrder} showOdds={showOdds} setShowOdds={setShowOdds} resetSeason={resetSeason} setDraftOrder={setDraftOrder} setCastaways={setCastaways} showToast={showToast} />}
         </div>
-
+ 
         {toast && <div className="toast">{toast}</div>}
       </div>
     </>
   );
 }
-
+ 
 // Convert American odds string to implied win probability
 function oddsToImplied(odds) {
   if (!odds) return 0;
@@ -568,7 +588,7 @@ function oddsToImplied(odds) {
   const n = parseInt(odds.replace("+",""));
   return 100 / (n + 100);
 }
-
+ 
 // Projected points = sum of (implied_prob * max_possible_pts) for each alive pick
 function projectedPts(picks, totalCastaways) {
   const maxPts = calcPoints(totalCastaways, totalCastaways);
@@ -577,12 +597,12 @@ function projectedPts(picks, totalCastaways) {
     .reduce((sum, c) => sum + oddsToImplied(c.odds) * maxPts, 0)
     .toFixed(1);
 }
-
+ 
 function Leaderboard({ season, scores, castaways, showOdds }) {
   const eliminated = castaways.filter(c => c.eliminationOrder).length;
   const remaining = season.totalCastaways - eliminated;
   const champs = getChampionshipsThrough(49);
-
+ 
   // Sum implied win probability for each team's alive picks
   function teamOddsSummary(picks) {
     const alive = picks.filter(c => !c.eliminationOrder && c.odds);
@@ -595,7 +615,7 @@ function Leaderboard({ season, scores, castaways, showOdds }) {
       return "+" + Math.round(((1 - totalImplied) / totalImplied) * 100);
     }
   }
-
+ 
   return (
     <div>
       <div className="page-title">Leaderboard</div>
@@ -626,7 +646,7 @@ function Leaderboard({ season, scores, castaways, showOdds }) {
                     <span key={c.id} className={`c-tag ${c.eliminationOrder ? "eliminated" : "alive"}`}>
                       {c.name}{c.eliminationOrder
                         ? ` · ${calcPoints(c.eliminationOrder, season.totalCastaways)}pt`
-                        : (showOdds && c.odds ? ` · ${c.odds} · 2pt` : " · 2pt")}
+                        : (showOdds && c.odds ? ` · ${c.odds} · 3pt` : " · 3pt")}
                     </span>
                   ))}
                   {team.picks.length === 0 && <span style={{ fontSize: "0.65rem", color: "#aaa" }}>No picks — set on Draft page</span>}
@@ -648,7 +668,7 @@ function Leaderboard({ season, scores, castaways, showOdds }) {
     </div>
   );
 }
-
+ 
 function Castaways({ season, castaways, showOdds }) {
   const alive     = castaways.filter(c => !c.eliminationOrder && c.draftedBy);
   const undrafted = castaways.filter(c => !c.eliminationOrder && !c.draftedBy);
@@ -671,7 +691,7 @@ function Castaways({ season, castaways, showOdds }) {
     </div>
   );
 }
-
+ 
 function CastawayCard({ c, season, showOdds }) {
   const team = TEAMS.find(t => t.id === c.draftedBy);
   const pts  = c.eliminationOrder ? calcPoints(c.eliminationOrder, season.totalCastaways) : null;
@@ -683,7 +703,15 @@ function CastawayCard({ c, season, showOdds }) {
         <div className="c-name">{c.name}</div>
         {c.bio && <div className="c-bio">{c.bio}</div>}
         {c.tribe && (
-          <div style={{ marginBottom:"0.25rem" }}>
+          <div style={{ marginBottom:"0.25rem", display:"flex", alignItems:"center", gap:"0.25rem", flexWrap:"wrap" }}>
+            {c.origTribe && c.origTribe !== c.tribe && (
+              <span style={{ fontSize:"0.55rem", letterSpacing:"0.1em", textTransform:"uppercase", padding:"0.1rem 0.4rem", borderRadius:"2px", background:`${(TRIBE_COLORS[c.origTribe]||"#aaa")}22`, color:TRIBE_COLORS[c.origTribe]||"#aaa", border:`1px solid ${(TRIBE_COLORS[c.origTribe]||"#aaa")}55` }}>
+                {c.origTribe}
+              </span>
+            )}
+            {c.origTribe && c.origTribe !== c.tribe && (
+              <span style={{ fontSize:"0.5rem", color:"#555" }}>→</span>
+            )}
             <span style={{ fontSize:"0.55rem", letterSpacing:"0.1em", textTransform:"uppercase", padding:"0.1rem 0.4rem", borderRadius:"2px", background:`${(TRIBE_COLORS[c.tribe]||"#aaa")}22`, color:TRIBE_COLORS[c.tribe]||"#aaa", border:`1px solid ${(TRIBE_COLORS[c.tribe]||"#aaa")}55` }}>
               {c.tribe}
             </span>
@@ -699,12 +727,12 @@ function CastawayCard({ c, season, showOdds }) {
     </div>
   );
 }
-
+ 
 function History({ historySeason, setHistorySeason }) {
   const data = HISTORICAL[historySeason];
   const champs = getChampionshipsThrough(historySeason);
   const sorted = data ? [...data.teamScores].sort((a,b) => (b.score||0)-(a.score||0)) : [];
-
+ 
   return (
     <div>
       <div className="page-title">History</div>
@@ -715,7 +743,7 @@ function History({ historySeason, setHistorySeason }) {
           <button key={id} className={`season-btn ${historySeason === id ? "active" : ""}`} onClick={() => setHistorySeason(id)}>{id}</button>
         ))}
       </div>
-
+ 
       {data ? (
         <>
           <div className="section-title">Season {historySeason} — Team Scores</div>
@@ -733,7 +761,7 @@ function History({ historySeason, setHistorySeason }) {
               </div>
             ))}
           </div>
-
+ 
           <div className="section-title">Placement Results — Season {historySeason}</div>
           <div style={{ border:"1px solid rgba(255,255,255,0.07)", borderRadius:4, overflow:"hidden" }}>
             <table className="hist-table">
@@ -761,20 +789,20 @@ function History({ historySeason, setHistorySeason }) {
     </div>
   );
 }
-
+ 
 function DraftManual({ castaways, showOdds }) {
   // LOCKED — draft is complete. Read-only view only.
   const teamById = Object.fromEntries(TEAMS.map(t => [t.id, t]));
-
+ 
   return (
     <div>
       <div className="page-title">Draft</div>
       <div className="page-subtitle">Season 50 · Draft complete · Picks locked</div>
-
+ 
       <div className="panel" style={{ marginBottom:"1.25rem", borderColor:"rgba(200,146,42,0.3)", background:"rgba(200,146,42,0.04)" }}>
         <div style={{ fontSize:"0.72rem", color:"#c8922a" }}>🔒 The Season 50 draft is locked. Picks cannot be changed.</div>
       </div>
-
+ 
       <div className="grid2" style={{ marginBottom:"1.25rem" }}>
         {TEAMS.map(t => {
           const picks = castaways.filter(c => c.draftedBy === t.id);
@@ -786,7 +814,13 @@ function DraftManual({ castaways, showOdds }) {
                   <div key={c.id} className="row" style={{ justifyContent:"space-between", padding:"0.45rem 0.5rem", border:"1px solid rgba(255,255,255,0.06)", borderRadius:3, background:"rgba(255,255,255,0.02)" }}>
                     <div>
                       <div style={{ fontSize:"0.78rem" }}>{c.name}</div>
-                      <div className="row" style={{ gap:"0.4rem" }}>
+                      <div className="row" style={{ gap:"0.3rem", alignItems:"center" }}>
+                        {c.origTribe && c.origTribe !== c.tribe && (
+                          <span style={{ fontSize:"0.58rem", color:TRIBE_COLORS[c.origTribe]||"#999" }}>{c.origTribe}</span>
+                        )}
+                        {c.origTribe && c.origTribe !== c.tribe && (
+                          <span style={{ fontSize:"0.5rem", color:"#555" }}>→</span>
+                        )}
                         {c.tribe && <span style={{ fontSize:"0.58rem", color:TRIBE_COLORS[c.tribe]||"#999" }}>{c.tribe}</span>}
                         {showOdds && c.odds && <span style={{ fontSize:"0.58rem", color:oddsColor(c.odds) }}>{c.odds}</span>}
                       </div>
@@ -802,7 +836,7 @@ function DraftManual({ castaways, showOdds }) {
           );
         })}
       </div>
-
+ 
       <div className="panel">
         <div className="section-title">Not Selected</div>
         <div className="row" style={{ flexWrap:"wrap", gap:"0.4rem" }}>
@@ -816,7 +850,7 @@ function DraftManual({ castaways, showOdds }) {
     </div>
   );
 }
-
+ 
 function Points({ season, castaways }) {
   const total = season.totalCastaways;
   const elimMap = {};
@@ -825,7 +859,7 @@ function Points({ season, castaways }) {
     const eo = i + 1, fp = total - eo + 1, pts = calcPoints(eo, total);
     return { fp, eo, pts, castaway: elimMap[eo] };
   }).sort((a,b) => b.fp - a.fp);
-
+ 
   return (
     <div>
       <div className="page-title">Points</div>
@@ -844,8 +878,20 @@ function Points({ season, castaways }) {
               </div>
               {/* Bottom line: team (only if castaway exists) */}
               {hasCastaway && (
-                <div style={{ marginTop:"0.2rem", paddingLeft:"0.1rem" }}>
+                <div style={{ marginTop:"0.2rem", paddingLeft:"0.1rem", display:"flex", gap:"0.5rem", alignItems:"center", flexWrap:"wrap" }}>
                   <span style={{ fontSize:"0.62rem", color: team ? team.color : "#555" }}>{team ? team.name : "Undrafted"}</span>
+                  {r.castaway.tribe && (
+                    <span style={{ fontSize:"0.58rem", color:"#555" }}>·</span>
+                  )}
+                  {r.castaway.origTribe && r.castaway.origTribe !== r.castaway.tribe && (
+                    <span style={{ fontSize:"0.58rem", color: TRIBE_COLORS[r.castaway.origTribe]||"#777" }}>{r.castaway.origTribe}</span>
+                  )}
+                  {r.castaway.origTribe && r.castaway.origTribe !== r.castaway.tribe && (
+                    <span style={{ fontSize:"0.5rem", color:"#555" }}>→</span>
+                  )}
+                  {r.castaway.tribe && (
+                    <span style={{ fontSize:"0.58rem", color: TRIBE_COLORS[r.castaway.tribe]||"#777" }}>{r.castaway.tribe}</span>
+                  )}
                 </div>
               )}
             </div>
@@ -855,8 +901,21 @@ function Points({ season, castaways }) {
     </div>
   );
 }
-
+ 
 const S50_EPISODES = [
+  {
+    number: 3,
+    title: "Episode 3",
+    airDate: "March 11, 2026",
+    eliminated: "Q Burdette",
+    advantages: [
+      { holder: "Aubry Bracco", kind: "advantage", type: "Idol", status: "active", note: "Aubry's Boomerang Idol is now widely known — Christian told Emily before the swap, Emily immediately told Q and Ozzy, then told Angelina. Essentially the whole new Vatu tribe knows." },
+      { holder: "Ozzy Lusth", kind: "advantage", type: "Idol", status: "active", note: "Ozzy's Boomerang Idol (from Genevieve) remains active. Q revealed its origins to Ozzy in Episode 3 as a trust-building move, confirming Genevieve originally found and sent it." },
+      { holder: "Cirie Fields", kind: "advantage", type: "Extra Vote", status: "active", note: "Cirie's Extra Vote remains secret and unused. She is now on the new Cila tribe, outnumbered by four original Kalo members." },
+      { holder: "Colby Donaldson", kind: "disadvantage", type: "Lost Vote", status: "active", note: "Colby's lost vote from the Episode 1 Journey has not yet been triggered. He is now on the new Kalo tribe and will lose his vote at their next Tribal Council." },
+    ],
+    recap: "Episode 3 opened on Day 7 with Jeff Probst delivering the tribe swap announcement via an impromptu rap — the result of the fans' 'In the Hands of the Fans' vote. All 21 remaining players dropped their buffs and redrew into three new tribes of seven. The new Cila (orange) kept Cirie Fields and Rick Devens from the original alliance while absorbing four former Kalo members including Dee Valladares and Jonathan Young, who immediately identified Cirie as a merge threat. On new Kalo (blue), Joe Hunter, Coach, and Colby formed an instant bromance, while Coach bluntly told Chrissy Hofbeck she talked too much — making her cry. Genevieve began spreading distrust of Aubry to her new tribemates. The most chaotic camp was new Vatu (purple), which reunited three David vs. Goliath alums: Christian Hubicki, Mike White, and Angelina Keeley. In a rushed whisper before the swap, Christian told Emily that Aubry had an idol — Emily, feeling left out of the loop, immediately told Q and Ozzy, then told Angelina everything she knew. Q bluffed to Mike White that he had an extra vote (he does not), and told Mike to vote for him instead of Stephenie to 'protect her.' Mike called his bluff: the entire tribe voted Q out 5-1, with only Stephenie casting a vote against Angelina. Q became the 4th person eliminated from Season 50, wearing the same outfit he wore when he was voted out in Season 46.",
+  },
   {
     number: 2,
     title: "Episode 2",
@@ -875,27 +934,39 @@ const S50_EPISODES = [
     eliminated: "Jenna Lewis-Dougherty, Kyle Fraser (medevac)",
     advantages: [
       { holder: "Ozzy Lusth", kind: "advantage", type: "Idol", status: "active", note: "Genevieve (Vatu) found the first Boomerang Idol — a fully-powered idol good through Final Five — and sent it to Ozzy. If Ozzy is voted out holding it, the idol returns to Genevieve." },
-      { holder: "Ozzy Lusth", kind: "advantage", type: "Extra Vote", status: "active", note: "Won on Exile Island after Coach stole the supplies key, forcing Ozzy into a negotiation where he traded his extra vote offer to Q — but Ozzy actually got the Extra Vote from Q in the deal." },
+      { holder: "Ozzy Lusth", kind: "advantage", type: "Extra Vote", status: "active", note: "Won from Q on Exile Island — Coach stole the supplies key, leaving Q to trade his vote to Ozzy for camp supplies. In Episode 3, Q falsely told Mike White he had an extra vote (he does not)." },
       { holder: "Colby Donaldson", kind: "disadvantage", type: "Lost Vote", status: "active", note: "Lost the Journey stacking challenge to Savannah, forfeiting his vote at the next Tribal Council." },
-      { holder: "Q Burdette", kind: "disadvantage", type: "Lost Vote", status: "active", note: "Sent to Exile Island with Coach after the supplies challenge. Coach took the supplies key, leaving Q to trade away his vote to Ozzy in exchange for camp supplies." },
+      { holder: "Q Burdette", kind: "disadvantage", type: "Lost Vote", status: "used", note: "Sent to Exile Island with Coach after the supplies challenge. Coach took the supplies key, leaving Q to trade away his vote to Ozzy in exchange for camp supplies. Q confirmed to Ozzy in Episode 3 that he had lost his vote, using it as a trust-building gesture." },
       { holder: "Savannah Louie", kind: "advantage", type: "Block-a-Vote", status: "voted-out", note: "Won the Journey stacking challenge against Colby but never successfully deployed — her tribemates suspected she had it, and she was voted out in Episode 2 before she could use it." },
     ],
     recap: "The three-hour Season 50 premiere wasted no time living up to its 'Epic Party' title, kicking off with 24 returning legends hitting the beach with old rivalries instantly reigniting and new ones forming by sunset. The fan-voted 'dynamic advantages' flooded the game with trinkets immediately: Genevieve found the celebrity-endorsed Billie Eilish Boomerang Idol and sent it straight to Ozzy, banking on history repeating itself after he was previously voted out with an idol. On Exile Island, Coach's decision to steal the supplies key reignited his long-running beef with Ozzy, and a negotiation ended with Ozzy landing an Extra Vote while Q returned to camp voteless. A Journey saw Savannah beat Colby in a stacking challenge, earning a Block-a-Vote while Colby lost his vote. At Cila's Tribal Council, Jenna Lewis-Dougherty came in too hot — openly campaigning against Cirie on Day 1 — and her own tribemates turned the target back on her, voting her out 7-1. The episode closed on a somber note when Kyle Fraser was medically evacuated with a ruptured Achilles tendon, becoming the first Survivor winner ever to be medevac'd.",
   },
 ];
-
+ 
 function Recap() {
   return (
     <div>
       <div className="page-title">Recap</div>
       <div className="page-subtitle">Season 50 · Episode-by-episode breakdown · Most recent first</div>
-
+ 
       {/* Advantages & Disadvantages — mobile-friendly cards */}
       <div className="section-title">Advantages &amp; Disadvantages</div>
       <div style={{ display: "flex", flexDirection: "column", gap: "0.5rem", marginBottom: "2rem" }}>
-        {S50_EPISODES.flatMap(ep =>
-          ep.advantages.map((adv, i) => ({ ...adv, epTitle: ep.title, epNum: ep.number, i }))
-        ).map((adv, idx) => (
+        {(() => {
+          // Flatten oldest-first so the originating episode label is kept during dedup
+          const all = [...S50_EPISODES].reverse().flatMap(ep =>
+            ep.advantages.map((adv, i) => ({ ...adv, epTitle: ep.title, epNum: ep.number, i }))
+          );
+          const seen = new Set();
+          const deduped = all.filter(adv => {
+            const key = adv.holder + '|' + adv.type;
+            if (seen.has(key)) return false;
+            seen.add(key);
+            return true;
+          });
+          // Restore newest-first display order
+          return deduped.reverse();
+        })().map((adv, idx) => (
           <div key={`${adv.epNum}-${adv.i}`} style={{ display: "flex", flexDirection: "column", gap: "0.35rem", padding: "0.75rem 1rem", background: idx % 2 === 0 ? "rgba(255,255,255,0.02)" : "transparent", border: "1px solid rgba(255,255,255,0.06)", borderRadius: 4 }}>
             {/* Top row: status + episode + type */}
             <div style={{ display: "flex", alignItems: "center", gap: "0.5rem", flexWrap: "wrap" }}>
@@ -920,7 +991,7 @@ function Recap() {
           </div>
         ))}
       </div>
-
+ 
       {/* Episode recaps */}
       <div className="section-title">Episodes</div>
       <div style={{ display: "flex", flexDirection: "column", gap: "1.5rem" }}>
@@ -946,14 +1017,14 @@ function Recap() {
     </div>
   );
 }
-
+ 
 function AdminManual({ season, castaways, draftOrder, showOdds, setShowOdds, resetSeason, setDraftOrder, setCastaways, showToast }) {
   const [confirmReset, setConfirmReset] = useState(false);
   const [authed, setAuthed] = useState(false);
   const [pwInput, setPwInput] = useState("");
   const [pwError, setPwError] = useState(false);
   const teamById = Object.fromEntries(TEAMS.map(t => [t.id, t]));
-
+ 
   if (!authed) {
     return (
       <div>
@@ -992,36 +1063,36 @@ function AdminManual({ season, castaways, draftOrder, showOdds, setShowOdds, res
       </div>
     );
   }
-
+ 
   const usedOrders = new Set(castaways.filter(c => c.eliminationOrder).map(c => c.eliminationOrder));
   const nextElim = (() => { for (let i=1; i<=season.totalCastaways; i++) if (!usedOrders.has(i)) return i; return season.totalCastaways+1; })();
-
+ 
   const setElimOrder = (id, val) => {
     const v = val.trim() === "" ? null : parseInt(val, 10);
     setCastaways(prev => prev.map(c => c.id === id ? { ...c, eliminationOrder: Number.isFinite(v) ? v : null } : c));
   };
-
+ 
   const quickElim = (id) => {
     if (nextElim > season.totalCastaways) { showToast("All castaways already eliminated!"); return; }
     setCastaways(prev => prev.map(c => c.id === id ? { ...c, eliminationOrder: nextElim } : c));
     showToast(`Eliminated! #${nextElim}`);
   };
-
+ 
   const restore = (id) => {
     setCastaways(prev => prev.map(c => c.id === id ? { ...c, eliminationOrder: null } : c));
     showToast("Castaway restored.");
   };
-
+ 
   const clearElims = () => { setCastaways(prev => prev.map(c => ({ ...c, eliminationOrder: null }))); showToast("All eliminations cleared."); };
-
+ 
   const alive     = castaways.filter(c => !c.eliminationOrder);
   const eliminated = castaways.filter(c => c.eliminationOrder).sort((a,b) => b.eliminationOrder - a.eliminationOrder);
-
+ 
   return (
     <div>
       <div className="page-title">Admin</div>
       <div className="page-subtitle">Commissioner controls · Next elimination #{nextElim <= season.totalCastaways ? nextElim : "done"}</div>
-
+ 
       <div className="panel" style={{ marginBottom:"1.25rem" }}>
         <div className="section-title">Controls</div>
         <div className="row" style={{ marginBottom:"0.75rem" }}>
@@ -1040,7 +1111,7 @@ function AdminManual({ season, castaways, draftOrder, showOdds, setShowOdds, res
         </div>
         <div className="hint">Use "Elim #N" button to mark the next castaway out instantly, or type a number manually. Use "Restore" to undo any elimination.</div>
       </div>
-
+ 
       <div className="grid2">
         <div className="panel">
           <div className="section-title">Still In — {alive.length}</div>
@@ -1068,7 +1139,7 @@ function AdminManual({ season, castaways, draftOrder, showOdds, setShowOdds, res
             {alive.length === 0 && <div className="hint">Everyone has been eliminated!</div>}
           </div>
         </div>
-
+ 
         <div className="panel">
           <div className="section-title">Eliminated — {eliminated.length} (most recent first)</div>
           {eliminated.length === 0
