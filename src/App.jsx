@@ -1,780 +1,9 @@
-
-
-page.jsx
-jsx
-
-Please update this entire code.  I want to add another page to my Survivor App.  Call it Recap and link it to each pages just like all of the other pages.  Add a 1 paragraph review of each episode.  Include who was eliminated and what advantages or disadvantages the castaways have.   Sort the episodes descending.
-
-Mar 10
-Let me start by reading the uploaded file and the design skill.
-
-
-Viewed 5 files
-Viewed 5 files
-Now I have the full picture. Let me build the updated file with the Recap page added.
-
-
-Check skills directory
-Check skills directory
-Now I have everything I need. Let me create the updated file with the Recap page integrated into the existing dark, refined aesthetic.
-
-
-Get exact nav line to understand what to replace
-Get exact nav line to understand what to replace
-Now I'll copy the file and make targeted edits to add the Recap page:
-
-
-Edited 2 files, ran a command
-Edited 2 files, ran a command
-Now let me add the Recap component and episode data before the closing of the file. I'll insert it just before function AdminManual:
-
-
-Edited a file, ran a command, read a file
-Edited a file, ran a command, read a file
-Here's what was added:
-
-Recap page is now linked in the nav bar between History and Admin, and includes:
-
-Episode 2 (most recent, shown first) — covers Savannah Louie's elimination, Christian Hubicki's idol find, and Cirie Fields' steal-a-vote
-Episode 1 — covers Jenna Lewis-Dougherty's vote-out, Kyle Fraser's medevac, Aubry Bracco's extra vote, and Jonathan Young's nullified idol
-Each episode card features:
-
-A gold accent bar at the top matching the app's aesthetic
-Episode title, air date, and a red "Eliminated" badge
-A full paragraph recap in the existing dark/mono style
-An advantages/disadvantages section with color-coded Active (green) or Used (strikethrough/gray) status badges, the advantage type in gold, the holder's name, and a note on how it was acquired
-As new episodes air, just add a new object to the top of S50_EPISODES with the episode number, title, date, eliminated castaway(s), advantages, and recap paragraph — the rest sorts itself automatically (descending by episode number).
-
-Page
-Code · JSX 
-Now when I load it, I get the landing page and when I click continue it just goes to a blank screen.  I tested it on multiple device
-
-Mar 10
-Let me look at the current file to diagnose the issue.
-
-
-Check the splice point where recap page render was added
-Check the splice point where recap page render was added
-Found it — the str_replace accidentally merged the <Recap /> line with the AdminManual props, breaking line 547. Let me fix that:
-
-
-Edited a file, viewed a file
-Edited a file, viewed a file
-Clean. The Admin line had gotten its props orphaned outside the JSX tag, which caused a parse error that crashed the whole app.
-
-
-Presented file
-Presented file
-That should be fully working now. The bug was that my earlier edit accidentally dropped the {page === "admin" && <AdminManual line and left its props floating as raw JSX text, which caused a syntax error that made the entire app crash to a blank screen after the splash. All pages — including the new Recap — should render correctly now.
-
-Page
-Code · JSX 
-Those advantages are definitely not right.  Can you double check on all of them?
-
-Mar 10
-
-Searched the web
-Searched the web
-Got everything I need. The advantages were significantly wrong — I had fabricated several of them. Here's what actually happened across both episodes:
-
-Episode 1:
-
-Genevieve found the Billie Eilish Boomerang Idol (Vatu) and gave it to Ozzy
-Ozzy won an Extra Vote on Exile Island (and later gave it to Cirie in Ep 2)
-Q lost his vote on Exile Island
-Savannah won a Block-a-Vote on the Journey
-Colby lost his vote on the Journey
-Episode 2:
-
-Christian found Cila's Boomerang Idol and gifted it to Aubry
-Ozzy gave Cirie his Extra Vote (first advantage of her career)
-Savannah's Block-a-Vote was flushed/exposed at her vote-out
-Let me fix all of this now:
-
-
-Viewed a file, edited a file, read a file
-Viewed a file, edited a file, read a file
-The advantages are now corrected based on actual episode recaps. Here's what changed:
-
-Episode 1 — was completely wrong, now accurate:
-
-Genevieve found the Billie Eilish Boomerang Idol → sent it to Ozzy (not Aubry)
-Ozzy won an Extra Vote on Exile Island (didn't exist before)
-Savannah won a Block-a-Vote on the Journey (not Aubry's "Extra Vote")
-Colby and Q both took Lost Vote disadvantages (missing entirely before)
-Removed the fake "Jonathan nullified idol" — that never happened
-Episode 2 — also corrected:
-
-Christian found Cila's Boomerang Idol and gave it to Aubry (not "Christian found an idol on Cila beach")
-Cirie received Ozzy's Extra Vote — correctly labeled as an Extra Vote, not a Steal-a-Vote
-Savannah's Block-a-Vote now shows as "used/expired" since she was voted out with it
-Air dates also fixed to 2026.
-
-Page
-Code · JSX 
-Can you please put the RECAP right after LEADERBOARD?
-
-Mar 10
-
-Edited a file, read a file
-Edited a file, read a file
-Done — Recap is now the second item in the nav, right after Leaderboard.
-
-Page
-Code · JSX 
-Will you please add to your episode 2 recap?  Just something simple about them hiding a fake idol
-
-Mar 10
-Sure! What details would you like me to include — who made the fake idol, who it was planted on or intended for, and what happened with it?
-
-And that “dark cloud” was merely one of two incredible bookends to the second episode of Survivor 50, as Christian later ended the proceedings by hilariously performing an intentional face-plant while leaving Tribal Council. And, proving an impressive commitment to the bit, he even pretended (at least we assume pretended) to get lost on his way out of Tribal.
-The reason for the ridiculous fall — in which he tripped on absolutely nothing and just kind of crumpled to the ground like Colby’s journey puzzle — was to provide a distraction for his partner in crime, Rick Devens.
-Exclusive video, interviews, breaking news, games, polls, and more!
-That’s because Devens had an absolutely brilliant idea. After learning of Christian’s Boomerang Idol, Rick thought it would be fun to take Christian’s packaging and make a fake idol to hide at Tribal Council, and that’s exactly what that sweet, ring-tossing, Joe-arguing, Savannah-hunting bastard did!
-He used the distraction of Christian’s absurd Tribal tumble to sneak his fake idol behind one of the rocks surrounding the fire. Of course, he then almost undid the entire thing by blatantly mugging to Jeff Probst after, like “Yo, you see that, buddy?”
-
-Show more
-Mar 10
-Got it! That's a great detail. Let me add it to the Episode 2 recap now.
-
-
-Edited a file, read a file
-Edited a file, read a file
-Added! The recap now ends with the Rick/Christian fake idol caper — Christian's theatrical face-plant as the distraction, the planted fake idol behind the fire rocks, and Rick nearly blowing the whole thing by immediately mugging at Probst. Should be a fun read for the league.
-
-Page
-Code · JSX 
-Instead of showing us 1, 2,3,4,5 right now, please change your methodology to show 1,1,1,4,5.  Also anything that uses that light gray font, anywhere in the app is almost impossible to see
-
-Mar 10
-Two clear fixes. Let me handle both.
-
-
-Viewed 2 files
-Viewed 2 files
-Now I have a full picture of both issues. Let me fix them:
-
-
-Fix rank display to use tied rankings, and brighten all gray text throughout CSS
-Fix rank display to use tied rankings, and brighten all gray text throughout CSS
-Now fix the rank logic to show tied positions:
-
-
-Edited 3 files, read a file
-Edited 3 files, read a file
-Both fixes are in:
-
-Tied rankings — if three teams are at the same score, they all show 1 and the next team shows 4, exactly like standard sports standings
-Gray text — bumped all the dim grays (#777, #888, #999, #aaa) up to #bbb or #ccc throughout the CSS, so subtitles, hints, labels, nav buttons, tags, and table headers are all meaningfully more legible
-Page
-Code · JSX 
-Will you please invert the results on the points page?  Right now you need to scroll down to see any results at all.  Dont change any data, just sort descending instead.
-
-Mar 10
-
-Viewed a file, ran a command, edited a file
-Viewed a file, ran a command, edited a file
-Done — the Points page now leads with 1st place (highest points) at the top and works down to last place.
-
-Page
-Code · JSX 
-Will you add a new field to the Points page?  Team (Jinga, Miloa, Ojalu, etc.)
-
-Mar 10
-
-Viewed a file, edited a file, read a file
-Viewed a file, edited a file, read a file
-Done — Team is now the fourth column on the Points page, displayed in each team's color. Rows without an eliminated castaway yet show a dash, and undrafted castaways will also show a dash since they don't belong to a team.
-
-Page
-Code · JSX 
-Q and Colby havent been to tribal council yet, so i think both of them still have the lose a vote disadvantage
-
-Mar 10
-Good catch. Those lost votes are still active since neither tribe has been to Tribal yet. Let me update the Episode 1 advantage statuses:
-
-
-Edited a file, read a file
-Edited a file, read a file
-Both Colby and Q's Lost Vote disadvantages now show as Active (green) in the Episode 1 recap.
-
-Page
-Code · JSX 
-Instead of listing the advantages and disadvantages with the episodes, move them all to the top of the page.  List them by Episode.
-
-Mar 10
-
-Viewed 3 files, edited a file, read a file
-Viewed 3 files, edited a file, read a file
-Done. The Recap page now opens with the full Advantages & Disadvantages section at the top, grouped under each episode header in gold. The episode recaps with their eliminated badges follow below under an Episodes section header.
-
-Page
-Code · JSX 
-I'd like you to clean it up.  Maybe into a table?  Field names: Status (Active/Inactive/Used), Episode, Castaway(Castaway who has the advantage now), Description
-
-Mar 10
-
-Replace advantages section with a clean table
-Replace advantages section with a clean table
-I also need to update the data so the note field carries the plain description and the type field isn't wasted — let me also rename the display to use type as the Description since that's what you'd want to see there, with the note as the detail. Actually let me check what the data looks like and make sure the Description column shows the right thing:
-
-
-Check what note vs type contains in episode data
-Check what note vs type contains in episode data
-Good — type is the advantage name and note is the description. The table is already using note for Description, which is correct. But I should also show the advantage name (type) somewhere — it makes sense to combine it into the Description column as a label above the note. Let me update the Description cell:
-
-
-Edited a file, read a file
-Edited a file, read a file
-Clean table now at the top with four columns — Status (colored badge), Episode, Castaway, and Description (advantage name in white + detail text below it in muted). Episodes recaps follow underneath as before.
-
-Page
-Code · JSX 
-Christian doesn't currently have the advantage, Aubry does.  You only need to list Savannah once.  Change her advantage status to Voted Out
-
-Mar 10
-Three quick fixes:
-
-
-Fix Christian/Aubry holder, remove duplicate Savannah, change her status to voted-out
-Fix Christian/Aubry holder, remove duplicate Savannah, change her status to voted-out
-Now remove the duplicate Savannah entry in Episode 1 and update the status badge to handle "voted-out":
-
-
-Remove duplicate Savannah from Episode 1 advantages
-Remove duplicate Savannah from Episode 1 advantages
-Now update the status badge rendering to handle "voted-out":
-
-
-Edited a file, read a file
-Edited a file, read a file
-All fixed — Aubry is now listed as the holder, Savannah appears only once with a red Voted Out badge, and the duplicate Episode 1 entry is gone.
-
-Page
-Code · JSX 
-Change Savannah to episode 1 and move her to the bottom of the list
-
-Mar 10
-
-Edited 2 files, read a file
-Edited 2 files, read a file
-Done — Savannah is now under Episode 1 and sits at the bottom of the table with her Voted Out badge.
-
-Page
-Code · JSX 
-Add a field after Castaway called Type.  In order make them something like: Idol, Extra Vote, Idol, Extra Vote, Lost Vote, Lost Voted, Idol.  Do something to indicate advantage vs disadvantage (color, font, emoji, whatever)
-
-Mar 10
-
-Find the table header and row rendering in Recap
-Find the table header and row rendering in Recap
-Now I need to add a kind field to the data and update the table. Let me do both together:
-
-
-Edited 2 files
-Edited 2 files
-Now update the table header and row to include the Type column:
-
-
-Edited a file, read a file
-Edited a file, read a file
-Done. The Type column now shows a ⬆ in blue for advantages (Idol, Extra Vote, Block-a-Vote) and a ⬇ in red-orange for disadvantages (Lost Vote), making it immediately clear at a glance which is which.
-
-Page
-Code · JSX 
-I dont like using Rd for disadvantages and for "Voted Out" in the status.  Will you please change 1 of them?
-
-Mar 10
-Which one would you like to change, and what color would you prefer?
-
-Change voted out to Orange (previously episode color), Episode to Gray (same as description), No change to name, type and description
-
-Mar 10
-
-Edited 2 files, read a file
-Edited 2 files, read a file
-Done — Voted Out badge is now orange to match the episode header style, and the Episode column is gray to match the Description text.
-
-Page
-Code · JSX 
-Make Episode purple
-
-Mar 10
-
-Edited a file, read a file
-Edited a file, read a file
-Done — Episode is now purple.
-
-Page
-Code · JSX 
-The advantages/disadvantages dont display well on a mobile device unless you rotate it.  Can you fix that?  It’s ok to change my table idea, just maintain the concept
-
-Mar 10
-
-Viewed a file, edited a file, read a file
-Viewed a file, edited a file, read a file
-Switched from a fixed-column grid to stacked cards. Each card shows the same info — Status badge, Episode (purple), Type (blue/red with arrow) all on one wrappable top row, then the castaway name in white below it, and the description underneath. Should read cleanly on any screen width without needing to rotate.
-
-Page
-Code · JSX 
-Flip flop the red and orange colors for disadvantages and voted out.  Also the points page doesn’t work very well on a mobile device either.
-
-Mar 10
-Two fixes at once. Let me sort out the colors and make the Points page mobile-friendly.
-
-
-Viewed a file, edited a file
-Viewed a file, edited a file
-Actually, the real fix is a proper responsive approach using CSS — let me do this properly by replacing the grid layout entirely with a two-line card style on mobile via a media query addition to the CSS, and update the disadvantage/voted-out colors at the same time:
-
-
-Fix Points to use proper responsive cards and flip disadvantage/voted-out colors
-Fix Points to use proper responsive cards and flip disadvantage/voted-out colors
-Now flip the colors — disadvantage type gets orange, voted-out badge gets red:
-
-
-Edited 2 files, read a file
-Edited 2 files, read a file
-Both fixes done:
-
-Points page — dropped the fixed-column grid entirely. Each row now shows finish + points + castaway name on one line, with the team color below it. Reads cleanly at any width with no wrapping issues.
-Colors flipped — Voted Out badge is now red, disadvantage type (Lost Vote) is now orange.
-Page
-Code · JSX 
-This is an AI photo of team miller.  Can you add it subtly somewhere on the App?
-
-Mar 11
-Ha, that's a great photo. Let me tuck it in somewhere fitting — I'll add it as a subtle easter egg on the Leaderboard next to Miloa's entry, since they're already getting the "😂 lol" treatment.
-
-
-Ran a command, viewed a file, edited a file
-Ran a command, viewed a file, edited a file
-The file path won't work in a browser though — I need to convert the image to a base64 data URL so it's embedded directly in the code:
-
-
-Check size of base64 encoded image
-Check size of base64 encoded image
-3.8MB is too large to embed directly. Let me resize it first:
-
-
-Ran 3 commands
-Ran 3 commands
-Got it. Now let me embed that into the code:
-
-
-Ran 3 commands, read a file
-Ran 3 commands, read a file
-Done! The photo is now embedded directly in the code as a base64 image so it works in any browser without needing a file path. It shows up as a small circular avatar on the right side of Miloa's leaderboard card — subtle, slightly faded, with a gold border to match the app's aesthetic. Hover over it and the title says "Team Miller's Official Portrait." 🏝️
-
-Page
-Code · JSX 
-I dont like it.  Remove both the lol emoji stuff and that photo.  Could we add the full photo to the landing page.  Maybe make it a little transparent so it kind of blends in?
-
-Mar 11
-
-Find the Miloa lol text and photo in leaderboard
-Find the Miloa lol text and photo in leaderboard
-Now let me find the splash/landing page section:
-
-
-Find the splash page JSX
-Find the splash page JSX
-Now I'll grab the base64 string from the file and do both edits — remove the lol/photo from leaderboard, add the full photo to the splash:
-
-
-Ran 3 commands, viewed 2 files
-Ran 3 commands, viewed 2 files
-Let me clean all of that up and do it properly.
-
-
-Ran 2 commands
-Ran 2 commands
-Good — "Team Miller" is just data, not the photo. The photo img tag must be in the splash section now. Let me do a full clean rewrite of the file properly:
-
-
-Strip all previous photo/emoji changes cleanly
-Strip all previous photo/emoji changes cleanly
-Good — fully clean. Now let me embed the full photo properly into the splash:
-
-
-Ran 3 commands
-Ran 3 commands
-Structure looks correct. Let me verify the closing tags are balanced:
-
-
-Check closing tags of splash
-Check closing tags of splash
-Clean. Three closing tags in the right order: </button> → </div> (inner zIndex wrapper) → </div> (outer splash container) → </>.
-
-
-Presented file
-Presented file
-Done! The "lol" text and leaderboard photo are both removed. The full photo now fills the landing page as a background at 15% opacity — dark enough to stay subtle against the black backdrop while the tribal torches and vibe show through behind the splash text. 🏝️
-
-Page
-Code · JSX 
-How do I see the splash page?
-
-Mar 11
-The splash page only shows once per session — after you click "Click to Continue →" it sets a flag in React state and won't show again until you refresh the page.
-
-So just hit F5 (or Cmd+R / Ctrl+R) and it'll appear again.
-
-When I hit F5 it just refreshes the page im on, but doesn't reload the splay page
-
-Mar 11
-That's because the splashDismissed state resets on refresh, but your browser is likely serving a cached version of the file. A few things to try:
-
-Hard refresh — Ctrl+Shift+R (Windows) or Cmd+Shift+R (Mac) — forces the browser to reload without cache
-Clear the app's localStorage/sessionStorage — open DevTools (F12) → Application tab → Storage → Clear site data
-If you're running it locally via a dev server, make sure you saved and re-deployed the new page.jsx
-Also — let me check how the splash dismissal is actually stored in the code:
-
-
-Check how splash dismissed state is stored
-Check how splash dismissed state is stored
-The splash dismissed state is saved in localStorage under the key sf_splash_ep2_v2. That's why a simple refresh doesn't bring it back — it persists across refreshes.
-
-To see the splash again:
-
-Open DevTools (F12)
-Go to Application tab → Local Storage → your site
-Find sf_splash_ep2_v2 and delete it
-Refresh the page
-Or paste this into the browser console and hit Enter:
-
-javascript
-localStorage.removeItem("sf_splash_ep2_v2"); location.reload();
-Can you make it so that every time I publish/commit the new code, it will start on the splash page?
-
-Mar 11
-The splash key is already versioned (sf_splash_ep2_v2) — so you just need to bump that version number each time you commit. Let me make that a single easy change:
-
-
-Edited 2 files, ran a command, viewed a file
-Edited 2 files, ran a command, viewed a file
-Now replace the hardcoded key strings with the constant:
-
-
-Edited 2 files, read a file
-Edited 2 files, read a file
-Now at the top of the file you'll see:
-
-js
-// ⬇️ Bump this each time you commit/publish to force the splash page to reappear for everyone
-const SPLASH_VERSION = "ep2_v2";
-Each time you publish, just change it — e.g. "ep2_v2" → "ep3_v1". Since it's a new localStorage key, everyone (including you) will see the splash again on their next visit, no manual cache clearing needed.
-
-Page
-Code · JSX 
-Episode 3 was tonight.  The tribes were repacked.  Please update the entire app based on episode 3 data online.  I also have some notes
-
-Mar 11
-Let me search for Episode 3 details and cross-reference with your notes.
-
-
-Searched the web
-Searched the web
-Let me search more specifically for the episode 3 details.
-
-
-Searched the web
-Searched the web
-I have everything I need. Let me now pull together all the data and do the full update:
-
-Episode 3 Summary:
-
-Voted out: Q Burdette (5-1, only Stephenie voted for Angelina... wait, let me re-check) — Q out, Stephenie was the lone dissenter
-New tribes:
-Cila (orange): Charlie, Dee, Kamilla, Rick Devens, Cirie, Rizo, Jonathan
-Kalo (blue/teal): Aubry, Colby, Tiffany, Coach, Chrissy, Joe, Genevieve
-Vatu (new): Stephenie, Ozzy, Emily, Christian, Mike, Angelina, Q
-Immunity: Cila 1st, Kalo 2nd, Vatu went to tribal
-Advantages: Ozzy still has idol, Aubry still has idol, Cirie still has extra vote, Colby still has lost vote
-Now let me read the current file and make all updates:
-
-
-Viewed 3 files
-Viewed 3 files
-Let me search thoroughly for all Episode 3 details before touching the code.
-
-
-Searched the web
-Searched the web
-I have everything I need. Let me compile the full picture before coding:
-
-New tribes:
-
-Cila (orange): Charlie Davis, Rick Devens, Kamilla Karthigesu, Cirie Fields, Rizo Velovic, Dee Valladares, Jonathan Young
-Kalo (blue): Aubry Bracco, Colby Donaldson, Tiffany Ervin, Coach Wade, Chrissy Hofbeck, Joe Hunter, Genevieve Mushaluk
-Vatu (purple): Christian Hubicki, Mike White, Angelina Keeley, Ozzy Lusth, Q Burdette, Stephenie LaGrossa, Emily Flippen
-Voted out: Q Burdette (5-1, only Stephenie voted for Q... wait — Stephenie was the lone vote FOR Q, everyone else voted Q out)
-
-Advantages from your notes + search:
-
-Ozzy: Idol (Boomerang, active) + Lost Vote (traded away — now expired since he's in new tribe context, but his vote loss was from EP1)
-Aubry: Idol (Boomerang, active) — now known by basically everyone on Vatu
-Cirie: Extra Vote (active)
-Colby: Lost Vote (active, from EP1 journey)
-Q's Block-a-Vote: voted out, never used
-Now let me make all the updates:
-
-
-Viewed 3 files
-Viewed 3 files
-Now I have everything. Let me make all the changes in one shot:
-
-Changes needed:
-
-SPLASH_VERSION → ep3_v1
-Tribe assignments for all 21 remaining players (post-swap)
-EP1_ELIMINATIONS → add Q Burdette as elimination #4
-Add Episode 3 to S50_EPISODES
-Update advantage statuses (Q's Lost Vote → expired/used, Ozzy's Extra Vote note update, Q's Block-a-Vote note already voted-out)
-Splash text update to "Episode 3"
-
-Ran 3 commands, edited a file
-Ran 3 commands, edited a file
-All tribes are already correct — the post-swap assignments match perfectly. The warnings were false alarms because those castaways were already on the right tribe. Now let me update the S50_EPISODES array and advantage statuses:
-
-
-Add Episode 3 recap, update advantages, Q elimination
-Add Episode 3 recap, update advantages, Q elimination
-All good. Let me do a final sanity check on the key data:
-
-
-Final verification of all changes
-Final verification of all changes
-Everything looks perfect. Let me present the file:
-
-
-Presented file
-Presented file
-Here's everything that was updated for Episode 3:
-
-Elimination: Q Burdette added as boot #4 (voted out 5-1, only Stephenie voted for Angelina)
-
-Tribe swap — all 21 players reassigned (the data was already correct from CBS pre-release photos, confirmed by the episode):
-
-🟠 Cila: Charlie, Rick Devens, Kamilla, Cirie, Rizo, Dee, Jonathan
-🔵 Kalo: Aubry, Colby, Tiffany, Coach, Chrissy, Joe, Genevieve
-🟣 Vatu: Christian, Mike, Angelina, Ozzy, Stephenie, Emily (+ Q, now eliminated)
-Advantages updated:
-
-Aubry's Idol → noted as widely exposed (Christian → Emily → Q/Ozzy → Angelina)
-Q's Lost Vote → marked Used, updated note about him confessing it to Ozzy
-Ozzy's Extra Vote → updated note that Q falsely claimed to have one in Ep3
-Colby's Lost Vote → still active, will trigger at Kalo's next tribal
-Recap page → Episode 3 write-up added at the top
-
-Splash → bumped to ep3_v1 so everyone sees it fresh on next visit, and text updated to "Episode 3"
-
-Page
-Code · JSX 
-The splash page says "Watch Episode 2 before...".  That should say Episode 3.  On the leaderboard, all remaining players should all have 3pts since they are all guaranteed that many points.  Add up the team scores appropriately.  On the Recap page, several of the advantages/disadvantages are listed multiple times.  Should be only once.  On the castaways page, include the castaways original tribe and there new tribe.  Maybe just do a "/".  Do the same on the points page and draft page.
-
-Mar 12
-
-Ran 3 commands
-Ran 3 commands
-Good — the tribe field in S50_CASTAWAYS is the current (post-swap) tribe. I need to add an origTribe field for original tribes. Let me look up the original tribe assignments and do all fixes at once:
-
-
-Fix splash text, deduplicate advantages, add origTribe to castaway data
-Fix splash text, deduplicate advantages, add origTribe to castaway data
-Now fix the UI — leaderboard alive pts, castaway card tribe display, points page tribe, draft page tribe:
-
-
-Viewed 4 files
-Viewed 4 files
-Now I have everything I need. Let me do all the UI changes in one script:
-
-
-Ran 2 commands
-Ran 2 commands
-All good. Let me do a quick final sanity check on scores:
-
-
-Verify expected team scores
-Verify expected team scores
-Scores look right. Note that Q gets 2pts (eo=4, so calcPoints(4,24) = 4-2 = 2), not 3 — that's correct since he was eliminated. Let me present the file:
-
-
-Presented file
-Presented file
-Here's everything that changed:
-
-Splash → now correctly says "Watch Episode 3 before continuing"
-
-Leaderboard → all alive players now show 3pt (guaranteed minimum) instead of 2pt. Scores updated accordingly — current standings: Jinga & Weloki tied at 15pts, Ojalu 14pts, Miloa 13pts
-
-Recap advantages → deduplicated — each advantage/disadvantage now appears only once (the most recent mention), no more repeats across episodes
-
-Castaways page → tribe badge now shows original tribe → new tribe (e.g. Cila → Vatu) using an arrow. Players who didn't swap just show their single tribe
-
-Points page → same origTribe → tribe display added in the team/tribe line under each castaway
-
-Draft page → same origTribe → tribe treatment on each pick card
-
-Page
-Code · JSX 
-The tribe badges did not update.
-
-Mar 12
-Let me check what's actually in the castaway data at runtime:
-
-
-Check origTribe references in file
-Check origTribe references in file
-The data is correct. The problem is that origTribe is set in S50_CASTAWAYS and passed through buildCastawaysForSeason50, but the app loads state from localStorage — so the saved state doesn't have origTribe. The applyLockedDraft function merges saved state but never pulls origTribe from the master data. Let me fix that:
-
-
-Check applyLockedDraft function
-Check applyLockedDraft function
-Found it — applyLockedDraft merges from localStorage but never enforces tribe or origTribe from master. Since users have stale localStorage, those fields stay as the old values. Fix is to always force tribe and origTribe from the master data too:
-
-
-Viewed a file, edited a file, read a file
-Viewed a file, edited a file, read a file
-The root cause was that tribe and origTribe were being read from stale localStorage instead of the master data. applyLockedDraft now always overwrites both fields from S50_CASTAWAYS — the same way it already enforced draftedBy and elimination order. The badges should update correctly now.
-
-Page
-Code · JSX 
-On the Recap page, move Ozzy's idol down 1 spot so that ozzy's advantages are listed next to each other
-
-Mar 12
-
-Viewed a file, ran a command
-Viewed a file, ran a command
-The dedup logic shows the first occurrence of each holder+type, so the order in Episode 3's array determines what shows. Currently it's: Aubry Idol, Cirie Extra Vote, Ozzy Idol, Colby Lost Vote. I need to swap Cirie and Ozzy's Idol so Ozzy's two entries land together when deduplicated — but wait, Ozzy's Extra Vote is only in Episode 1. The dedup keeps the first seen, so Episode 3 entries come first. I just need to swap lines 900 and 901:
-
-
-Edited a file, read a file
-Edited a file, read a file
-Done. The advantages will now display in this order: Aubry's Idol → Ozzy's Idol → Ozzy's Extra Vote → Cirie's Extra Vote → Colby's Lost Vote.
-
-Page
-Code · JSX 
-On the Recap page, move the advantages/disadvantages that are no longer active to the bottom of the list.  For Q's, instead of Used, put Applied Episode 3
-
-Mar 12
-
-Viewed a file, ran a command
-Viewed a file, ran a command
-Now I have the full picture. Two changes needed: sort active to top in the render logic, and update Q's status label. Q's status is "used" — I'll change it to "applied" and handle that in the display.
-
-
-Change Q's Lost Vote status to applied
-Change Q's Lost Vote status to applied
-Now update the render logic to sort active first, and handle the "applied" status label and styling:
-
-
-Sort active advantages to top and inactive to bottom, add applied status handling
-Sort active advantages to top and inactive to bottom, add applied status handling
-Now fix the closing of the .map() — it changed from )) to ); with the new variable approach:
-
-
-Check the closing of the advantages map block
-Check the closing of the advantages map block
-The closing )) needs to become ); to match the new return ( pattern:
-
-
-Edited a file, read a file
-Edited a file, read a file
-Done. Active advantages now appear at the top, with inactive ones (Savannah's Block-a-Vote and Q's Lost Vote) dimmed and pushed to the bottom. Q's badge reads "Applied Episode 3" instead of "Used."
-
-Page
-Code · JSX 
-Way too light.  Can barely see it
-
-Mar 12
-
-Edited a file, read a file
-Edited a file, read a file
-Bumped from 0.55 to 0.8 — should be much more readable now while still visually distinguished from the active ones.
-
-Page
-Code · JSX 
-Keep the advantages and disadvantages in the same color brightness and format as the rest of them.
-
-Mar 12
-
-Edited 2 files, viewed a file, read a file
-Edited 2 files, viewed a file, read a file
-No more dimming — inactive cards are now full brightness. The status badge for "Voted Out" and "Applied Episode 3" uses a warm amber tone to visually distinguish it from the green "Active" badge, without washing anything out.
-
-Page
-Code · JSX 
-Please update the app for episode 4.  Update the warning number on the landing page.  Update the castaway scores and team scores.  All castaways still in the game after episode 4 should have 4 pts each.  Mike White was voted out.  Update the points page with Mike.  Update the recap page.  Add rizos idol given by Genevieve to the advantages.  Definitely include details of the challenge reward.
-
-Mar 18
-I need details about Episode 4 before I can update accurately. What happened?
-
-Who won reward and what was the reward?
-What did the immunity challenge look like / who won?
-Tribal Council details — how did the vote go, any idol plays, key conversations?
-Rizo's idol from Genevieve — when/how did Genevieve give it to him, and what type is it (Boomerang Idol like the others)?
-Any other advantage activity — was Colby's lost vote triggered (Kalo went to tribal)?
-Any other notable moments for the recap?
-There are plenty of episode 4 recaps already online
-
-Mar 18
-
-Searched the web
-Searched the web
-I have everything I need. Now let me do all the updates:
-
-
-Viewed 2 files, ran a command
-Viewed 2 files, ran a command
-Now I have everything. Let me do all updates in one script:
-
-
-Ran 2 commands, read a file
-Ran 2 commands, read a file
-All updated for Episode 4 — "Knife to the Heart." Here's a summary of everything changed:
-
-Splash → warning now says Episode 4, version bumped to ep4_v1 (forces it to reappear for everyone)
-Leaderboard → all 19 remaining castaways show 4pt; Mike White shows his earned points (3pts for eo=5); team totals: Jinga & Weloki 20pts · Ojalu 18pts · Miloa 16pts · Nochoso 8pts
-Recap → Episode 4 added at the top with full recap covering the talent show, Genevieve's idol find & gift to Rizo, the combined immunity/reward challenge (ocean swim → submerged boat → arch puzzle spelling CELEBRATION), Zac Brown's spearfishing feast and private concert for Kalo, Dee's tears at Cila, Mike's Operation Save Angelina backfiring on him when Christian recognized the manipulation, and the 3-2-1 tribal blindside
-Advantages → Rizo's Boomerang Idol added (with Genevieve's strategic motive noted), Colby's lost vote updated to note Kalo won and it still hasn't triggered, all others carried forward
-Page
-Code · JSX 
-Please change the two references to Episode 3 on the landing page to say Episode 4.  Also, the episode recap is way too long.  Cut it by half or more.
-
-Mar 18
-
-Ran 2 commands, read a file
-Ran 2 commands, read a file
-Done. Landing page now says Episode 4 in both spots, and the recap was cut to roughly half — keeping the talent show, Genevieve's idol gift to Rizo, the challenge details (submerged boat → CELEBRATION puzzle), Zac Brown reward, and the full Tribal breakdown.
-
-Page
-Code · JSX 
-The episode 4 recap is soooo long.  The recaps should just be a simple recap.
-
-Mar 18
-
-Ran 2 commands, read a file
-Ran 2 commands, read a file
-All four episode recaps are now short and punchy — each cut to 3–5 sentences covering just the key moments, challenge result, and boot.
-
-Page
-Code · JSX 
-
-
-
-
-
-Claude is AI and can make mistakes. Please double-check responses.
-Page · JSX
-Copy
-
 // src/App.jsx
 import { useEffect, useMemo, useState } from "react";
- 
-// ⬇️ Bump this each time you commit/publish to force the splash page to reappear for everyone
+
+// Bump this each time you commit/publish to force the splash page to reappear for everyone
 const SPLASH_VERSION = "ep4_v1";
- 
+
 function calcPoints(eliminationOrder, totalCastaways) {
   if (!eliminationOrder || eliminationOrder <= 2) return 0;
   const lastThreeStart = totalCastaways - 2;
@@ -785,7 +14,7 @@ function calcPoints(eliminationOrder, totalCastaways) {
   }
   return eliminationOrder - 2;
 }
- 
+
 const TEAMS = [
   { id: 1, name: "Miloa",   members: "Team Miller",    color: "#c8922a" },
   { id: 2, name: "Jinga",   members: "Team Mackereth", color: "#6a9fd8" },
@@ -793,7 +22,7 @@ const TEAMS = [
   { id: 4, name: "Weloki",  members: "Team Wells",     color: "#c46ab0" },
   { id: 5, name: "Nochoso", members: "The Unchosen",   color: "#888888" },
 ];
- 
+
 const SEASONS = [
   { id: 50, label: "Season 50", totalCastaways: 24, current: true },
   { id: 49, label: "Season 49", totalCastaways: 18 },
@@ -804,9 +33,9 @@ const SEASONS = [
   { id: 44, label: "Season 44", totalCastaways: 18 },
   { id: 43, label: "Season 43", totalCastaways: 18 },
 ];
- 
+
 const TRIBE_COLORS = { Vatu: "#a855c8", Kalo: "#2ab8a0", Cila: "#e8782a" };
- 
+
 // draftedBy: 1=Miloa, 2=Jinga, 3=Ojalu, 4=Weloki, null=undrafted
 // Draft locked — do not modify picks here
 const S50_CASTAWAYS = [
@@ -835,9 +64,9 @@ const S50_CASTAWAYS = [
   { name: "Stephenie LaGrossa",      tribe: "Vatu", origTribe: "Vatu", bio: "Runner-up S11 Guatemala · S10 Palau · S20 Heroes vs. Villains",        odds: "+4000", photo: "https://entertainmentnow.com/wp-content/uploads/2026/01/survivor-season-50-cast-spoilers-first-photos-stephanie-lagrossa-kendrick.jpg", draftedBy: 3 },
   { name: "Tiffany Ervin",           tribe: "Kalo", origTribe: "Vatu", bio: "8th place S46",                                                        odds: "+3500", photo: "https://entertainmentnow.com/wp-content/uploads/2026/01/survivor-season-50-cast-spoilers-first-photos-tiffany-ervin.jpg",           draftedBy: 2    },
 ];
- 
+
 const ADMIN_PASSWORD = "Ottffsse9";
- 
+
 const S43_RESULTS = {
   season: 43,
   teamScores: [
@@ -867,7 +96,7 @@ const S43_RESULTS = {
     { place: 1,  points: 0,  player: "Morriah", team: "NA",     teamColor: "#777" },
   ],
 };
- 
+
 const S44_RESULTS = {
   season: 44,
   teamScores: [
@@ -897,7 +126,7 @@ const S44_RESULTS = {
     { place: 1,  points: 0,  player: "Bruce",    team: "NA",     teamColor: "#777" },
   ],
 };
- 
+
 const S45_RESULTS = {
   season: 45,
   teamScores: [
@@ -927,7 +156,7 @@ const S45_RESULTS = {
     { place: 1,  points: 0,  player: "Hanna",   team: "NA",     teamColor: "#777" },
   ],
 };
- 
+
 const S46_RESULTS = {
   season: 46,
   teamScores: [
@@ -957,7 +186,7 @@ const S46_RESULTS = {
     { place: 1,  points: 0,  player: "David",   team: "NA",     teamColor: "#777" },
   ],
 };
- 
+
 const S47_RESULTS = {
   season: 47,
   teamScores: [
@@ -987,7 +216,7 @@ const S47_RESULTS = {
     { place: 1,  points: 0,  player: "Jon",       team: "NA",     teamColor: "#777" },
   ],
 };
- 
+
 const S48_RESULTS = {
   season: 48,
   teamScores: [
@@ -1017,7 +246,7 @@ const S48_RESULTS = {
     { place: 1,  points: 0,  player: "Stephanie", team: "NA",     teamColor: "#777" },
   ],
 };
- 
+
 const S49_RESULTS = {
   season: 49,
   teamScores: [
@@ -1047,9 +276,9 @@ const S49_RESULTS = {
     { place: 1,  points: 0,  player: "Nicole",   team: "NA",     teamColor: "#777" },
   ],
 };
- 
+
 const HISTORICAL = { 43: S43_RESULTS, 44: S44_RESULTS, 45: S45_RESULTS, 46: S46_RESULTS, 47: S47_RESULTS, 48: S48_RESULTS, 49: S49_RESULTS };
- 
+
 const SEASON_WINNERS = [
   { season: 43, winner: "Jinga"  },
   { season: 44, winner: "Jinga"  },
@@ -1059,7 +288,7 @@ const SEASON_WINNERS = [
   { season: 48, winner: "Jinga"  },
   { season: 49, winner: "Jinga"  },
 ];
- 
+
 function getChampionshipsThrough(season) {
   const counts = {};
   for (const s of SEASON_WINNERS) {
@@ -1067,7 +296,7 @@ function getChampionshipsThrough(season) {
   }
   return counts;
 }
- 
+
 const EP1_ELIMINATIONS = {
   "Jenna Lewis-Dougherty": 1,  // Episode 1 boot
   "Kyle Fraser": 2,            // Episode 1 medevac
@@ -1075,7 +304,7 @@ const EP1_ELIMINATIONS = {
   "Q Burdette": 4,             // Episode 3 boot
   "Mike White": 5,             // Episode 4 boot
 };
- 
+
 function buildCastawaysForSeason50() {
   return S50_CASTAWAYS.map((c, idx) => ({
     id: idx + 1, name: c.name, tribe: c.tribe || "", origTribe: c.origTribe || "", bio: c.bio || "",
@@ -1084,7 +313,7 @@ function buildCastawaysForSeason50() {
     eliminationOrder: EP1_ELIMINATIONS[c.name] ?? null,
   }));
 }
- 
+
 // Re-apply locked draft assignments + enforce known eliminations on top of saved state
 function applyLockedDraft(castaways) {
   return castaways.map(c => {
@@ -1102,7 +331,7 @@ function applyLockedDraft(castaways) {
     };
   });
 }
- 
+
 const STORAGE_KEY = "sf_v2_state";
 function loadState() {
   try { const r = localStorage.getItem(STORAGE_KEY); return r ? JSON.parse(r) : null; } catch { return null; }
@@ -1110,7 +339,7 @@ function loadState() {
 function saveState(s) {
   try { localStorage.setItem(STORAGE_KEY, JSON.stringify(s)); } catch {}
 }
- 
+
 function oddsColor(odds) {
   if (!odds) return "#555";
   if (odds.startsWith("-")) return "#c8922a";
@@ -1120,23 +349,23 @@ function oddsColor(odds) {
   if (n <= 2500) return "#6a9fd8";
   return "#aaa";
 }
- 
+
 function proxyPhoto(url) {
   if (!url) return "";
   return "https://images.weserv.nl/?url=" + encodeURIComponent(url) + "&w=400&output=jpg";
 }
- 
+
 function Photo({ src, alt, className }) {
   const [err, setErr] = useState(false);
   if (!src || err) return <div className={className + "-placeholder"}><span>👤</span></div>;
   return <img src={proxyPhoto(src)} alt={alt} className={className} onError={() => setErr(true)} loading="lazy" />;
 }
- 
+
 function ordinal(n) {
   const s = ["th","st","nd","rd"], v = n % 100;
   return n + (s[(v-20)%10] || s[v] || s[0]);
 }
- 
+
 const CSS = `
   @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;900&family=DM+Mono:wght@400;500&display=swap');
   * { box-sizing: border-box; margin: 0; padding: 0; }
@@ -1220,7 +449,7 @@ const CSS = `
     .lb-pts { font-size: 1.6rem; }
   }
 `;
- 
+
 export default function App() {
   const [splashDismissed, setSplashDismissed] = useState(() => {
     try { return localStorage.getItem(`sf_splash_${SPLASH_VERSION}`) === "1"; } catch { return false; }
@@ -1229,27 +458,27 @@ export default function App() {
   const [historySeason, setHistorySeason] = useState(49);
   const [toast, setToast] = useState(null);
   const [showOdds, setShowOdds] = useState(false);
- 
+
   const [castaways, setCastawaysRaw] = useState(() => {
     const saved = loadState();
     if (saved?.castaways?.length) return applyLockedDraft(saved.castaways);
     return buildCastawaysForSeason50();
   });
- 
+
   const [draftOrder, setDraftOrderRaw] = useState(() => {
     const saved = loadState();
     return saved?.draftOrder || TEAMS.map(t => t.id);
   });
- 
+
   useEffect(() => { saveState({ castaways, draftOrder, showOdds }); }, [castaways, draftOrder, showOdds]);
- 
+
   const setCastaways = (fn) => setCastawaysRaw(prev => typeof fn === "function" ? fn(prev) : fn);
   const setDraftOrder = (o) => setDraftOrderRaw(o);
   const showToast = (msg) => { setToast(msg); setTimeout(() => setToast(null), 2500); };
   const resetSeason = () => { setCastawaysRaw(buildCastawaysForSeason50()); setDraftOrderRaw(TEAMS.map(t => t.id)); setShowOdds(false); showToast("Season 50 reset."); };
- 
+
   const season50 = SEASONS.find(s => s.id === 50);
- 
+
   const scores = useMemo(() => {
     return TEAMS.map(team => {
       const picks = castaways.filter(c => c.draftedBy === team.id);
@@ -1257,12 +486,12 @@ export default function App() {
       return { ...team, picks, total };
     }).sort((a, b) => b.total - a.total);
   }, [castaways, season50]);
- 
+
   const dismissSplash = () => {
     try { localStorage.setItem(`sf_splash_${SPLASH_VERSION}`, "1"); } catch {}
     setSplashDismissed(true);
   };
- 
+
   if (!splashDismissed) {
     return (
       <>
@@ -1308,7 +537,7 @@ export default function App() {
       </>
     );
   }
- 
+
   return (
     <>
       <style>{CSS}</style>
@@ -1323,7 +552,7 @@ export default function App() {
             ))}
           </nav>
         </header>
- 
+
         <div className="container">
           {page === "leaderboard" && <Leaderboard season={season50} scores={scores} castaways={castaways} showOdds={showOdds} />}
           {page === "castaways"   && <Castaways   season={season50} castaways={castaways} showOdds={showOdds} />}
@@ -1333,13 +562,13 @@ export default function App() {
           {page === "recap"       && <Recap />}
           {page === "admin"       && <AdminManual season={season50} castaways={castaways} draftOrder={draftOrder} showOdds={showOdds} setShowOdds={setShowOdds} resetSeason={resetSeason} setDraftOrder={setDraftOrder} setCastaways={setCastaways} showToast={showToast} />}
         </div>
- 
+
         {toast && <div className="toast">{toast}</div>}
       </div>
     </>
   );
 }
- 
+
 // Convert American odds string to implied win probability
 function oddsToImplied(odds) {
   if (!odds) return 0;
@@ -1347,7 +576,7 @@ function oddsToImplied(odds) {
   const n = parseInt(odds.replace("+",""));
   return 100 / (n + 100);
 }
- 
+
 // Projected points = sum of (implied_prob * max_possible_pts) for each alive pick
 function projectedPts(picks, totalCastaways) {
   const maxPts = calcPoints(totalCastaways, totalCastaways);
@@ -1356,12 +585,12 @@ function projectedPts(picks, totalCastaways) {
     .reduce((sum, c) => sum + oddsToImplied(c.odds) * maxPts, 0)
     .toFixed(1);
 }
- 
+
 function Leaderboard({ season, scores, castaways, showOdds }) {
   const eliminated = castaways.filter(c => c.eliminationOrder).length;
   const remaining = season.totalCastaways - eliminated;
   const champs = getChampionshipsThrough(49);
- 
+
   // Sum implied win probability for each team's alive picks
   function teamOddsSummary(picks) {
     const alive = picks.filter(c => !c.eliminationOrder && c.odds);
@@ -1374,7 +603,7 @@ function Leaderboard({ season, scores, castaways, showOdds }) {
       return "+" + Math.round(((1 - totalImplied) / totalImplied) * 100);
     }
   }
- 
+
   return (
     <div>
       <div className="page-title">Leaderboard</div>
@@ -1427,7 +656,7 @@ function Leaderboard({ season, scores, castaways, showOdds }) {
     </div>
   );
 }
- 
+
 function Castaways({ season, castaways, showOdds }) {
   const alive     = castaways.filter(c => !c.eliminationOrder && c.draftedBy);
   const undrafted = castaways.filter(c => !c.eliminationOrder && !c.draftedBy);
@@ -1450,7 +679,7 @@ function Castaways({ season, castaways, showOdds }) {
     </div>
   );
 }
- 
+
 function CastawayCard({ c, season, showOdds }) {
   const team = TEAMS.find(t => t.id === c.draftedBy);
   const pts  = c.eliminationOrder ? calcPoints(c.eliminationOrder, season.totalCastaways) : null;
@@ -1486,12 +715,12 @@ function CastawayCard({ c, season, showOdds }) {
     </div>
   );
 }
- 
+
 function History({ historySeason, setHistorySeason }) {
   const data = HISTORICAL[historySeason];
   const champs = getChampionshipsThrough(historySeason);
   const sorted = data ? [...data.teamScores].sort((a,b) => (b.score||0)-(a.score||0)) : [];
- 
+
   return (
     <div>
       <div className="page-title">History</div>
@@ -1502,7 +731,7 @@ function History({ historySeason, setHistorySeason }) {
           <button key={id} className={`season-btn ${historySeason === id ? "active" : ""}`} onClick={() => setHistorySeason(id)}>{id}</button>
         ))}
       </div>
- 
+
       {data ? (
         <>
           <div className="section-title">Season {historySeason} — Team Scores</div>
@@ -1520,7 +749,7 @@ function History({ historySeason, setHistorySeason }) {
               </div>
             ))}
           </div>
- 
+
           <div className="section-title">Placement Results — Season {historySeason}</div>
           <div style={{ border:"1px solid rgba(255,255,255,0.07)", borderRadius:4, overflow:"hidden" }}>
             <table className="hist-table">
@@ -1548,20 +777,20 @@ function History({ historySeason, setHistorySeason }) {
     </div>
   );
 }
- 
+
 function DraftManual({ castaways, showOdds }) {
   // LOCKED — draft is complete. Read-only view only.
   const teamById = Object.fromEntries(TEAMS.map(t => [t.id, t]));
- 
+
   return (
     <div>
       <div className="page-title">Draft</div>
       <div className="page-subtitle">Season 50 · Draft complete · Picks locked</div>
- 
+
       <div className="panel" style={{ marginBottom:"1.25rem", borderColor:"rgba(200,146,42,0.3)", background:"rgba(200,146,42,0.04)" }}>
         <div style={{ fontSize:"0.72rem", color:"#c8922a" }}>🔒 The Season 50 draft is locked. Picks cannot be changed.</div>
       </div>
- 
+
       <div className="grid2" style={{ marginBottom:"1.25rem" }}>
         {TEAMS.map(t => {
           const picks = castaways.filter(c => c.draftedBy === t.id);
@@ -1595,7 +824,7 @@ function DraftManual({ castaways, showOdds }) {
           );
         })}
       </div>
- 
+
       <div className="panel">
         <div className="section-title">Not Selected</div>
         <div className="row" style={{ flexWrap:"wrap", gap:"0.4rem" }}>
@@ -1609,7 +838,7 @@ function DraftManual({ castaways, showOdds }) {
     </div>
   );
 }
- 
+
 function Points({ season, castaways }) {
   const total = season.totalCastaways;
   const elimMap = {};
@@ -1618,7 +847,7 @@ function Points({ season, castaways }) {
     const eo = i + 1, fp = total - eo + 1, pts = calcPoints(eo, total);
     return { fp, eo, pts, castaway: elimMap[eo] };
   }).sort((a,b) => b.fp - a.fp);
- 
+
   return (
     <div>
       <div className="page-title">Points</div>
@@ -1660,7 +889,7 @@ function Points({ season, castaways }) {
     </div>
   );
 }
- 
+
 const S50_EPISODES = [
   {
     number: 4,
@@ -1716,13 +945,13 @@ const S50_EPISODES = [
     recap: "24 returning legends, three tribes. Genevieve found the first Boomerang Idol and sent it to Ozzy. At Exile Island, Coach stole the supplies key — Q traded his vote to Ozzy for camp supplies. A Journey had Savannah beat Colby for a Block-a-Vote while Colby lost his vote. At Cila's Tribal, Jenna came in too hot targeting Cirie on Day 1 and was voted out 7-1. The premiere closed with Kyle Fraser medevac'd with a ruptured Achilles — the first Survivor winner ever evacuated.",
   },
 ];
- 
+
 function Recap() {
   return (
     <div>
       <div className="page-title">Recap</div>
       <div className="page-subtitle">Season 50 · Episode-by-episode breakdown · Most recent first</div>
- 
+
       {/* Advantages & Disadvantages — mobile-friendly cards */}
       <div className="section-title">Advantages &amp; Disadvantages</div>
       <div style={{ display: "flex", flexDirection: "column", gap: "0.5rem", marginBottom: "2rem" }}>
@@ -1776,7 +1005,7 @@ function Recap() {
           );
         })}
       </div>
- 
+
       {/* Episode recaps */}
       <div className="section-title">Episodes</div>
       <div style={{ display: "flex", flexDirection: "column", gap: "1.5rem" }}>
@@ -1802,14 +1031,14 @@ function Recap() {
     </div>
   );
 }
- 
+
 function AdminManual({ season, castaways, draftOrder, showOdds, setShowOdds, resetSeason, setDraftOrder, setCastaways, showToast }) {
   const [confirmReset, setConfirmReset] = useState(false);
   const [authed, setAuthed] = useState(false);
   const [pwInput, setPwInput] = useState("");
   const [pwError, setPwError] = useState(false);
   const teamById = Object.fromEntries(TEAMS.map(t => [t.id, t]));
- 
+
   if (!authed) {
     return (
       <div>
@@ -1848,36 +1077,36 @@ function AdminManual({ season, castaways, draftOrder, showOdds, setShowOdds, res
       </div>
     );
   }
- 
+
   const usedOrders = new Set(castaways.filter(c => c.eliminationOrder).map(c => c.eliminationOrder));
   const nextElim = (() => { for (let i=1; i<=season.totalCastaways; i++) if (!usedOrders.has(i)) return i; return season.totalCastaways+1; })();
- 
+
   const setElimOrder = (id, val) => {
     const v = val.trim() === "" ? null : parseInt(val, 10);
     setCastaways(prev => prev.map(c => c.id === id ? { ...c, eliminationOrder: Number.isFinite(v) ? v : null } : c));
   };
- 
+
   const quickElim = (id) => {
     if (nextElim > season.totalCastaways) { showToast("All castaways already eliminated!"); return; }
     setCastaways(prev => prev.map(c => c.id === id ? { ...c, eliminationOrder: nextElim } : c));
     showToast(`Eliminated! #${nextElim}`);
   };
- 
+
   const restore = (id) => {
     setCastaways(prev => prev.map(c => c.id === id ? { ...c, eliminationOrder: null } : c));
     showToast("Castaway restored.");
   };
- 
+
   const clearElims = () => { setCastaways(prev => prev.map(c => ({ ...c, eliminationOrder: null }))); showToast("All eliminations cleared."); };
- 
+
   const alive     = castaways.filter(c => !c.eliminationOrder);
   const eliminated = castaways.filter(c => c.eliminationOrder).sort((a,b) => b.eliminationOrder - a.eliminationOrder);
- 
+
   return (
     <div>
       <div className="page-title">Admin</div>
       <div className="page-subtitle">Commissioner controls · Next elimination #{nextElim <= season.totalCastaways ? nextElim : "done"}</div>
- 
+
       <div className="panel" style={{ marginBottom:"1.25rem" }}>
         <div className="section-title">Controls</div>
         <div className="row" style={{ marginBottom:"0.75rem" }}>
@@ -1896,7 +1125,7 @@ function AdminManual({ season, castaways, draftOrder, showOdds, setShowOdds, res
         </div>
         <div className="hint">Use "Elim #N" button to mark the next castaway out instantly, or type a number manually. Use "Restore" to undo any elimination.</div>
       </div>
- 
+
       <div className="grid2">
         <div className="panel">
           <div className="section-title">Still In — {alive.length}</div>
@@ -1924,7 +1153,7 @@ function AdminManual({ season, castaways, draftOrder, showOdds, setShowOdds, res
             {alive.length === 0 && <div className="hint">Everyone has been eliminated!</div>}
           </div>
         </div>
- 
+
         <div className="panel">
           <div className="section-title">Eliminated — {eliminated.length} (most recent first)</div>
           {eliminated.length === 0
@@ -1955,5 +1184,3 @@ function AdminManual({ season, castaways, draftOrder, showOdds, setShowOdds, res
     </div>
   );
 }
-
-
