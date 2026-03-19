@@ -2,7 +2,7 @@
 import { useEffect, useMemo, useState } from "react";
 
 // Bump this each time you commit/publish to force the splash page to reappear for everyone
-const SPLASH_VERSION = "ep4_v1_7";
+const SPLASH_VERSION = "ep4_v1_8";
 
 function calcPoints(eliminationOrder, totalCastaways) {
   if (!eliminationOrder || eliminationOrder <= 2) return 0;
@@ -649,7 +649,7 @@ function Leaderboard({ season, scores, castaways, showOdds }) {
                 </div>
               </div>
               <div className="lb-score">
-                <div className="lb-pts" style={{ color: rank === 1 ? "#c8922a" : team.color }}>{team.total}</div>
+                <div className="lb-pts" style={{ color: team.color }}>{team.total}</div>
                 <div className="lb-pts-label">points</div>
                 {showOdds && (
                   <div style={{ fontSize: "0.58rem", color: "#777", marginTop: "0.25rem" }}>
