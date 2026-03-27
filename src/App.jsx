@@ -2,7 +2,7 @@
 import { useEffect, useMemo, useState } from "react";
 
 // Bump this each time you commit/publish to force the splash page to reappear for everyone
-const SPLASH_VERSION = "ep4_v1_8";
+const SPLASH_VERSION = "ep5_v1";
 
 function calcPoints(eliminationOrder, totalCastaways) {
   if (!eliminationOrder || eliminationOrder <= 2) return 0;
@@ -303,6 +303,8 @@ const EP1_ELIMINATIONS = {
   "Savannah Louie": 3,         // Episode 2 boot
   "Q Burdette": 4,             // Episode 3 boot
   "Mike White": 5,             // Episode 4 boot
+  "Angelina Keeley": 6,        // Episode 5 boot (Vatu tribal)
+  "Charlie Davis": 7,          // Episode 5 boot (Cila tribal)
 };
 
 function buildCastawaysForSeason50() {
@@ -482,7 +484,7 @@ export default function App() {
   const scores = useMemo(() => {
     return TEAMS.map(team => {
       const picks = castaways.filter(c => c.draftedBy === team.id);
-      const total = picks.reduce((sum, c) => sum + (c.eliminationOrder ? calcPoints(c.eliminationOrder, season50.totalCastaways) : 4), 0);
+      const total = picks.reduce((sum, c) => sum + (c.eliminationOrder ? calcPoints(c.eliminationOrder, season50.totalCastaways) : 6), 0);
       return { ...team, picks, total };
     }).sort((a, b) => b.total - a.total);
   }, [castaways, season50]);
@@ -518,9 +520,9 @@ export default function App() {
             fontFamily: "'Playfair Display', serif", fontWeight: 900,
             fontSize: "clamp(1.6rem, 5vw, 2.4rem)", color: "#f0ebe0",
             lineHeight: 1.2, marginBottom: "1.25rem",
-          }}>Scores have been updated<br/>for Episode 4</div>
+          }}>Scores have been updated<br/>for Episode 5</div>
           <div style={{ fontSize: "0.78rem", color: "#999", marginBottom: "2.5rem", maxWidth: 360, lineHeight: 1.6 }}>
-            Watch Episode 4 before continuing to avoid spoilers.
+            Watch Episode 5 before continuing to avoid spoilers.
           </div>
           <button onClick={dismissSplash} style={{
             background: "rgba(200,146,42,0.12)", border: "1px solid rgba(200,146,42,0.5)",
@@ -642,7 +644,7 @@ function Leaderboard({ season, scores, castaways, showOdds }) {
                     <span key={c.id} className={`c-tag ${c.eliminationOrder ? "eliminated" : "alive"}`}>
                       {c.name}{c.eliminationOrder
                         ? ` · ${calcPoints(c.eliminationOrder, season.totalCastaways)}pt`
-                        : (showOdds && c.odds ? ` · ${c.odds} · 4pt` : " · 4pt")}
+                        : (showOdds && c.odds ? ` · ${c.odds} · 6pt` : " · 6pt")}
                     </span>
                   ))}
                   {team.picks.length === 0 && <span style={{ fontSize: "0.65rem", color: "#aaa" }}>No picks — set on Draft page</span>}
@@ -899,6 +901,22 @@ function Points({ season, castaways }) {
 }
 
 const S50_EPISODES = [
+  {
+    number: 5,
+    title: "Episode 5",
+    airDate: "March 25, 2026",
+    eliminated: "Angelina Keeley, Charlie Davis",
+    advantages: [
+      { holder: "Rizo Velovic", kind: "advantage", type: "Idol", status: "active", note: "Rizo's Boomerang Idol remains active and is now widely known — he revealed it to Dee to earn her trust, and also told Kamilla about it. Cirie also knows." },
+      { holder: "Aubry Bracco", kind: "advantage", type: "Idol", status: "active", note: "Aubry's Boomerang Idol remains active heading into the merge." },
+      { holder: "Ozzy Lusth", kind: "advantage", type: "Idol", status: "active", note: "Ozzy's Boomerang Idol remains active." },
+      { holder: "Ozzy Lusth", kind: "advantage", type: "Extra Vote", status: "active", note: "Ozzy's Extra Vote remains unplayed." },
+      { holder: "Ozzy Lusth", kind: "advantage", type: "Shot in the Dark", status: "active", note: "Christian gave his Shot in the Dark to Ozzy as a gesture of trust after Ozzy's meltdown over the Mike White blindside. Ozzy chose not to use it — instead voting with the tribe to eliminate Angelina." },
+      { holder: "Cirie Fields", kind: "advantage", type: "Extra Vote", status: "active", note: "Cirie's Extra Vote remains secret. She revealed it to Rizo when they committed to a final-two deal — his 'Survivor dream.'" },
+      { holder: "Colby Donaldson", kind: "disadvantage", type: "Lost Vote", status: "active", note: "Colby's lost vote still hasn't triggered — Kalo won immunity in Episode 5 and did not attend Tribal Council." },
+    ],
+    recap: "Episode 5, \'Open Wounds,\' opened with Ozzy fuming over the Mike White blindside — a throwback to Cochran\'s betrayal in South Pacific. Christian took blame and handed Ozzy his Shot in the Dark as a gesture of trust, leaving himself vulnerable. Ozzy considered revenge but ultimately voted with the tribe: Angelina went out 4-1, giving her jacket to Christian on the way out — a full-circle callback to jacket-gate. At Cila, the episode\'s title fit Charlie perfectly: still wounded by Maria\'s Season 46 vote and now set off by Rizo admitting he also skipped his ally\'s win vote on S49. Jonathan and Devens pulled together an old-Kalo majority targeting Rizo, but Dee flipped the script — building a women\'s alliance with Rizo, who earned her trust by revealing his Billie Eilish Idol, and committed to a final-two with Cirie. Kamilla was the swing vote; Rizo got to her first with a Kyle Fraser name-drop (a lie) and the idol info. Charlie came second and felt too slow. Rizo delivered a Taylor Swift-coded speech at Tribal: \'This is no love story between us. Bad blood. RizGod-style getaway car.\' Charlie was blindsided 4-3. The merge is next.",
+  },
   {
     number: 4,
     title: "Episode 4",
