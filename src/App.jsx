@@ -487,7 +487,7 @@ export default function App() {
   const scores = useMemo(() => {
     return TEAMS.map(team => {
       const picks = castaways.filter(c => c.draftedBy === team.id);
-      const total = picks.reduce((sum, c) => sum + (c.eliminationOrder ? calcPoints(c.eliminationOrder, season50.totalCastaways) : 6), 0);
+      const total = picks.reduce((sum, c) => sum + (c.eliminationOrder ? calcPoints(c.eliminationOrder, season50.totalCastaways) : 9), 0);
       return { ...team, picks, total };
     }).sort((a, b) => b.total - a.total);
   }, [castaways, season50]);
