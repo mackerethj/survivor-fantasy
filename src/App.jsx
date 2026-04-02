@@ -637,7 +637,7 @@ function Leaderboard({ season, scores, castaways, showOdds }) {
                     <span key={c.id} className={`c-tag ${c.eliminationOrder ? "eliminated" : "alive"}`}>
                       {c.name}{c.eliminationOrder
                         ? ` · ${calcPoints(c.eliminationOrder, season.totalCastaways)}pt`
-                        : (showOdds && c.odds ? ` · ${c.odds} · 6pt` : " · 6pt")}
+                        : (showOdds && c.odds ? ` · ${c.odds} · 9pt` : " · 9pt")}
                     </span>
                   ))}
                   {team.picks.length === 0 && <span style={{ fontSize: "0.65rem", color: "#aaa" }}>No picks — set on Draft page</span>}
