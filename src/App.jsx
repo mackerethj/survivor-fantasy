@@ -2,7 +2,7 @@
 import { useEffect, useMemo, useState } from "react";
 
 // Bump this each time you commit/publish to force the splash page to reappear for everyone
-const SPLASH_VERSION = "ep6_v1.1";
+const SPLASH_VERSION = "ep6_v1.2";
 
 function calcPoints(eliminationOrder, totalCastaways) {
   if (!eliminationOrder || eliminationOrder <= 2) return 0;
@@ -915,7 +915,6 @@ const S50_EPISODES = [
       { holder: "Aubry Bracco", kind: "advantage", type: "Idol", status: "active", note: "Aubry's Boomerang Idol remains active heading into the merge." },
       { holder: "Ozzy Lusth", kind: "advantage", type: "Idol", status: "active", note: "Ozzy's Boomerang Idol remains active." },
       { holder: "Ozzy Lusth", kind: "advantage", type: "Extra Vote", status: "active", note: "Ozzy's Extra Vote remains unplayed." },
-      { holder: "Ozzy Lusth", kind: "advantage", type: "Shot in the Dark", status: "active", note: "Christian gave his Shot in the Dark to Ozzy as a gesture of trust after Ozzy's meltdown over the Mike White blindside. Ozzy chose not to use it — instead voting with the tribe to eliminate Angelina." },
       { holder: "Cirie Fields", kind: "advantage", type: "Extra Vote", status: "active", note: "Cirie's Extra Vote remains secret. She revealed it to Rizo when they committed to a final-two deal." },
       { holder: "Colby Donaldson", kind: "disadvantage", type: "Lost Vote", status: "active", note: "Colby's lost vote still hasn't triggered — Kalo won immunity in Episode 5 and did not attend Tribal Council." },
     ],
