@@ -1014,19 +1014,29 @@ function Recap() {
       <div className="section-title">Advantages &amp; Disadvantages</div>
       <div style={{ display: "flex", flexDirection: "column", gap: "0.5rem", marginBottom: "2rem" }}>
         {(() => {
-          const all = [...S50_EPISODES].reverse().flatMap(ep =>
-            ep.advantages.map((adv, i) => ({ ...adv, epTitle: ep.title, epNum: ep.number, i }))
-          );
-          const seen = new Set();
-          const deduped = all.filter(adv => {
-            const key = adv.holder + '|' + adv.type;
-            if (seen.has(key)) return false;
-            seen.add(key);
-            return true;
-          });
-          const sorted = [
-            ...deduped.filter(a => a.status === "active"),
-            ...deduped.filter(a => a.status !== "active"),
+const all = [...S50_EPISODES]
+  .sort((a, b) => b.number - a.number)
+  .flatMap(ep =>
+    ep.advantages.map((adv, i) => ({
+      ...adv,
+      epTitle: ep.title,
+      epNum: ep.number,
+      i
+    }))
+  );
+
+const seen = new Set();
+const deduped = all.filter(adv => {
+  const key = adv.holder + "|" + adv.type;
+  if (seen.has(key)) return false;
+  seen.add(key);
+  return true;
+});
+
+const sorted = [
+  ...deduped.filter(a => a.status === "active"),
+  ...deduped.filter(a => a.status !== "active"),
+];
           ];
           return sorted;
         })().map((adv, idx) => {
