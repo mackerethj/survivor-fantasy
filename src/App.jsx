@@ -1025,8 +1025,8 @@ function Recap() {
             return true;
           });
           const sorted = [
-            ...deduped.filter(a => a.status === "active").reverse(),
-            ...deduped.filter(a => a.status !== "active").reverse(),
+            ...deduped.filter(a => a.status === "active"),
+            ...deduped.filter(a => a.status !== "active"),
           ];
           return sorted;
         })().map((adv, idx) => {
