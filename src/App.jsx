@@ -2,7 +2,7 @@
 import { useEffect, useMemo, useState } from "react";
 
 // Bump this each time you commit/publish to force the splash page to reappear for everyone
-const SPLASH_VERSION = "ep7_v1";
+const SPLASH_VERSION = "ep7_v1.1";
 
 function calcPoints(eliminationOrder, totalCastaways) {
   if (!eliminationOrder || eliminationOrder <= 2) return 0;
@@ -524,6 +524,18 @@ export default function App() {
               fontSize: "clamp(1.6rem, 5vw, 2.4rem)", color: "#f0ebe0",
               lineHeight: 1.2, marginBottom: "1.25rem",
             }}>Scores have been updated<br/>for Episode 7</div>
+            <div style={{
+              fontStyle: "italic",
+              fontSize: "0.82rem",
+              color: "#d8c08a",
+              marginBottom: "1rem",
+              maxWidth: 420,
+              lineHeight: 1.7,
+            }}>
+              “The Dragon Slayer<br />
+              speaks in honor, fire, and fate —<br />
+              one torch fades tonight.”
+            </div>
             <div style={{ fontSize: "0.78rem", color: "#999", marginBottom: "2.5rem", maxWidth: 360, lineHeight: 1.6 }}>
               The Dragon Slayer declared war and the largest Tribal Council in Survivor history delivered. Watch Episode 7 before continuing to avoid spoilers.
             </div>
