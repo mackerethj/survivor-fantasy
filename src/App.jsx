@@ -896,11 +896,11 @@ const S50_EPISODES = [
     airDate: "April 8, 2026",
     eliminated: "Dee Valladares",
     advantages: [
-      { holder: "Rizo Velovic", kind: "advantage", type: "Idol", status: "active", note: "Rizo's Boomerang Idol remains active, but its secrecy is fully gone — Emily blabbed to Rizo that Dee had told her about it. Now essentially the whole tribe knows." },
+      { holder: "Rizo Velovic", kind: "advantage", type: "Idol", status: "active", note: "Rizo's Boomerang Idol remains active, but its secrecy is fully gone — Emily told Rizo that Dee had told her about it. Now essentially the whole tribe knows." },
       { holder: "Ozzy Lusth", kind: "advantage", type: "Idol", status: "active", note: "Ozzy's Boomerang Idol remains active. He won individual immunity this episode (his 8th career win), which kept him safe regardless." },
       { holder: "Ozzy Lusth", kind: "advantage", type: "Extra Vote", status: "active", note: "Ozzy's Extra Vote remains unplayed." },
-      { holder: "Cirie Fields", kind: "advantage", type: "Extra Vote", status: "active", note: "Cirie's Extra Vote remains secret. She saw straight through Stephenie's lie about her journey advantage — but kept quiet." },
-      { holder: "Stephenie LaGrossa", kind: "advantage", type: "Steal-a-Vote", status: "active", note: "Stephenie went on a journey and held her arm raised for a full hour — a remarkable feat given her surgically repaired shoulder from Heroes vs. Villains. She earned a Steal-a-Vote advantage. She tried to lie about earning it, but Cirie immediately saw through her." },
+      { holder: "Cirie Fields", kind: "advantage", type: "Extra Vote", status: "active", note: "Cirie's Extra Vote remains secret." },
+      { holder: "Stephenie LaGrossa", kind: "advantage", type: "Steal-a-Vote", status: "active", note: "Stephenie went on a journey and held her arm raised for a full hour.  She earned a Steal-a-Vote advantage. She tried to lie about earning it, but Cirie immediately saw through her." },
       { holder: "Aubry Bracco", kind: "advantage", type: "Idol", status: "used", note: "Aubry played her Boomerang Idol on herself at Tribal Council as promised. It did not return to the finder (Devens) because Aubry played it herself rather than being voted out holding it. The idol is now spent." },
       { holder: "Dee Valladares", kind: "advantage", type: "Shot in the Dark", status: "applied", note: "Dee played her Shot in the Dark at Tribal — it came up 'Not Safe,' so all votes against her counted. She was eliminated 9-4-1 (4 votes for Tiffany, 1 for Coach). First jury member." },
     ],
@@ -912,7 +912,7 @@ const S50_EPISODES = [
     airDate: "April 1, 2026",
     eliminated: "Kamilla Karthigesu, Genevieve Mushaluk, Colby Donaldson",
     advantages: [
-      { holder: "Rizo Velovic", kind: "advantage", type: "Idol", status: "active", note: "Rizo's Boomerang Idol remains active. Ozzy now knows about it after Rizo revealed it during their Exile Island bonding session, where they solidified an alliance." },
+      { holder: "Rizo Velovic", kind: "advantage", type: "Idol", status: "active", note: "Rizo's Boomerang Idol remains active. Ozzy now knows about it after Rizo revealed it during their Exile Island bonding session." },
       { holder: "Aubry Bracco", kind: "advantage", type: "Idol", status: "active", note: "Aubry announced she was playing her idol before the Purple group's tribal, but ultimately no idols were played — the vote went cleanly 3-0 against Genevieve. Aubry's idol remains active heading into Episode 7." },
       { holder: "Ozzy Lusth", kind: "advantage", type: "Idol", status: "active", note: "Ozzy's Boomerang Idol remains active. He and Rizo were both safe on Exile Island and missed the Blood Moon tribals entirely." },
       { holder: "Ozzy Lusth", kind: "advantage", type: "Extra Vote", status: "active", note: "Ozzy's Extra Vote remains unplayed." },
