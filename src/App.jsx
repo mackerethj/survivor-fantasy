@@ -561,7 +561,7 @@ export default function App() {
         <header className="header">
           <div className="logo">SURVIVOR<span>FANTASY</span></div>
           <nav className="nav">
-            {["leaderboard","recap","points","castaways","draft","history"].map(p => (
+            {["leaderboard","recap","points","castaways","history"].map(p => (
               <button key={p} className={`nav-btn ${page === p ? "active" : ""}`} onClick={() => setPage(p)}>
                 {p}
               </button>
@@ -573,7 +573,6 @@ export default function App() {
           {page === "leaderboard" && <Leaderboard season={season50} scores={scores} castaways={castaways} showOdds={showOdds} />}
           {page === "castaways"   && <Castaways   season={season50} castaways={castaways} showOdds={showOdds} />}
           {page === "history"     && <History historySeason={historySeason} setHistorySeason={setHistorySeason} />}
-          {page === "draft"       && <DraftTable season={season50} castaways={castaways} />}
           {page === "points"      && <Points season={season50} castaways={castaways} />}
           {page === "recap"       && <Recap />}
         </div>
