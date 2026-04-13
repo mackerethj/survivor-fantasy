@@ -1068,8 +1068,6 @@ const S50_EPISODES = [
     airDate: "March 18, 2026",
     eliminated: "Mike White",
     advantages: [
-      { holder: "Rizo Velovic", kind: "advantage", type: "Idol", status: "active", note: "Genevieve found her second Billie Eilish Boomerang Idol while shadowing Aubry on an idol hunt. The Boomerang Idol required her to send it to someone on another tribe, so she chose Rizo — calculating that she can eventually blindside him to boomerang it back. Rizo received it hidden in his bag and was immediately stoked." },
-      { holder: "Aubry Bracco", kind: "advantage", type: "Idol", status: "active", note: "Aubry's Boomerang Idol remains active heading into Episode 5. Its existence is widely known across the new Vatu tribe." },
       { holder: "Ozzy Lusth", kind: "advantage", type: "Idol", status: "active", note: "Ozzy's Boomerang Idol (originally sent by Genevieve) remains active." },
       { holder: "Ozzy Lusth", kind: "advantage", type: "Extra Vote", status: "active", note: "Ozzy's Extra Vote, won at Exile Island in Episode 1, remains unplayed." },
       { holder: "Cirie Fields", kind: "advantage", type: "Extra Vote", status: "active", note: "Cirie's Extra Vote (given by Ozzy in Episode 2) remains secret and unused." },
