@@ -532,9 +532,9 @@ export default function App() {
               maxWidth: 420,
               lineHeight: 1.7,
             }}>
-              “The Dragon Slayer<br />
+              "The Dragon Slayer<br />
               speaks in honor, fire, and fate —<br />
-              one torch fades tonight.”
+              one torch fades tonight."
             </div>
             <div style={{ fontSize: "0.78rem", color: "#999", marginBottom: "2.5rem", maxWidth: 360, lineHeight: 1.6 }}>
               The Dragon Slayer declared war and the largest Tribal Council in Survivor history delivered. Watch Episode 7 before continuing to avoid spoilers.
@@ -563,7 +563,7 @@ export default function App() {
         <header className="header">
           <div className="logo">SURVIVOR<span>FANTASY</span></div>
           <nav className="nav">
-            {["leaderboard","recap","points","castaways","draft","history","admin"].map(p => (
+            {["leaderboard","recap","points","castaways","draft","history"].map(p => (
               <button key={p} className={`nav-btn ${page === p ? "active" : ""}`} onClick={() => setPage(p)}>
                 {p}
               </button>
@@ -575,10 +575,9 @@ export default function App() {
           {page === "leaderboard" && <Leaderboard season={season50} scores={scores} castaways={castaways} showOdds={showOdds} />}
           {page === "castaways"   && <Castaways   season={season50} castaways={castaways} showOdds={showOdds} />}
           {page === "history"     && <History historySeason={historySeason} setHistorySeason={setHistorySeason} />}
-          {page === "draft"       && <DraftManual season={season50} castaways={castaways} draftOrder={draftOrder} setDraftOrder={setDraftOrder} setCastaways={setCastaways} showToast={showToast} showOdds={showOdds} />}
+          {page === "draft"       && <DraftTable season={season50} castaways={castaways} />}
           {page === "points"      && <Points season={season50} castaways={castaways} />}
           {page === "recap"       && <Recap />}
-          {page === "admin"       && <AdminManual season={season50} castaways={castaways} draftOrder={draftOrder} showOdds={showOdds} setShowOdds={setShowOdds} resetSeason={resetSeason} setDraftOrder={setDraftOrder} setCastaways={setCastaways} showToast={showToast} />}
         </div>
 
         {toast && <div className="toast">{toast}</div>}
@@ -794,59 +793,173 @@ function History({ historySeason, setHistorySeason }) {
   );
 }
 
-function DraftManual({ castaways, showOdds }) {
+// Draft order — pick number maps to castaway name
+const DRAFT_ORDER = [
+  "Christian Hubicki",
+  "Genevieve Mushaluk",
+  "Jonathan Young",
+  "Stephenie LaGrossa",
+  "Joe Hunter",
+  "Rizo Velovic",
+  "Rick Devens",
+  "Mike White",
+  'Benjamin "Coach" Wade',
+  "Aubry Bracco",
+  "Ozzy Lusth",
+  "Kamilla Karthigesu",
+  "Dee Valladares",
+  "Tiffany Ervin",
+  "Cirie Fields",
+  "Emily Flippen",
+  "Savannah Louie",
+  "Charlie Davis",
+  "Colby Donaldson",
+  "Q Burdette",
+  "Chrissy Hofbeck",
+  "Angelina Keeley",
+  "Kyle Fraser",
+  "Jenna Lewis-Dougherty",
+];
+
+function DraftTable({ season, castaways }) {
+  const [sortCol, setSortCol] = useState("pick");
+  const [sortDir, setSortDir] = useState("asc");
+
+  const rows = DRAFT_ORDER.map((name, idx) => {
+    const c = castaways.find(x => x.name === name);
+    const team = c && c.draftedBy ? TEAMS.find(t => t.id === c.draftedBy) : null;
+    const pts = c && c.eliminationOrder ? calcPoints(c.eliminationOrder, season.totalCastaways) : null;
+    const place = c && c.eliminationOrder ? season.totalCastaways - c.eliminationOrder + 1 : null;
+    return {
+      pick: idx + 1,
+      name,
+      shortName: name.split(" ")[0] === "Benjamin" ? "Coach" : name.split(" ")[0],
+      team,
+      teamName: team ? team.name : "—",
+      teamColor: team ? team.color : "#555",
+      eliminationOrder: c ? c.eliminationOrder : null,
+      place,
+      pts,
+    };
+  });
+
+  const sorted = [...rows].sort((a, b) => {
+    let av, bv;
+    if (sortCol === "pick")   { av = a.pick;  bv = b.pick; }
+    if (sortCol === "name")   { av = a.name;  bv = b.name; }
+    if (sortCol === "team")   { av = a.teamName; bv = b.teamName; }
+    if (sortCol === "place")  { av = a.place ?? 999;  bv = b.place ?? 999; }
+    if (sortCol === "pts")    { av = a.pts ?? -1; bv = b.pts ?? -1; }
+    if (typeof av === "string") return sortDir === "asc" ? av.localeCompare(bv) : bv.localeCompare(av);
+    return sortDir === "asc" ? av - bv : bv - av;
+  });
+
+  const toggleSort = (col) => {
+    if (sortCol === col) setSortDir(d => d === "asc" ? "desc" : "asc");
+    else { setSortCol(col); setSortDir(col === "pts" || col === "place" ? "asc" : "asc"); }
+  };
+
+  const arrow = (col) => {
+    if (sortCol !== col) return <span style={{ color: "#444", marginLeft: "0.3rem" }}>↕</span>;
+    return <span style={{ color: "#c8922a", marginLeft: "0.3rem" }}>{sortDir === "asc" ? "↑" : "↓"}</span>;
+  };
+
+  const thStyle = (col) => ({
+    padding: "0.6rem 0.85rem",
+    textAlign: col === "pts" || col === "place" ? "center" : "left",
+    fontSize: "0.6rem",
+    letterSpacing: "0.1em",
+    textTransform: "uppercase",
+    color: sortCol === col ? "#c8922a" : "#888",
+    borderBottom: "1px solid rgba(255,255,255,0.08)",
+    cursor: "pointer",
+    userSelect: "none",
+    whiteSpace: "nowrap",
+    background: "rgba(255,255,255,0.02)",
+    fontWeight: 400,
+    fontFamily: "'DM Mono', monospace",
+  });
+
+  const eliminated = castaways.filter(c => c.eliminationOrder).length;
+  const remaining = season.totalCastaways - eliminated;
+
   return (
     <div>
       <div className="page-title">Draft</div>
-      <div className="page-subtitle">Season 50 · Draft complete · Picks locked</div>
+      <div className="page-subtitle">Season 50 · 24 Picks · {eliminated} Eliminated · {remaining} Remaining</div>
 
-      <div className="panel" style={{ marginBottom:"1.25rem", borderColor:"rgba(200,146,42,0.3)", background:"rgba(200,146,42,0.04)" }}>
-        <div style={{ fontSize:"0.72rem", color:"#c8922a" }}>🔒 The Season 50 draft is locked. Picks cannot be changed.</div>
+      <div style={{ border: "1px solid rgba(255,255,255,0.08)", borderRadius: 4, overflow: "hidden" }}>
+        <table style={{ width: "100%", borderCollapse: "collapse" }}>
+          <thead>
+            <tr>
+              <th style={{ ...thStyle("pick"), minWidth: "3rem" }} onClick={() => toggleSort("pick")}>#  {arrow("pick")}</th>
+              <th style={thStyle("name")} onClick={() => toggleSort("name")}>Castaway {arrow("name")}</th>
+              <th style={thStyle("team")} onClick={() => toggleSort("team")}>Team {arrow("team")}</th>
+              <th style={{ ...thStyle("place"), minWidth: "4rem" }} onClick={() => toggleSort("place")}>Place {arrow("place")}</th>
+              <th style={{ ...thStyle("pts"), minWidth: "4.5rem" }} onClick={() => toggleSort("pts")}>Points {arrow("pts")}</th>
+            </tr>
+          </thead>
+          <tbody>
+            {sorted.map((row, idx) => {
+              const isElim = row.eliminationOrder !== null;
+              return (
+                <tr key={row.pick} style={{ background: idx % 2 === 0 ? "rgba(255,255,255,0.015)" : "transparent", opacity: isElim ? 0.65 : 1 }}>
+                  {/* Pick # */}
+                  <td style={{ padding: "0.6rem 0.85rem", fontFamily: "'Playfair Display', serif", fontWeight: 900, fontSize: "0.85rem", color: "#555", borderBottom: "1px solid rgba(255,255,255,0.04)" }}>
+                    {row.pick}
+                  </td>
+                  {/* Castaway */}
+                  <td style={{ padding: "0.6rem 0.85rem", borderBottom: "1px solid rgba(255,255,255,0.04)" }}>
+                    <div style={{ fontSize: "0.8rem", color: isElim ? "#888" : "#f0ebe0", textDecoration: isElim ? "line-through" : "none", fontWeight: 500 }}>
+                      {row.name}
+                    </div>
+                  </td>
+                  {/* Team */}
+                  <td style={{ padding: "0.6rem 0.85rem", borderBottom: "1px solid rgba(255,255,255,0.04)" }}>
+                    <span style={{ fontSize: "0.72rem", color: row.teamColor, fontWeight: 500 }}>{row.teamName}</span>
+                  </td>
+                  {/* Place */}
+                  <td style={{ padding: "0.6rem 0.85rem", textAlign: "center", borderBottom: "1px solid rgba(255,255,255,0.04)" }}>
+                    {row.place !== null
+                      ? <span style={{ fontSize: "0.75rem", color: "#d0cab8" }}>{ordinal(row.place)}</span>
+                      : <span style={{ fontSize: "0.72rem", color: "#6db86d" }}>Active</span>}
+                  </td>
+                  {/* Points */}
+                  <td style={{ padding: "0.6rem 0.85rem", textAlign: "center", borderBottom: "1px solid rgba(255,255,255,0.04)" }}>
+                    {row.pts !== null
+                      ? <span style={{ fontFamily: "'Playfair Display', serif", fontWeight: 900, fontSize: "0.9rem", color: "#c8922a" }}>{row.pts}</span>
+                      : <span style={{ fontSize: "0.72rem", color: "#6db86d" }}>10</span>}
+                  </td>
+                </tr>
+              );
+            })}
+          </tbody>
+        </table>
       </div>
 
-      <div className="grid2" style={{ marginBottom:"1.25rem" }}>
+      {/* Team summary strip */}
+      <div style={{ marginTop: "1.5rem", display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(180px, 1fr))", gap: "0.75rem" }}>
         {TEAMS.map(t => {
-          const picks = castaways.filter(c => c.draftedBy === t.id);
+          const teamRows = rows.filter(r => r.teamName === t.name);
+          const scored = teamRows.reduce((sum, r) => sum + (r.pts !== null ? r.pts : 10), 0);
+          const alive = teamRows.filter(r => r.eliminationOrder === null).length;
           return (
-            <div key={t.id} className="panel">
-              <div className="section-title" style={{ color: t.color }}>{t.name} — {t.members}</div>
-              <div style={{ display:"flex", flexDirection:"column", gap:"0.35rem" }}>
-                {picks.map(c => (
-                  <div key={c.id} className="row" style={{ justifyContent:"space-between", padding:"0.45rem 0.5rem", border:"1px solid rgba(255,255,255,0.06)", borderRadius:3, background:"rgba(255,255,255,0.02)" }}>
-                    <div>
-                      <div style={{ fontSize:"0.78rem" }}>{c.name}</div>
-                      <div className="row" style={{ gap:"0.3rem", alignItems:"center" }}>
-                        {c.origTribe && c.origTribe !== c.tribe && (
-                          <span style={{ fontSize:"0.58rem", color:TRIBE_COLORS[c.origTribe]||"#999" }}>{c.origTribe}</span>
-                        )}
-                        {c.origTribe && c.origTribe !== c.tribe && (
-                          <span style={{ fontSize:"0.5rem", color:"#555" }}>→</span>
-                        )}
-                        {c.tribe && <span style={{ fontSize:"0.58rem", color:TRIBE_COLORS[c.tribe]||"#999" }}>{c.tribe}</span>}
-                        {showOdds && c.odds && <span style={{ fontSize:"0.58rem", color:oddsColor(c.odds) }}>{c.odds}</span>}
-                      </div>
-                    </div>
-                    {c.eliminationOrder
-                      ? <span style={{ fontSize:"0.62rem", color:"#888", textDecoration:"line-through" }}>Elim #{c.eliminationOrder}</span>
-                      : <span style={{ fontSize:"0.62rem", color:"#6db86d" }}>Active</span>}
-                  </div>
-                ))}
-                {picks.length === 0 && <div className="hint">No picks.</div>}
+            <div key={t.id} className="panel" style={{ borderColor: `${t.color}33` }}>
+              <div style={{ fontSize: "0.72rem", fontWeight: 500, color: t.color, marginBottom: "0.35rem" }}>{t.name}</div>
+              <div style={{ fontSize: "0.6rem", color: "#888", marginBottom: "0.5rem" }}>{t.members}</div>
+              <div style={{ display: "flex", gap: "1rem", alignItems: "baseline" }}>
+                <div>
+                  <div style={{ fontFamily: "'Playfair Display', serif", fontWeight: 900, fontSize: "1.5rem", color: t.color, lineHeight: 1 }}>{scored}</div>
+                  <div style={{ fontSize: "0.55rem", color: "#777", letterSpacing: "0.08em", textTransform: "uppercase" }}>pts</div>
+                </div>
+                <div>
+                  <div style={{ fontFamily: "'Playfair Display', serif", fontWeight: 900, fontSize: "1.5rem", color: alive > 0 ? "#6db86d" : "#555", lineHeight: 1 }}>{alive}</div>
+                  <div style={{ fontSize: "0.55rem", color: "#777", letterSpacing: "0.08em", textTransform: "uppercase" }}>alive</div>
+                </div>
               </div>
             </div>
           );
         })}
-      </div>
-
-      <div className="panel">
-        <div className="section-title">Not Selected</div>
-        <div className="row" style={{ flexWrap:"wrap", gap:"0.4rem" }}>
-          {castaways.filter(c => !c.draftedBy).map(c => (
-            <span key={c.id} style={{ fontSize:"0.65rem", color:"#666", padding:"0.2rem 0.5rem", border:"1px solid rgba(255,255,255,0.06)", borderRadius:3 }}>
-              {c.name}
-            </span>
-          ))}
-        </div>
       </div>
     </div>
   );
@@ -908,11 +1021,11 @@ const S50_EPISODES = [
     airDate: "April 8, 2026",
     eliminated: "Dee Valladares",
     advantages: [
-      { holder: "Rizo Velovic", kind: "advantage", type: "Idol", status: "active", note: "Rizo's Boomerang Idol remains active, but its secrecy is fully gone — Emily told Rizo that Dee had told her about it. Now essentially the whole tribe knows." },
+      { holder: "Rizo Velovic", kind: "advantage", type: "Idol", status: "active", note: "Rizo's Boomerang Idol remains active, but its secrecy is fully gone — Emily blabbed to Rizo that Dee had told her about it. Now essentially the whole tribe knows." },
       { holder: "Ozzy Lusth", kind: "advantage", type: "Idol", status: "active", note: "Ozzy's Boomerang Idol remains active. He won individual immunity this episode (his 8th career win), which kept him safe regardless." },
       { holder: "Ozzy Lusth", kind: "advantage", type: "Extra Vote", status: "active", note: "Ozzy's Extra Vote remains unplayed." },
-      { holder: "Cirie Fields", kind: "advantage", type: "Extra Vote", status: "active", note: "Cirie's Extra Vote remains secret." },
-      { holder: "Stephenie LaGrossa", kind: "advantage", type: "Steal-a-Vote", status: "active", note: "Stephenie went on a journey where she was challenged to held her arm raised for a full hour.  She earned a Steal-a-Vote advantage. She tried to lie about earning it, but Cirie immediately saw through her." },
+      { holder: "Cirie Fields", kind: "advantage", type: "Extra Vote", status: "active", note: "Cirie's Extra Vote remains secret. She saw straight through Stephenie's lie about her journey advantage — but kept quiet." },
+      { holder: "Stephenie LaGrossa", kind: "advantage", type: "Steal-a-Vote", status: "active", note: "Stephenie went on a journey and held her arm raised for a full hour — a remarkable feat given her surgically repaired shoulder from Heroes vs. Villains. She earned a Steal-a-Vote advantage. She tried to lie about earning it, but Cirie immediately saw through her." },
       { holder: "Aubry Bracco", kind: "advantage", type: "Idol", status: "used", note: "Aubry played her Boomerang Idol on herself at Tribal Council as promised. It did not return to the finder (Devens) because Aubry played it herself rather than being voted out holding it. The idol is now spent." },
       { holder: "Dee Valladares", kind: "advantage", type: "Shot in the Dark", status: "applied", note: "Dee played her Shot in the Dark at Tribal — it came up 'Not Safe,' so all votes against her counted. She was eliminated 9-4-1 (4 votes for Tiffany, 1 for Coach). First jury member." },
     ],
@@ -924,7 +1037,7 @@ const S50_EPISODES = [
     airDate: "April 1, 2026",
     eliminated: "Kamilla Karthigesu, Genevieve Mushaluk, Colby Donaldson",
     advantages: [
-      { holder: "Rizo Velovic", kind: "advantage", type: "Idol", status: "active", note: "Rizo's Boomerang Idol remains active. Ozzy now knows about it after Rizo revealed it during their Exile Island bonding session." },
+      { holder: "Rizo Velovic", kind: "advantage", type: "Idol", status: "active", note: "Rizo's Boomerang Idol remains active. Ozzy now knows about it after Rizo revealed it during their Exile Island bonding session, where they solidified an alliance." },
       { holder: "Aubry Bracco", kind: "advantage", type: "Idol", status: "active", note: "Aubry announced she was playing her idol before the Purple group's tribal, but ultimately no idols were played — the vote went cleanly 3-0 against Genevieve. Aubry's idol remains active heading into Episode 7." },
       { holder: "Ozzy Lusth", kind: "advantage", type: "Idol", status: "active", note: "Ozzy's Boomerang Idol remains active. He and Rizo were both safe on Exile Island and missed the Blood Moon tribals entirely." },
       { holder: "Ozzy Lusth", kind: "advantage", type: "Extra Vote", status: "active", note: "Ozzy's Extra Vote remains unplayed." },
@@ -1014,29 +1127,19 @@ function Recap() {
       <div className="section-title">Advantages &amp; Disadvantages</div>
       <div style={{ display: "flex", flexDirection: "column", gap: "0.5rem", marginBottom: "2rem" }}>
         {(() => {
-const all = [...S50_EPISODES]
-  .sort((a, b) => b.number - a.number)
-  .flatMap(ep =>
-    ep.advantages.map((adv, i) => ({
-      ...adv,
-      epTitle: ep.title,
-      epNum: ep.number,
-      i
-    }))
-  );
-
-const seen = new Set();
-const deduped = all.filter(adv => {
-  const key = adv.holder + "|" + adv.type;
-  if (seen.has(key)) return false;
-  seen.add(key);
-  return true;
-});
-
-const sorted = [
-  ...deduped.filter(a => a.status === "active"),
-  ...deduped.filter(a => a.status !== "active"),
-];
+          const all = [...S50_EPISODES].reverse().flatMap(ep =>
+            ep.advantages.map((adv, i) => ({ ...adv, epTitle: ep.title, epNum: ep.number, i }))
+          );
+          const seen = new Set();
+          const deduped = all.filter(adv => {
+            const key = adv.holder + '|' + adv.type;
+            if (seen.has(key)) return false;
+            seen.add(key);
+            return true;
+          });
+          const sorted = [
+            ...deduped.filter(a => a.status === "active").reverse(),
+            ...deduped.filter(a => a.status !== "active").reverse(),
           ];
           return sorted;
         })().map((adv, idx) => {
@@ -1089,159 +1192,6 @@ const sorted = [
             </p>
           </div>
         ))}
-      </div>
-    </div>
-  );
-}
-
-function AdminManual({ season, castaways, draftOrder, showOdds, setShowOdds, resetSeason, setDraftOrder, setCastaways, showToast }) {
-  const [confirmReset, setConfirmReset] = useState(false);
-  const [authed, setAuthed] = useState(false);
-  const [pwInput, setPwInput] = useState("");
-  const [pwError, setPwError] = useState(false);
-  const teamById = Object.fromEntries(TEAMS.map(t => [t.id, t]));
-
-  if (!authed) {
-    return (
-      <div>
-        <div className="page-title">Admin</div>
-        <div className="page-subtitle">Commissioner access only</div>
-        <div className="panel" style={{ maxWidth: 360 }}>
-          <div className="section-title">Password Required</div>
-          <div style={{ display:"flex", flexDirection:"column", gap:"0.75rem" }}>
-            <input
-              className="input"
-              type="password"
-              placeholder="Enter admin password"
-              value={pwInput}
-              onChange={e => { setPwInput(e.target.value); setPwError(false); }}
-              onKeyDown={e => {
-                if (e.key === "Enter") {
-                  if (pwInput === ADMIN_PASSWORD) { setAuthed(true); setPwInput(""); }
-                  else { setPwError(true); setPwInput(""); }
-                }
-              }}
-              style={{ borderColor: pwError ? "rgba(200,60,60,0.5)" : undefined }}
-            />
-            {pwError && <div style={{ fontSize:"0.65rem", color:"#cc6060" }}>Incorrect password. Try again.</div>}
-            <button
-              className="action-btn primary"
-              style={{ marginBottom:0 }}
-              onClick={() => {
-                if (pwInput === ADMIN_PASSWORD) { setAuthed(true); setPwInput(""); }
-                else { setPwError(true); setPwInput(""); }
-              }}
-            >
-              Unlock
-            </button>
-          </div>
-        </div>
-      </div>
-    );
-  }
-
-  const usedOrders = new Set(castaways.filter(c => c.eliminationOrder).map(c => c.eliminationOrder));
-  const nextElim = (() => { for (let i=1; i<=season.totalCastaways; i++) if (!usedOrders.has(i)) return i; return season.totalCastaways+1; })();
-
-  const setElimOrder = (id, val) => {
-    const v = val.trim() === "" ? null : parseInt(val, 10);
-    setCastaways(prev => prev.map(c => c.id === id ? { ...c, eliminationOrder: Number.isFinite(v) ? v : null } : c));
-  };
-
-  const quickElim = (id) => {
-    if (nextElim > season.totalCastaways) { showToast("All castaways already eliminated!"); return; }
-    setCastaways(prev => prev.map(c => c.id === id ? { ...c, eliminationOrder: nextElim } : c));
-    showToast(`Eliminated! #${nextElim}`);
-  };
-
-  const restore = (id) => {
-    setCastaways(prev => prev.map(c => c.id === id ? { ...c, eliminationOrder: null } : c));
-    showToast("Castaway restored.");
-  };
-
-  const clearElims = () => { setCastaways(prev => prev.map(c => ({ ...c, eliminationOrder: null }))); showToast("All eliminations cleared."); };
-
-  const alive     = castaways.filter(c => !c.eliminationOrder);
-  const eliminated = castaways.filter(c => c.eliminationOrder).sort((a,b) => b.eliminationOrder - a.eliminationOrder);
-
-  return (
-    <div>
-      <div className="page-title">Admin</div>
-      <div className="page-subtitle">Commissioner controls · Next elimination #{nextElim <= season.totalCastaways ? nextElim : "done"}</div>
-
-      <div className="panel" style={{ marginBottom:"1.25rem" }}>
-        <div className="section-title">Controls</div>
-        <div className="row" style={{ marginBottom:"0.75rem" }}>
-          <button className="action-btn" style={{ marginBottom:0, background:showOdds?"rgba(200,146,42,0.12)":"rgba(255,255,255,0.03)", borderColor:showOdds?"rgba(200,146,42,0.5)":"rgba(255,255,255,0.1)", color:showOdds?"#c8922a":"#aaa" }} onClick={() => setShowOdds(o=>!o)}>
-            {showOdds ? "👁 Odds Visible" : "🙈 Odds Hidden"}
-          </button>
-          <button className="action-btn" style={{ marginBottom:0 }} onClick={clearElims}>Clear All Eliminations</button>
-          {!confirmReset
-            ? <button className="action-btn danger" style={{ marginBottom:0 }} onClick={() => setConfirmReset(true)}>↺ Reset Season</button>
-            : <>
-                <span className="hint" style={{ color:"#cc6060" }}>This will erase all picks + eliminations. Sure?</span>
-                <button className="action-btn danger" style={{ marginBottom:0, background:"rgba(200,60,60,0.2)", borderColor:"rgba(200,60,60,0.5)", color:"#ff8080" }} onClick={() => { resetSeason(); setConfirmReset(false); }}>Yes, Reset</button>
-                <button className="action-btn" style={{ marginBottom:0 }} onClick={() => setConfirmReset(false)}>Cancel</button>
-              </>
-          }
-        </div>
-        <div className="hint">Use "Elim #N" button to mark the next castaway out instantly, or type a number manually. Use "Restore" to undo any elimination.</div>
-      </div>
-
-      <div className="grid2">
-        <div className="panel">
-          <div className="section-title">Still In — {alive.length}</div>
-          <div style={{ display:"flex", flexDirection:"column", gap:"0.4rem" }}>
-            {alive.map(c => {
-              const team = c.draftedBy ? teamById[c.draftedBy] : null;
-              return (
-                <div key={c.id} className="elim-row">
-                  <div style={{ minWidth:0 }}>
-                    <div style={{ fontSize:"0.78rem" }}>{c.name}</div>
-                    <div className="row" style={{ gap:"0.4rem" }}>
-                      {c.tribe && <span style={{ fontSize:"0.6rem", color:TRIBE_COLORS[c.tribe]||"#777" }}>{c.tribe}</span>}
-                      <span style={{ fontSize:"0.6rem", color: team ? team.color : "#777" }}>{team ? team.name : "Undrafted"}</span>
-                    </div>
-                  </div>
-                  <div className="row" style={{ gap:"0.35rem" }}>
-                    <input className="input" style={{ width:64 }} placeholder="#" value={c.eliminationOrder ?? ""} onChange={e => setElimOrder(c.id, e.target.value)} />
-                    <button className="action-btn primary" style={{ marginBottom:0, padding:"0.35rem 0.65rem", fontSize:"0.62rem", whiteSpace:"nowrap" }} onClick={() => quickElim(c.id)}>
-                      Elim #{nextElim}
-                    </button>
-                  </div>
-                </div>
-              );
-            })}
-            {alive.length === 0 && <div className="hint">Everyone has been eliminated!</div>}
-          </div>
-        </div>
-
-        <div className="panel">
-          <div className="section-title">Eliminated — {eliminated.length} (most recent first)</div>
-          {eliminated.length === 0
-            ? <div className="hint">No eliminations yet.</div>
-            : (
-              <div style={{ display:"flex", flexDirection:"column", gap:"0.4rem" }}>
-                {eliminated.map(c => {
-                  const team = c.draftedBy ? teamById[c.draftedBy] : null;
-                  const pts = calcPoints(c.eliminationOrder, season.totalCastaways);
-                  return (
-                    <div key={c.id} className="elim-row done">
-                      <div style={{ minWidth:0 }}>
-                        <div style={{ fontSize:"0.75rem", color:"#999" }}>#{c.eliminationOrder} · {c.name}</div>
-                        <div className="row" style={{ gap:"0.4rem" }}>
-                          <span style={{ fontSize:"0.6rem", color: team ? team.color : "#777" }}>{team ? team.name : "—"}</span>
-                          <span style={{ fontSize:"0.6rem", color:"#c8922a" }}>{pts} pts</span>
-                        </div>
-                      </div>
-                      <button className="action-btn" style={{ marginBottom:0, padding:"0.3rem 0.6rem", fontSize:"0.6rem" }} onClick={() => restore(c.id)}>Restore</button>
-                    </div>
-                  );
-                })}
-              </div>
-            )
-          }
-        </div>
       </div>
     </div>
   );
