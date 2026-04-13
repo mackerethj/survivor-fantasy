@@ -822,9 +822,12 @@ const DRAFT_ORDER = [
 ];
 
 function Points({ season, castaways }) {
+  const [sortCol, setSortCol] = useState("default");
+  const [sortDir, setSortDir] = useState("asc");
+
   const rows = castaways.map((c) => {
     const team = c.draftedBy ? TEAMS.find(t => t.id === c.draftedBy) : null;
-    const pts  = c.eliminationOrder ? calcPoints(c.eliminationOrder, season.totalCastaways) : null;
+    const pts = c.eliminationOrder ? calcPoints(c.eliminationOrder, season.totalCastaways) : null;
     const finishPlace = c.eliminationOrder ? season.totalCastaways - c.eliminationOrder + 1 : null;
     const draftPick = DRAFT_ORDER.indexOf(c.name) + 1 || null;
 
@@ -842,108 +845,120 @@ function Points({ season, castaways }) {
   });
 
   const sorted = [...rows].sort((a, b) => {
-    // Active first
-    if (a.isActive && !b.isActive) return -1;
-    if (!a.isActive && b.isActive) return 1;
-
-    // Among active: Drafted ascending
-    if (a.isActive && b.isActive) {
-      return (a.draftPick ?? 999) - (b.draftPick ?? 999);
+    if (sortCol === "default") {
+      if (a.isActive && !b.isActive) return -1;
+      if (!a.isActive && b.isActive) return 1;
+      if (a.isActive && b.isActive) return (a.draftPick ?? 999) - (b.draftPick ?? 999);
+      return (a.finishPlace ?? 999) - (b.finishPlace ?? 999);
     }
 
-    // Among eliminated: Place ascending
-    return (a.finishPlace ?? 999) - (b.finishPlace ?? 999);
+    let av;
+    let bv;
+
+    if (sortCol === "place") {
+      av = a.finishPlace ?? 999;
+      bv = b.finishPlace ?? 999;
+    }
+    if (sortCol === "name") {
+      av = a.name;
+      bv = b.name;
+    }
+    if (sortCol === "drafted") {
+      av = a.draftPick ?? 999;
+      bv = b.draftPick ?? 999;
+    }
+    if (sortCol === "team") {
+      av = a.teamName;
+      bv = b.teamName;
+    }
+    if (sortCol === "pts") {
+      av = a.pts ?? -1;
+      bv = b.pts ?? -1;
+    }
+
+    if (typeof av === "string") {
+      return sortDir === "asc" ? av.localeCompare(bv) : bv.localeCompare(av);
+    }
+
+    return sortDir === "asc" ? av - bv : bv - av;
+  });
+
+  const toggleSort = (col) => {
+    if (sortCol === col) {
+      setSortDir((d) => (d === "asc" ? "desc" : "asc"));
+    } else {
+      setSortCol(col);
+      setSortDir("asc");
+    }
+  };
+
+  const arrow = (col) => {
+    if (sortCol !== col) return <span style={{ color: "#444", marginLeft: "0.3rem" }}>↕</span>;
+    return <span style={{ color: "#c8922a", marginLeft: "0.3rem" }}>{sortDir === "asc" ? "↑" : "↓"}</span>;
+  };
+
+  const thStyle = (col) => ({
+    padding: "0.6rem 0.85rem",
+    textAlign: (col === "pts" || col === "drafted" || col === "place") ? "center" : "left",
+    fontSize: "0.6rem",
+    letterSpacing: "0.1em",
+    textTransform: "uppercase",
+    color: sortCol === col ? "#c8922a" : "#888",
+    borderBottom: "1px solid rgba(255,255,255,0.08)",
+    cursor: "pointer",
+    userSelect: "none",
+    whiteSpace: "nowrap",
+    background: "rgba(255,255,255,0.02)",
+    fontWeight: 400,
+    fontFamily: "'DM Mono', monospace",
   });
 
   const eliminated = castaways.filter(c => c.eliminationOrder).length;
-  const remaining  = season.totalCastaways - eliminated;
+  const remaining = season.totalCastaways - eliminated;
 
   return (
     <div>
       <div className="page-title">Points</div>
-      <div className="page-subtitle">Season {season.id} · {eliminated} Eliminated · {remaining} Remaining</div>
+      <div className="page-subtitle">
+        Season {season.id} · {eliminated} Eliminated · {remaining} Remaining
+      </div>
+
+      <div style={{ marginBottom: "0.75rem" }}>
+        <button
+          className="action-btn"
+          onClick={() => {
+            setSortCol("default");
+            setSortDir("asc");
+          }}
+          style={{
+            marginBottom: 0,
+            color: sortCol === "default" ? "#c8922a" : "#ccc",
+            borderColor: sortCol === "default" ? "rgba(200,146,42,0.4)" : "rgba(255,255,255,0.1)",
+            background: sortCol === "default" ? "rgba(200,146,42,0.08)" : "rgba(255,255,255,0.03)",
+          }}
+        >
+          Default Order
+        </button>
+      </div>
 
       <div style={{ border: "1px solid rgba(255,255,255,0.08)", borderRadius: 4, overflow: "hidden" }}>
         <table style={{ width: "100%", borderCollapse: "collapse" }}>
           <thead>
             <tr>
-              <th style={{
-                padding: "0.6rem 0.85rem",
-                textAlign: "center",
-                fontSize: "0.6rem",
-                letterSpacing: "0.1em",
-                textTransform: "uppercase",
-                color: "#888",
-                borderBottom: "1px solid rgba(255,255,255,0.08)",
-                whiteSpace: "nowrap",
-                background: "rgba(255,255,255,0.02)",
-                fontWeight: 400,
-                fontFamily: "'DM Mono', monospace",
-                minWidth: "4.5rem"
-              }}>
-                Place
+              <th style={{ ...thStyle("place"), minWidth: "4.5rem" }} onClick={() => toggleSort("place")}>
+                Place {arrow("place")}
               </th>
-              <th style={{
-                padding: "0.6rem 0.85rem",
-                textAlign: "left",
-                fontSize: "0.6rem",
-                letterSpacing: "0.1em",
-                textTransform: "uppercase",
-                color: "#888",
-                borderBottom: "1px solid rgba(255,255,255,0.08)",
-                whiteSpace: "nowrap",
-                background: "rgba(255,255,255,0.02)",
-                fontWeight: 400,
-                fontFamily: "'DM Mono', monospace",
-              }}>
-                Castaway
+              <th style={thStyle("name")} onClick={() => toggleSort("name")}>
+                Castaway {arrow("name")}
               </th>
-              <th style={{
-                padding: "0.6rem 0.85rem",
-                textAlign: "center",
-                fontSize: "0.6rem",
-                letterSpacing: "0.1em",
-                textTransform: "uppercase",
-                color: "#888",
-                borderBottom: "1px solid rgba(255,255,255,0.08)",
-                whiteSpace: "nowrap",
-                background: "rgba(255,255,255,0.02)",
-                fontWeight: 400,
-                fontFamily: "'DM Mono', monospace",
-                minWidth: "4.5rem"
-              }}>
-                Drafted
+              <th style={{ ...thStyle("drafted"), minWidth: "4.5rem" }} onClick={() => toggleSort("drafted")}>
+                Drafted {arrow("drafted")}
               </th>
-              <th style={{
-                padding: "0.6rem 0.85rem",
-                textAlign: "left",
-                fontSize: "0.6rem",
-                letterSpacing: "0.1em",
-                textTransform: "uppercase",
-                color: "#888",
-                borderBottom: "1px solid rgba(255,255,255,0.08)",
-                whiteSpace: "nowrap",
-                background: "rgba(255,255,255,0.02)",
-                fontWeight: 400,
-                fontFamily: "'DM Mono', monospace",
-              }}>
-                Team
+              <th style={thStyle("team")} onClick={() => toggleSort("team")}>
+                Team {arrow("team")}
               </th>
-              <th style={{
-                padding: "0.6rem 0.85rem",
-                textAlign: "center",
-                fontSize: "0.6rem",
-                letterSpacing: "0.1em",
-                textTransform: "uppercase",
-                color: "#888",
-                borderBottom: "1px solid rgba(255,255,255,0.08)",
-                whiteSpace: "nowrap",
-                background: "rgba(255,255,255,0.02)",
-                fontWeight: 400,
-                fontFamily: "'DM Mono', monospace",
-                minWidth: "4.5rem"
-              }}>
-                Points
+              <th style={{ ...thStyle("pts"), minWidth: "4.5rem" }} onClick={() => toggleSort("pts")}>
+                Points {arrow("pts")}
               </th>
             </tr>
           </thead>
@@ -951,7 +966,13 @@ function Points({ season, castaways }) {
             {sorted.map((row, idx) => {
               const isElim = row.eliminationOrder !== null;
               return (
-                <tr key={row.name} style={{ background: idx % 2 === 0 ? "rgba(255,255,255,0.015)" : "transparent", opacity: isElim ? 0.65 : 1 }}>
+                <tr
+                  key={row.name}
+                  style={{
+                    background: idx % 2 === 0 ? "rgba(255,255,255,0.015)" : "transparent",
+                    opacity: isElim ? 0.65 : 1,
+                  }}
+                >
                   <td style={{ padding: "0.6rem 0.85rem", textAlign: "center", borderBottom: "1px solid rgba(255,255,255,0.04)" }}>
                     {row.finishPlace !== null
                       ? <span style={{ fontSize: "0.75rem", color: "#d0cab8" }}>{ordinal(row.finishPlace)}</span>
@@ -971,7 +992,9 @@ function Points({ season, castaways }) {
                   </td>
 
                   <td style={{ padding: "0.6rem 0.85rem", borderBottom: "1px solid rgba(255,255,255,0.04)" }}>
-                    <span style={{ fontSize: "0.72rem", color: row.teamColor, fontWeight: 500 }}>{row.teamName}</span>
+                    <span style={{ fontSize: "0.72rem", color: row.teamColor, fontWeight: 500 }}>
+                      {row.teamName}
+                    </span>
                   </td>
 
                   <td style={{ padding: "0.6rem 0.85rem", textAlign: "center", borderBottom: "1px solid rgba(255,255,255,0.04)" }}>
@@ -990,11 +1013,11 @@ function Points({ season, castaways }) {
         {TEAMS.map(t => {
           const teamRows = rows.filter(r => r.teamName === t.name);
           const scored = teamRows.reduce((sum, r) => sum + (r.pts !== null ? r.pts : 10), 0);
-          const alive  = teamRows.filter(r => r.eliminationOrder === null).length;
+          const alive = teamRows.filter(r => r.eliminationOrder === null).length;
           return (
             <div key={t.id} className="panel" style={{ borderColor: `${t.color}33` }}>
               <div style={{ fontSize: "0.72rem", fontWeight: 500, color: t.color, marginBottom: "0.35rem" }}>{t.name}</div>
-              <div style={{ fontSize: "0.6rem",  color: "#888",   marginBottom: "0.5rem"  }}>{t.members}</div>
+              <div style={{ fontSize: "0.6rem", color: "#888", marginBottom: "0.5rem" }}>{t.members}</div>
               <div style={{ display: "flex", gap: "1rem", alignItems: "baseline" }}>
                 <div>
                   <div style={{ fontFamily: "'Playfair Display', serif", fontWeight: 900, fontSize: "1.5rem", color: t.color, lineHeight: 1 }}>{scored}</div>
