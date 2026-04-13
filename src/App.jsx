@@ -298,17 +298,17 @@ function getChampionshipsThrough(season) {
 }
 
 const EP1_ELIMINATIONS = {
-  "Jenna Lewis-Dougherty": 1,  // Episode 1 boot
-  "Kyle Fraser": 2,            // Episode 1 medevac
-  "Savannah Louie": 3,         // Episode 2 boot
-  "Q Burdette": 4,             // Episode 3 boot
-  "Mike White": 5,             // Episode 4 boot
-  "Angelina Keeley": 6,        // Episode 5 boot (Vatu tribal)
-  "Charlie Davis": 7,          // Episode 5 boot (Cila tribal)
-  "Kamilla Karthigesu": 8,     // Episode 6 Blood Moon boot (Orange group)
-  "Genevieve Mushaluk": 9,     // Episode 6 Blood Moon boot (Purple group, used Shot in the Dark)
-  "Colby Donaldson": 10,       // Episode 6 Blood Moon boot (Teal group, unanimous)
-  "Dee Valladares": 11,        // Episode 7 boot — 1st jury member, voted out 9-4-1
+  "Jenna Lewis-Dougherty": 1,
+  "Kyle Fraser": 2,
+  "Savannah Louie": 3,
+  "Q Burdette": 4,
+  "Mike White": 5,
+  "Angelina Keeley": 6,
+  "Charlie Davis": 7,
+  "Kamilla Karthigesu": 8,
+  "Genevieve Mushaluk": 9,
+  "Colby Donaldson": 10,
+  "Dee Valladares": 11,
 };
 
 function buildCastawaysForSeason50() {
@@ -320,7 +320,6 @@ function buildCastawaysForSeason50() {
   }));
 }
 
-// Re-apply locked draft assignments + enforce known eliminations on top of saved state
 function applyLockedDraft(castaways) {
   return castaways.map(c => {
     const master = S50_CASTAWAYS.find(m => m.name === c.name);
@@ -505,11 +504,16 @@ export default function App() {
           flexDirection: "column", alignItems: "center", justifyContent: "center",
           padding: "2rem", textAlign: "center", position: "relative", overflow: "hidden",
         }}>
-          <img src="data:image/jpeg;base64,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" alt="" aria-hidden="true" style={{
-            position: "absolute", inset: 0, width: "100%", height: "100%",
-            objectFit: "cover", objectPosition: "top center",
-            opacity: 0.15, pointerEvents: "none", userSelect: "none",
-          }} />
+          <img
+            src="data:image/jpeg;base64,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"
+            alt=""
+            aria-hidden="true"
+            style={{
+              position: "absolute", inset: 0, width: "100%", height: "100%",
+              objectFit: "cover", objectPosition: "top center",
+              opacity: 0.15, pointerEvents: "none", userSelect: "none",
+            }}
+          />
           <div style={{ position: "relative", zIndex: 1, display: "flex", flexDirection: "column", alignItems: "center" }}>
             <div style={{ fontSize: "2.8rem", marginBottom: "1rem" }}>⚖️🔥</div>
             <div style={{
@@ -537,14 +541,16 @@ export default function App() {
             <div style={{ fontSize: "0.78rem", color: "#999", marginBottom: "2.5rem", maxWidth: 360, lineHeight: 1.6 }}>
               The Dragon Slayer declared war and the largest Tribal Council in Survivor history delivered. Watch Episode 7 before continuing to avoid spoilers.
             </div>
-            <button onClick={dismissSplash} style={{
-              background: "rgba(200,146,42,0.12)", border: "1px solid rgba(200,146,42,0.5)",
-              color: "#c8922a", fontFamily: "'DM Mono', monospace", fontSize: "0.8rem",
-              letterSpacing: "0.12em", textTransform: "uppercase", padding: "0.85rem 2.5rem",
-              borderRadius: "2px", cursor: "pointer",
-            }}
-            onMouseEnter={e => e.target.style.background="rgba(200,146,42,0.22)"}
-            onMouseLeave={e => e.target.style.background="rgba(200,146,42,0.12)"}
+            <button
+              onClick={dismissSplash}
+              style={{
+                background: "rgba(200,146,42,0.12)", border: "1px solid rgba(200,146,42,0.5)",
+                color: "#c8922a", fontFamily: "'DM Mono', monospace", fontSize: "0.8rem",
+                letterSpacing: "0.12em", textTransform: "uppercase", padding: "0.85rem 2.5rem",
+                borderRadius: "2px", cursor: "pointer",
+              }}
+              onMouseEnter={e => e.target.style.background="rgba(200,146,42,0.22)"}
+              onMouseLeave={e => e.target.style.background="rgba(200,146,42,0.12)"}
             >
               Click to Continue →
             </button>
@@ -583,7 +589,6 @@ export default function App() {
   );
 }
 
-// Convert American odds string to implied win probability
 function oddsToImplied(odds) {
   if (!odds) return 0;
   if (odds.startsWith("-")) { const n = Math.abs(parseInt(odds)); return n / (n + 100); }
@@ -591,7 +596,6 @@ function oddsToImplied(odds) {
   return 100 / (n + 100);
 }
 
-// Projected points = sum of (implied_prob * max_possible_pts) for each alive pick
 function projectedPts(picks, totalCastaways) {
   const maxPts = calcPoints(totalCastaways, totalCastaways);
   return picks
@@ -649,7 +653,7 @@ function Leaderboard({ season, scores, castaways, showOdds }) {
                         : (showOdds && c.odds ? ` · ${c.odds} · 10pt` : " · 10pt")}
                     </span>
                   ))}
-                  {team.picks.length === 0 && <span style={{ fontSize: "0.65rem", color: "#aaa" }}>No picks — set on Draft page</span>}
+                  {team.picks.length === 0 && <span style={{ fontSize: "0.65rem", color: "#aaa" }}>No picks</span>}
                 </div>
               </div>
               <div className="lb-score">
@@ -790,6 +794,32 @@ function History({ historySeason, setHistorySeason }) {
   );
 }
 
+const DRAFT_ORDER = [
+  "Christian Hubicki",
+  "Genevieve Mushaluk",
+  "Jonathan Young",
+  "Stephenie LaGrossa",
+  "Joe Hunter",
+  "Rizo Velovic",
+  "Rick Devens",
+  "Mike White",
+  'Benjamin "Coach" Wade',
+  "Aubry Bracco",
+  "Ozzy Lusth",
+  "Kamilla Karthigesu",
+  "Dee Valladares",
+  "Tiffany Ervin",
+  "Cirie Fields",
+  "Emily Flippen",
+  "Savannah Louie",
+  "Charlie Davis",
+  "Colby Donaldson",
+  "Q Burdette",
+  "Chrissy Hofbeck",
+  "Angelina Keeley",
+  "Kyle Fraser",
+  "Jenna Lewis-Dougherty",
+];
 
 function Points({ season, castaways }) {
   const [sortCol, setSortCol] = useState("place");
@@ -873,29 +903,24 @@ function Points({ season, castaways }) {
               const isElim = row.eliminationOrder !== null;
               return (
                 <tr key={row.name} style={{ background: idx % 2 === 0 ? "rgba(255,255,255,0.015)" : "transparent", opacity: isElim ? 0.65 : 1 }}>
-                  {/* Place */}
                   <td style={{ padding: "0.6rem 0.85rem", textAlign: "center", borderBottom: "1px solid rgba(255,255,255,0.04)" }}>
                     {row.finishPlace !== null
                       ? <span style={{ fontSize: "0.75rem", color: "#d0cab8" }}>{ordinal(row.finishPlace)}</span>
                       : <span style={{ fontSize: "0.72rem", color: "#6db86d" }}>Active</span>}
                   </td>
-                  {/* Castaway */}
                   <td style={{ padding: "0.6rem 0.85rem", borderBottom: "1px solid rgba(255,255,255,0.04)" }}>
                     <div style={{ fontSize: "0.8rem", color: isElim ? "#888" : "#f0ebe0", textDecoration: isElim ? "line-through" : "none", fontWeight: 500 }}>
                       {row.name}
                     </div>
                   </td>
-                  {/* Drafted (pick #) */}
                   <td style={{ padding: "0.6rem 0.85rem", textAlign: "center", borderBottom: "1px solid rgba(255,255,255,0.04)" }}>
                     {row.draftPick
                       ? <span style={{ fontFamily: "'Playfair Display', serif", fontWeight: 900, fontSize: "0.85rem", color: "#555" }}>{row.draftPick}</span>
                       : <span style={{ fontSize: "0.65rem", color: "#555" }}>—</span>}
                   </td>
-                  {/* Team */}
                   <td style={{ padding: "0.6rem 0.85rem", borderBottom: "1px solid rgba(255,255,255,0.04)" }}>
                     <span style={{ fontSize: "0.72rem", color: row.teamColor, fontWeight: 500 }}>{row.teamName}</span>
                   </td>
-                  {/* Points */}
                   <td style={{ padding: "0.6rem 0.85rem", textAlign: "center", borderBottom: "1px solid rgba(255,255,255,0.04)" }}>
                     {row.pts !== null
                       ? <span style={{ fontFamily: "'Playfair Display', serif", fontWeight: 900, fontSize: "0.9rem", color: "#c8922a" }}>{row.pts}</span>
@@ -908,7 +933,6 @@ function Points({ season, castaways }) {
         </table>
       </div>
 
-      {/* Team summary strip */}
       <div style={{ marginTop: "1.5rem", display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(180px, 1fr))", gap: "0.75rem" }}>
         {TEAMS.map(t => {
           const teamRows = rows.filter(r => r.teamName === t.name);
@@ -1044,7 +1068,7 @@ function Recap() {
           );
           const seen = new Set();
           const deduped = all.filter(adv => {
-            const key = adv.holder + '|' + adv.type;
+            const key = adv.holder + "|" + adv.type;
             if (seen.has(key)) return false;
             seen.add(key);
             return true;
@@ -1063,23 +1087,23 @@ function Recap() {
           const statusBdr   = adv.status === "active" ? "1px solid rgba(109,184,109,0.25)" : "1px solid rgba(200,146,42,0.2)";
           const statusColor = adv.status === "active" ? "#6db86d" : "#a07830";
           return (
-          <div key={`${adv.epNum}-${adv.i}`} style={{ display: "flex", flexDirection: "column", gap: "0.35rem", padding: "0.75rem 1rem", background: idx % 2 === 0 ? "rgba(255,255,255,0.02)" : "transparent", border: "1px solid rgba(255,255,255,0.06)", borderRadius: 4 }}>
-            <div style={{ display: "flex", alignItems: "center", gap: "0.5rem", flexWrap: "wrap" }}>
-              <span style={{
-                fontSize: "0.55rem", letterSpacing: "0.08em", textTransform: "uppercase",
-                padding: "0.2rem 0.5rem", borderRadius: 2, whiteSpace: "nowrap",
-                background: statusBg, border: statusBdr, color: statusColor,
-              }}>
-                {statusLabel}
-              </span>
-              <span style={{ fontSize: "0.6rem", color: "#a78bda" }}>{adv.epTitle}</span>
-              <span style={{ fontSize: "0.6rem", color: adv.kind === "disadvantage" ? "#c8922a" : "#6ab4d8" }}>
-                {adv.kind === "disadvantage" ? "⬇ " : "⬆ "}{adv.type}
-              </span>
+            <div key={`${adv.epNum}-${adv.i}`} style={{ display: "flex", flexDirection: "column", gap: "0.35rem", padding: "0.75rem 1rem", background: idx % 2 === 0 ? "rgba(255,255,255,0.02)" : "transparent", border: "1px solid rgba(255,255,255,0.06)", borderRadius: 4 }}>
+              <div style={{ display: "flex", alignItems: "center", gap: "0.5rem", flexWrap: "wrap" }}>
+                <span style={{
+                  fontSize: "0.55rem", letterSpacing: "0.08em", textTransform: "uppercase",
+                  padding: "0.2rem 0.5rem", borderRadius: 2, whiteSpace: "nowrap",
+                  background: statusBg, border: statusBdr, color: statusColor,
+                }}>
+                  {statusLabel}
+                </span>
+                <span style={{ fontSize: "0.6rem", color: "#a78bda" }}>{adv.epTitle}</span>
+                <span style={{ fontSize: "0.6rem", color: adv.kind === "disadvantage" ? "#c8922a" : "#6ab4d8" }}>
+                  {adv.kind === "disadvantage" ? "⬇ " : "⬆ "}{adv.type}
+                </span>
+              </div>
+              <div style={{ fontSize: "0.75rem", color: "#f0ebe0", fontWeight: 500 }}>{adv.holder}</div>
+              <div style={{ fontSize: "0.65rem", color: "#bbb", lineHeight: 1.5 }}>{adv.note}</div>
             </div>
-            <div style={{ fontSize: "0.75rem", color: "#f0ebe0", fontWeight: 500 }}>{adv.holder}</div>
-            <div style={{ fontSize: "0.65rem", color: "#bbb", lineHeight: 1.5 }}>{adv.note}</div>
-          </div>
           );
         })}
       </div>
