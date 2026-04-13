@@ -329,10 +329,8 @@ function applyLockedDraft(castaways) {
     return {
       ...c,
       draftedBy: master.draftedBy ?? null,
-      // Always pull tribe + origTribe from master so stale localStorage never shows old values
       tribe: master.tribe || c.tribe,
       origTribe: master.origTribe || c.origTribe || "",
-      // Enforce known eliminations so stale localStorage never shows wrong scores
       eliminationOrder: lockedElim ?? c.eliminationOrder,
     };
   });
@@ -507,7 +505,7 @@ export default function App() {
           flexDirection: "column", alignItems: "center", justifyContent: "center",
           padding: "2rem", textAlign: "center", position: "relative", overflow: "hidden",
         }}>
-          <img src="data:image/jpeg;base64,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" alt="" aria-hidden="true" style={{
+          <img src="data:image/jpeg;base64,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" alt="" aria-hidden="true" style={{
             position: "absolute", inset: 0, width: "100%", height: "100%",
             objectFit: "cover", objectPosition: "top center",
             opacity: 0.15, pointerEvents: "none", userSelect: "none",
@@ -793,70 +791,42 @@ function History({ historySeason, setHistorySeason }) {
   );
 }
 
-// Draft order — pick number maps to castaway name
-const DRAFT_ORDER = [
-  "Christian Hubicki",
-  "Genevieve Mushaluk",
-  "Jonathan Young",
-  "Stephenie LaGrossa",
-  "Joe Hunter",
-  "Rizo Velovic",
-  "Rick Devens",
-  "Mike White",
-  'Benjamin "Coach" Wade',
-  "Aubry Bracco",
-  "Ozzy Lusth",
-  "Kamilla Karthigesu",
-  "Dee Valladares",
-  "Tiffany Ervin",
-  "Cirie Fields",
-  "Emily Flippen",
-  "Savannah Louie",
-  "Charlie Davis",
-  "Colby Donaldson",
-  "Q Burdette",
-  "Chrissy Hofbeck",
-  "Angelina Keeley",
-  "Kyle Fraser",
-  "Jenna Lewis-Dougherty",
-];
 
-function DraftTable({ season, castaways }) {
-  const [sortCol, setSortCol] = useState("pick");
+function Points({ season, castaways }) {
+  const [sortCol, setSortCol] = useState("place");
   const [sortDir, setSortDir] = useState("asc");
 
-  const rows = DRAFT_ORDER.map((name, idx) => {
-    const c = castaways.find(x => x.name === name);
-    const team = c && c.draftedBy ? TEAMS.find(t => t.id === c.draftedBy) : null;
-    const pts = c && c.eliminationOrder ? calcPoints(c.eliminationOrder, season.totalCastaways) : null;
-    const place = c && c.eliminationOrder ? season.totalCastaways - c.eliminationOrder + 1 : null;
+  const rows = castaways.map((c) => {
+    const team = c.draftedBy ? TEAMS.find(t => t.id === c.draftedBy) : null;
+    const pts  = c.eliminationOrder ? calcPoints(c.eliminationOrder, season.totalCastaways) : null;
+    const finishPlace = c.eliminationOrder ? season.totalCastaways - c.eliminationOrder + 1 : null;
+    const draftPick = DRAFT_ORDER.indexOf(c.name) + 1 || null;
     return {
-      pick: idx + 1,
-      name,
-      shortName: name.split(" ")[0] === "Benjamin" ? "Coach" : name.split(" ")[0],
+      name: c.name,
       team,
       teamName: team ? team.name : "—",
       teamColor: team ? team.color : "#555",
-      eliminationOrder: c ? c.eliminationOrder : null,
-      place,
+      eliminationOrder: c.eliminationOrder,
+      finishPlace,
       pts,
+      draftPick,
     };
   });
 
   const sorted = [...rows].sort((a, b) => {
     let av, bv;
-    if (sortCol === "pick")   { av = a.pick;  bv = b.pick; }
-    if (sortCol === "name")   { av = a.name;  bv = b.name; }
-    if (sortCol === "team")   { av = a.teamName; bv = b.teamName; }
-    if (sortCol === "place")  { av = a.place ?? 999;  bv = b.place ?? 999; }
-    if (sortCol === "pts")    { av = a.pts ?? -1; bv = b.pts ?? -1; }
+    if (sortCol === "place")   { av = a.finishPlace ?? 999;  bv = b.finishPlace ?? 999; }
+    if (sortCol === "name")    { av = a.name;                bv = b.name; }
+    if (sortCol === "drafted") { av = a.draftPick ?? 999;    bv = b.draftPick ?? 999; }
+    if (sortCol === "team")    { av = a.teamName;            bv = b.teamName; }
+    if (sortCol === "pts")     { av = a.pts ?? -1;           bv = b.pts ?? -1; }
     if (typeof av === "string") return sortDir === "asc" ? av.localeCompare(bv) : bv.localeCompare(av);
     return sortDir === "asc" ? av - bv : bv - av;
   });
 
   const toggleSort = (col) => {
     if (sortCol === col) setSortDir(d => d === "asc" ? "desc" : "asc");
-    else { setSortCol(col); setSortDir(col === "pts" || col === "place" ? "asc" : "asc"); }
+    else { setSortCol(col); setSortDir("asc"); }
   };
 
   const arrow = (col) => {
@@ -866,7 +836,7 @@ function DraftTable({ season, castaways }) {
 
   const thStyle = (col) => ({
     padding: "0.6rem 0.85rem",
-    textAlign: col === "pts" || col === "place" ? "center" : "left",
+    textAlign: (col === "pts" || col === "drafted" || col === "place") ? "center" : "left",
     fontSize: "0.6rem",
     letterSpacing: "0.1em",
     textTransform: "uppercase",
@@ -881,32 +851,34 @@ function DraftTable({ season, castaways }) {
   });
 
   const eliminated = castaways.filter(c => c.eliminationOrder).length;
-  const remaining = season.totalCastaways - eliminated;
+  const remaining  = season.totalCastaways - eliminated;
 
   return (
     <div>
-      <div className="page-title">Draft</div>
-      <div className="page-subtitle">Season 50 · 24 Picks · {eliminated} Eliminated · {remaining} Remaining</div>
+      <div className="page-title">Points</div>
+      <div className="page-subtitle">Season {season.id} · {eliminated} Eliminated · {remaining} Remaining</div>
 
       <div style={{ border: "1px solid rgba(255,255,255,0.08)", borderRadius: 4, overflow: "hidden" }}>
         <table style={{ width: "100%", borderCollapse: "collapse" }}>
           <thead>
             <tr>
-              <th style={{ ...thStyle("pick"), minWidth: "3rem" }} onClick={() => toggleSort("pick")}>#  {arrow("pick")}</th>
-              <th style={thStyle("name")} onClick={() => toggleSort("name")}>Castaway {arrow("name")}</th>
-              <th style={thStyle("team")} onClick={() => toggleSort("team")}>Team {arrow("team")}</th>
-              <th style={{ ...thStyle("place"), minWidth: "4rem" }} onClick={() => toggleSort("place")}>Place {arrow("place")}</th>
-              <th style={{ ...thStyle("pts"), minWidth: "4.5rem" }} onClick={() => toggleSort("pts")}>Points {arrow("pts")}</th>
+              <th style={{ ...thStyle("place"),   minWidth: "4.5rem" }} onClick={() => toggleSort("place")}>Place {arrow("place")}</th>
+              <th style={thStyle("name")}                               onClick={() => toggleSort("name")}>Castaway {arrow("name")}</th>
+              <th style={{ ...thStyle("drafted"), minWidth: "4.5rem" }} onClick={() => toggleSort("drafted")}>Drafted {arrow("drafted")}</th>
+              <th style={thStyle("team")}                               onClick={() => toggleSort("team")}>Team {arrow("team")}</th>
+              <th style={{ ...thStyle("pts"),     minWidth: "4.5rem" }} onClick={() => toggleSort("pts")}>Points {arrow("pts")}</th>
             </tr>
           </thead>
           <tbody>
             {sorted.map((row, idx) => {
               const isElim = row.eliminationOrder !== null;
               return (
-                <tr key={row.pick} style={{ background: idx % 2 === 0 ? "rgba(255,255,255,0.015)" : "transparent", opacity: isElim ? 0.65 : 1 }}>
-                  {/* Pick # */}
-                  <td style={{ padding: "0.6rem 0.85rem", fontFamily: "'Playfair Display', serif", fontWeight: 900, fontSize: "0.85rem", color: "#555", borderBottom: "1px solid rgba(255,255,255,0.04)" }}>
-                    {row.pick}
+                <tr key={row.name} style={{ background: idx % 2 === 0 ? "rgba(255,255,255,0.015)" : "transparent", opacity: isElim ? 0.65 : 1 }}>
+                  {/* Place */}
+                  <td style={{ padding: "0.6rem 0.85rem", textAlign: "center", borderBottom: "1px solid rgba(255,255,255,0.04)" }}>
+                    {row.finishPlace !== null
+                      ? <span style={{ fontSize: "0.75rem", color: "#d0cab8" }}>{ordinal(row.finishPlace)}</span>
+                      : <span style={{ fontSize: "0.72rem", color: "#6db86d" }}>Active</span>}
                   </td>
                   {/* Castaway */}
                   <td style={{ padding: "0.6rem 0.85rem", borderBottom: "1px solid rgba(255,255,255,0.04)" }}>
@@ -914,15 +886,15 @@ function DraftTable({ season, castaways }) {
                       {row.name}
                     </div>
                   </td>
+                  {/* Drafted (pick #) */}
+                  <td style={{ padding: "0.6rem 0.85rem", textAlign: "center", borderBottom: "1px solid rgba(255,255,255,0.04)" }}>
+                    {row.draftPick
+                      ? <span style={{ fontFamily: "'Playfair Display', serif", fontWeight: 900, fontSize: "0.85rem", color: "#555" }}>{row.draftPick}</span>
+                      : <span style={{ fontSize: "0.65rem", color: "#555" }}>—</span>}
+                  </td>
                   {/* Team */}
                   <td style={{ padding: "0.6rem 0.85rem", borderBottom: "1px solid rgba(255,255,255,0.04)" }}>
                     <span style={{ fontSize: "0.72rem", color: row.teamColor, fontWeight: 500 }}>{row.teamName}</span>
-                  </td>
-                  {/* Place */}
-                  <td style={{ padding: "0.6rem 0.85rem", textAlign: "center", borderBottom: "1px solid rgba(255,255,255,0.04)" }}>
-                    {row.place !== null
-                      ? <span style={{ fontSize: "0.75rem", color: "#d0cab8" }}>{ordinal(row.place)}</span>
-                      : <span style={{ fontSize: "0.72rem", color: "#6db86d" }}>Active</span>}
                   </td>
                   {/* Points */}
                   <td style={{ padding: "0.6rem 0.85rem", textAlign: "center", borderBottom: "1px solid rgba(255,255,255,0.04)" }}>
@@ -942,11 +914,11 @@ function DraftTable({ season, castaways }) {
         {TEAMS.map(t => {
           const teamRows = rows.filter(r => r.teamName === t.name);
           const scored = teamRows.reduce((sum, r) => sum + (r.pts !== null ? r.pts : 10), 0);
-          const alive = teamRows.filter(r => r.eliminationOrder === null).length;
+          const alive  = teamRows.filter(r => r.eliminationOrder === null).length;
           return (
             <div key={t.id} className="panel" style={{ borderColor: `${t.color}33` }}>
               <div style={{ fontSize: "0.72rem", fontWeight: 500, color: t.color, marginBottom: "0.35rem" }}>{t.name}</div>
-              <div style={{ fontSize: "0.6rem", color: "#888", marginBottom: "0.5rem" }}>{t.members}</div>
+              <div style={{ fontSize: "0.6rem",  color: "#888",   marginBottom: "0.5rem"  }}>{t.members}</div>
               <div style={{ display: "flex", gap: "1rem", alignItems: "baseline" }}>
                 <div>
                   <div style={{ fontFamily: "'Playfair Display', serif", fontWeight: 900, fontSize: "1.5rem", color: t.color, lineHeight: 1 }}>{scored}</div>
@@ -957,55 +929,6 @@ function DraftTable({ season, castaways }) {
                   <div style={{ fontSize: "0.55rem", color: "#777", letterSpacing: "0.08em", textTransform: "uppercase" }}>alive</div>
                 </div>
               </div>
-            </div>
-          );
-        })}
-      </div>
-    </div>
-  );
-}
-
-function Points({ season, castaways }) {
-  const total = season.totalCastaways;
-  const elimMap = {};
-  castaways.forEach(c => { if (c.eliminationOrder != null) elimMap[c.eliminationOrder] = c; });
-  const rows = Array.from({ length: total }, (_, i) => {
-    const eo = i + 1, fp = total - eo + 1, pts = calcPoints(eo, total);
-    return { fp, eo, pts, castaway: elimMap[eo] };
-  }).sort((a,b) => b.fp - a.fp);
-
-  return (
-    <div>
-      <div className="page-title">Points</div>
-      <div className="page-subtitle">Season {season.id} · Points by finish position</div>
-      <div style={{ border:"1px solid rgba(255,255,255,0.07)", borderRadius:4, overflow:"hidden" }}>
-        {rows.map((r, idx) => {
-          const team = r.castaway ? TEAMS.find(t => t.id === r.castaway.draftedBy) : null;
-          const hasCastaway = !!r.castaway;
-          return (
-            <div key={r.fp} style={{ padding:"0.65rem 1rem", borderBottom: idx < rows.length-1 ? "1px solid rgba(255,255,255,0.04)" : "none", background: idx%2===0 ? "rgba(255,255,255,0.01)" : "transparent" }}>
-              <div style={{ display:"flex", alignItems:"baseline", gap:"0.6rem", flexWrap:"wrap" }}>
-                <span style={{ color:"#f0ebe0", fontFamily:"'Playfair Display',serif", fontWeight:900, fontSize:"0.85rem", minWidth:"3rem" }}>{ordinal(r.fp)}</span>
-                <span style={{ color:"#c8922a", fontFamily:"'Playfair Display',serif", fontWeight:900, fontSize:"0.85rem", minWidth:"2.5rem" }}>{r.pts} pts</span>
-                <span style={{ color: hasCastaway ? "#f0ebe0" : "#444", fontSize:"0.78rem" }}>{hasCastaway ? r.castaway.name : "—"}</span>
-              </div>
-              {hasCastaway && (
-                <div style={{ marginTop:"0.2rem", paddingLeft:"0.1rem", display:"flex", gap:"0.5rem", alignItems:"center", flexWrap:"wrap" }}>
-                  <span style={{ fontSize:"0.62rem", color: team ? team.color : "#555" }}>{team ? team.name : "Undrafted"}</span>
-                  {r.castaway.tribe && (
-                    <span style={{ fontSize:"0.58rem", color:"#555" }}>·</span>
-                  )}
-                  {r.castaway.origTribe && r.castaway.origTribe !== r.castaway.tribe && (
-                    <span style={{ fontSize:"0.58rem", color: TRIBE_COLORS[r.castaway.origTribe]||"#777" }}>{r.castaway.origTribe}</span>
-                  )}
-                  {r.castaway.origTribe && r.castaway.origTribe !== r.castaway.tribe && (
-                    <span style={{ fontSize:"0.5rem", color:"#555" }}>→</span>
-                  )}
-                  {r.castaway.tribe && (
-                    <span style={{ fontSize:"0.58rem", color: TRIBE_COLORS[r.castaway.tribe]||"#777" }}>{r.castaway.tribe}</span>
-                  )}
-                </div>
-              )}
             </div>
           );
         })}
@@ -1057,7 +980,7 @@ const S50_EPISODES = [
       { holder: "Ozzy Lusth", kind: "advantage", type: "Idol", status: "active", note: "Ozzy's Boomerang Idol remains active." },
       { holder: "Ozzy Lusth", kind: "advantage", type: "Extra Vote", status: "active", note: "Ozzy's Extra Vote remains unplayed." },
       { holder: "Cirie Fields", kind: "advantage", type: "Extra Vote", status: "active", note: "Cirie's Extra Vote remains secret. She revealed it to Rizo when they committed to a final-two deal." },
-        ],
+    ],
     recap: "Episode 5, 'Open Wounds,' opened with Ozzy fuming over the Mike White blindside — a throwback to Cochran's betrayal in South Pacific. Christian took blame and handed Ozzy his Shot in the Dark as a gesture of trust, leaving himself vulnerable. Ozzy considered revenge but ultimately voted with the tribe: Angelina went out 4-1, giving her jacket to Christian on the way out — a full-circle callback to jacket-gate. At Cila, the episode's title fit Charlie perfectly: still wounded by Maria's Season 46 vote and now set off by Rizo admitting he also skipped his ally's win vote on S49. Jonathan and Devens pulled together an old-Kalo majority targeting Rizo, but Dee flipped the script — building a women's alliance with Rizo, who earned her trust by revealing his Billie Eilish Idol, and committed to a final-two with Cirie. Kamilla was the swing vote; Rizo got to her first with a Kyle Fraser name-drop (a lie) and the idol info. Charlie came second and felt too slow. Rizo delivered a Taylor Swift-coded speech at Tribal: 'This is no love story between us. Bad blood. RizGod-style getaway car.' Charlie was blindsided 4-3. The merge is next.",
   },
   {
@@ -1069,7 +992,7 @@ const S50_EPISODES = [
       { holder: "Ozzy Lusth", kind: "advantage", type: "Idol", status: "active", note: "Ozzy's Boomerang Idol (originally sent by Genevieve) remains active." },
       { holder: "Ozzy Lusth", kind: "advantage", type: "Extra Vote", status: "active", note: "Ozzy's Extra Vote, won at Exile Island in Episode 1, remains unplayed." },
       { holder: "Cirie Fields", kind: "advantage", type: "Extra Vote", status: "active", note: "Cirie's Extra Vote (given by Ozzy in Episode 2) remains secret and unused." },
-         ],
+    ],
     recap: "Cila held a camp talent show won by Rizo's Mickey Mouse impression. On Kalo, Genevieve found a third Boomerang Idol while shadowing Aubry and sent it to Rizo, planning to blindside him later and get it back. The combined reward/immunity challenge had tribes raise a submerged boat, then solve a letter-cube arch puzzle spelling CELEBRATION — Kalo won first, earning a Sanctuary visit with country star Zac Brown, while Vatu lost and went to Tribal. At Vatu, Mike wanted Emily gone; Christian wanted Mike out. Ozzy wanted Angelina gone. Christian told Emily she was the target and they'd blindside Mike, but if Ozzy found out he might blow up the vote. She immediately told Ozzy that Mike wanted to vote her out but stopped short of revealing the full plan. This confirmed to Christian that Emily can't keep a secret. He went ahead anyway: Stephenie and Emily joined him to vote Mike out 3-2-1. Ozzy was kept in the dark and somehow more devastated than Mike.",
   },
   {
@@ -1081,7 +1004,7 @@ const S50_EPISODES = [
       { holder: "Aubry Bracco", kind: "advantage", type: "Idol", status: "active", note: "Aubry's Boomerang Idol is now widely known — Christian told Emily before the swap, Emily immediately told Q and Ozzy, then told Angelina. Essentially the whole new Vatu tribe knows." },
       { holder: "Ozzy Lusth", kind: "advantage", type: "Idol", status: "active", note: "Ozzy's Boomerang Idol (from Genevieve) remains active." },
       { holder: "Cirie Fields", kind: "advantage", type: "Extra Vote", status: "active", note: "Cirie's Extra Vote remains secret and unused. She is now on the new Cila tribe, outnumbered by four original Kalo members." },
-         ],
+    ],
     recap: "Jeff Probst rapped the tribe swap announcement. Three new tribes of seven reshuffled the game: Cirie was outnumbered 4-1 by original Kalo on new Cila; Coach told Chrissy she talked too much (she cried); Genevieve pushed distrust of Aubry on new Kalo. On new Vatu, the DvG trio of Christian, Mike, and Angelina reunited. Christian told Emily about Aubry's idol pre-swap — Emily immediately told everyone, then Q bluffed to Mike that he had an extra vote. Mike called it, and the tribe voted Q out 5-1 (only Stephenie voted Angelina). Q wore the same outfit as his Season 46 boot.",
   },
   {
@@ -1101,7 +1024,7 @@ const S50_EPISODES = [
     airDate: "February 25, 2026",
     eliminated: "Jenna Lewis-Dougherty, Kyle Fraser (medevac)",
     advantages: [
-                { holder: "Q Burdette", kind: "disadvantage", type: "Lost Vote", status: "applied", note: "Sent to Exile Island with Coach after the supplies challenge. Coach took the supplies key, leaving Q to trade away his vote to Ozzy in exchange for camp supplies." },
+      { holder: "Q Burdette", kind: "disadvantage", type: "Lost Vote", status: "applied", note: "Sent to Exile Island with Coach after the supplies challenge. Coach took the supplies key, leaving Q to trade away his vote to Ozzy in exchange for camp supplies." },
       { holder: "Savannah Louie", kind: "advantage", type: "Block-a-Vote", status: "voted-out", note: "Won the Journey stacking challenge against Colby but never successfully deployed — her tribemates suspected she had it, and she was voted out in Episode 2 before she could use it." },
     ],
     recap: "24 returning legends, three tribes. Genevieve found the first Boomerang Idol and sent it to Ozzy. At Exile Island, Coach stole the supplies key — Q traded his vote to Ozzy for camp supplies. A Journey had Savannah beat Colby for a Block-a-Vote while Colby lost his vote. At Cila's Tribal, Jenna came in too hot targeting Cirie on Day 1 and was voted out 7-1. The premiere closed with Kyle Fraser medevac'd with a ruptured Achilles — the first Survivor winner ever evacuated.",
