@@ -1039,7 +1039,6 @@ const S50_EPISODES = [
     advantages: [
       { holder: "Rizo Velovic", kind: "advantage", type: "Idol", status: "active", note: "Rizo's Boomerang Idol remains active. Ozzy now knows about it after Rizo revealed it during their Exile Island bonding session, where they solidified an alliance." },
       { holder: "Aubry Bracco", kind: "advantage", type: "Idol", status: "active", note: "Aubry announced she was playing her idol before the Purple group's tribal, but ultimately no idols were played — the vote went cleanly 3-0 against Genevieve. Aubry's idol remains active heading into Episode 7." },
-      { holder: "Ozzy Lusth", kind: "advantage", type: "Idol", status: "active", note: "Ozzy's Boomerang Idol remains active. He and Rizo were both safe on Exile Island and missed the Blood Moon tribals entirely." },
       { holder: "Ozzy Lusth", kind: "advantage", type: "Extra Vote", status: "active", note: "Ozzy's Extra Vote remains unplayed." },
       { holder: "Cirie Fields", kind: "advantage", type: "Extra Vote", status: "active", note: "Cirie's Extra Vote remains secret. She survived the Blood Moon in the Teal group by steering the unanimous vote onto Colby." },
       { holder: "Genevieve Mushaluk", kind: "advantage", type: "Shot in the Dark", status: "applied", note: "Genevieve used her Shot in the Dark at the Purple group tribal — it came up 'not safe,' so all votes against her counted. She was eliminated 3-0." },
@@ -1080,7 +1079,7 @@ const S50_EPISODES = [
     eliminated: "Q Burdette",
     advantages: [
       { holder: "Aubry Bracco", kind: "advantage", type: "Idol", status: "active", note: "Aubry's Boomerang Idol is now widely known — Christian told Emily before the swap, Emily immediately told Q and Ozzy, then told Angelina. Essentially the whole new Vatu tribe knows." },
-      { holder: "Ozzy Lusth", kind: "advantage", type: "Idol", status: "active", note: "Ozzy's Boomerang Idol (from Genevieve) remains active. Q revealed its origins to Ozzy in Episode 3 as a trust-building move." },
+      { holder: "Ozzy Lusth", kind: "advantage", type: "Idol", status: "active", note: "Ozzy's Boomerang Idol (from Genevieve) remains active." },
       { holder: "Cirie Fields", kind: "advantage", type: "Extra Vote", status: "active", note: "Cirie's Extra Vote remains secret and unused. She is now on the new Cila tribe, outnumbered by four original Kalo members." },
          ],
     recap: "Jeff Probst rapped the tribe swap announcement. Three new tribes of seven reshuffled the game: Cirie was outnumbered 4-1 by original Kalo on new Cila; Coach told Chrissy she talked too much (she cried); Genevieve pushed distrust of Aubry on new Kalo. On new Vatu, the DvG trio of Christian, Mike, and Angelina reunited. Christian told Emily about Aubry's idol pre-swap — Emily immediately told everyone, then Q bluffed to Mike that he had an extra vote. Mike called it, and the tribe voted Q out 5-1 (only Stephenie voted Angelina). Q wore the same outfit as his Season 46 boot.",
@@ -1102,9 +1101,7 @@ const S50_EPISODES = [
     airDate: "February 25, 2026",
     eliminated: "Jenna Lewis-Dougherty, Kyle Fraser (medevac)",
     advantages: [
-      { holder: "Ozzy Lusth", kind: "advantage", type: "Idol", status: "active", note: "Genevieve (Vatu) found the first Boomerang Idol — a fully-powered idol good through Final Five — and sent it to Ozzy. If Ozzy is voted out holding it, the idol returns to Genevieve." },
-      { holder: "Ozzy Lusth", kind: "advantage", type: "Extra Vote", status: "active", note: "Acquired at Exile Island — Coach stole the supplies key, leaving Q desperate for camp supplies. Q offered his vote to Ozzy in exchange, giving Ozzy the Extra Vote." },
-           { holder: "Q Burdette", kind: "disadvantage", type: "Lost Vote", status: "applied", note: "Sent to Exile Island with Coach after the supplies challenge. Coach took the supplies key, leaving Q to trade away his vote to Ozzy in exchange for camp supplies." },
+                { holder: "Q Burdette", kind: "disadvantage", type: "Lost Vote", status: "applied", note: "Sent to Exile Island with Coach after the supplies challenge. Coach took the supplies key, leaving Q to trade away his vote to Ozzy in exchange for camp supplies." },
       { holder: "Savannah Louie", kind: "advantage", type: "Block-a-Vote", status: "voted-out", note: "Won the Journey stacking challenge against Colby but never successfully deployed — her tribemates suspected she had it, and she was voted out in Episode 2 before she could use it." },
     ],
     recap: "24 returning legends, three tribes. Genevieve found the first Boomerang Idol and sent it to Ozzy. At Exile Island, Coach stole the supplies key — Q traded his vote to Ozzy for camp supplies. A Journey had Savannah beat Colby for a Block-a-Vote while Colby lost his vote. At Cila's Tribal, Jenna came in too hot targeting Cirie on Day 1 and was voted out 7-1. The premiere closed with Kyle Fraser medevac'd with a ruptured Achilles — the first Survivor winner ever evacuated.",
