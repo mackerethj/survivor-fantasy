@@ -588,7 +588,6 @@ export default function App() {
               lineHeight: 1.7,
             }}>
               "Stack the coconuts high —<br />
-              Cirie's steady hand prevails.<br />
               Two torches fade tonight."
             </div>
             <div style={{ fontSize: "0.78rem", color: "#999", marginBottom: "2.5rem", maxWidth: 380, lineHeight: 1.6 }}>
