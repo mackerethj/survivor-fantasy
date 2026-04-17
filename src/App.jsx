@@ -455,18 +455,6 @@ const CSS = `
   .elim-row { display: flex; align-items: center; justify-content: space-between; padding: 0.55rem 0.75rem; border: 1px solid rgba(255,255,255,0.06); border-radius: 4px; background: rgba(255,255,255,0.02); gap: 0.5rem; }
   .elim-row.done { opacity: 0.5; }
 
-  /* Coconut splash animations */
-  @keyframes coconutFall {
-    0%   { transform: translateY(-80px) rotate(0deg); opacity: 0; }
-    10%  { opacity: 1; }
-    100% { transform: translateY(100vh) rotate(720deg); opacity: 0.6; }
-  }
-  @keyframes coconutSway {
-    0%, 100% { transform: translateX(0); }
-    50% { transform: translateX(12px); }
-  }
-  .coconut { position: absolute; font-size: 1.5rem; animation: coconutFall linear infinite, coconutSway ease-in-out infinite; pointer-events: none; }
-
   @media (max-width: 700px) {
     .container { padding: 1rem; }
     .grid2 { grid-template-columns: 1fr; }
@@ -476,14 +464,6 @@ const CSS = `
   }
 `;
 
-// Coconut data: random positions, speeds, delays for the splash
-const COCONUTS = Array.from({ length: 22 }, (_, i) => ({
-  left: `${3 + (i * 4.4)}%`,
-  delay: `${(i * 0.37) % 4}s`,
-  duration: `${5 + (i % 5)}s`,
-  swayDuration: `${2 + (i % 3)}s`,
-  size: i % 3 === 0 ? "1.9rem" : i % 3 === 1 ? "1.4rem" : "1.1rem",
-}));
 
 export default function App() {
   const [splashDismissed, setSplashDismissed] = useState(() => {
@@ -539,26 +519,6 @@ export default function App() {
           flexDirection: "column", alignItems: "center", justifyContent: "center",
           padding: "2rem", textAlign: "center", position: "relative", overflow: "hidden",
         }}>
-          {/* Falling coconuts */}
-          {COCONUTS.map((c, i) => (
-            <div
-              key={i}
-              className="coconut"
-              style={{
-                left: c.left,
-                top: 0,
-                fontSize: c.size,
-                animationName: "coconutFall, coconutSway",
-                animationDuration: `${c.duration}, ${c.swayDuration}`,
-                animationDelay: `${c.delay}, ${c.delay}`,
-                animationTimingFunction: "linear, ease-in-out",
-                animationIterationCount: "infinite, infinite",
-                zIndex: 0,
-              }}
-            >
-              🥥
-            </div>
-          ))}
 
           {/* Subtle background texture */}
           <div style={{
