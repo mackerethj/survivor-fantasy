@@ -1181,11 +1181,24 @@ const S50_EPISODES = [
     number: 8,
     title: "Episode 8",
     airDate: "April 15, 2026",
-    eliminated: "Chrissy Hofbeck, Benjamin \"Coach\" Wade",
-    advantages: [ 
-      { holder: "Rick Devens", kind: "advantage", type: "Fake Idol", status: "active", note: "Rick revealed his (fake) idol at tribal council.  He did not play it, quietly telling Aubrey "it can't be played until next week" },
-      { holder: "Benjamin (Coach) Wade", kind: "advantage", type: "Shot in the Dark", status: "applied", note: "Coach played his Shot in the Dark for his 2-person team with Chrissy, but it returend "Not Safe". },],
-    recap: "Episode 8, 'Double the Fun, Double the Demise,' built around a big pairs twist. The castaways had to divide themselves into duos, and that choice ended up mattering a lot because the episode’s central shock was a double elimination: one vote at Tribal sent both members of a pair home.  At the immunity challenge, Tiffany and Joe won and earned safety plus a food reward, which gave them extra time to talk strategy and strengthen connections. Meanwhile, Cirie had a major side mission on Exile Island, where she had to search through a huge pile of coconuts to protect her vote, and she returned ready to make a move.  Back at camp and at Tribal, the power shifted. Cirie helped flip the game, and Rick Devens added chaos with a fake-idol stunt that rattled people and made the vote even more unpredictable. In the end, the twist and the strategy came together to take out Coach Wade and Chrissy Hofbeck, making them the two people eliminated in the same Tribal Council.",
+    eliminated: 'Chrissy Hofbeck, Benjamin "Coach" Wade',
+    advantages: [
+      {
+        holder: "Rick Devens",
+        kind: "advantage",
+        type: "Fake Idol",
+        status: "active",
+        note: 'Rick revealed his fake idol at Tribal Council. He did not play it, quietly telling Aubry, "It can\'t be played until next week."',
+      },
+      {
+        holder: 'Benjamin "Coach" Wade',
+        kind: "advantage",
+        type: "Shot in the Dark",
+        status: "applied",
+        note: 'Coach played his Shot in the Dark for his 2-person team with Chrissy, but it returned "Not Safe."',
+      },
+    ],
+    recap: `Episode 8, "Double the Fun, Double the Demise," built around a big pairs twist. The castaways had to divide themselves into duos, and that choice ended up mattering a lot because the episode's central shock was a double elimination: one vote at Tribal sent both members of a pair home. At the immunity challenge, Tiffany and Joe won and earned safety plus a food reward, which gave them extra time to talk strategy and strengthen connections. Meanwhile, Cirie had a major side mission on Exile Island, where she had to search through a huge pile of coconuts to protect her vote, and she returned ready to make a move. Back at camp and at Tribal, the power shifted. Cirie helped flip the game, and Rick Devens added chaos with a fake-idol stunt that rattled people and made the vote even more unpredictable. In the end, the twist and the strategy came together to take out Coach Wade and Chrissy Hofbeck, making them the two people eliminated in the same Tribal Council.`,
   },
   {
     number: 7,
