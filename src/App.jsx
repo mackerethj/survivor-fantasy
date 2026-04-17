@@ -2,7 +2,7 @@
 import { useEffect, useMemo, useState } from "react";
 
 // Bump this each time you commit/publish to force the splash page to reappear for everyone
-const SPLASH_VERSION = "ep7_v1.1";
+const SPLASH_VERSION = "ep8_v1.0";
 
 function calcPoints(eliminationOrder, totalCastaways) {
   if (!eliminationOrder || eliminationOrder <= 2) return 0;
@@ -13,6 +13,13 @@ function calcPoints(eliminationOrder, totalCastaways) {
     return basePoints + stepsIntoFinalThree * 2;
   }
   return eliminationOrder - 2;
+}
+
+// Returns the point value for a given finish position (1 = winner)
+function calcPointsByFinish(finishPos, totalCastaways) {
+  // finishPos 1 = winner, finishPos = totalCastaways = first boot
+  const eliminationOrder = totalCastaways - finishPos + 1;
+  return calcPoints(eliminationOrder, totalCastaways);
 }
 
 const TEAMS = [
@@ -309,6 +316,9 @@ const EP1_ELIMINATIONS = {
   "Genevieve Mushaluk": 9,
   "Colby Donaldson": 10,
   "Dee Valladares": 11,
+  // Episode 8
+  "Chrissy Hofbeck": 12,
+  'Benjamin "Coach" Wade': 13,
 };
 
 function buildCastawaysForSeason50() {
@@ -444,6 +454,19 @@ const CSS = `
   .hist-table tr:hover td { background: rgba(255,255,255,0.02); }
   .elim-row { display: flex; align-items: center; justify-content: space-between; padding: 0.55rem 0.75rem; border: 1px solid rgba(255,255,255,0.06); border-radius: 4px; background: rgba(255,255,255,0.02); gap: 0.5rem; }
   .elim-row.done { opacity: 0.5; }
+
+  /* Coconut splash animations */
+  @keyframes coconutFall {
+    0%   { transform: translateY(-80px) rotate(0deg); opacity: 0; }
+    10%  { opacity: 1; }
+    100% { transform: translateY(100vh) rotate(720deg); opacity: 0.6; }
+  }
+  @keyframes coconutSway {
+    0%, 100% { transform: translateX(0); }
+    50% { transform: translateX(12px); }
+  }
+  .coconut { position: absolute; font-size: 1.5rem; animation: coconutFall linear infinite, coconutSway ease-in-out infinite; pointer-events: none; }
+
   @media (max-width: 700px) {
     .container { padding: 1rem; }
     .grid2 { grid-template-columns: 1fr; }
@@ -452,6 +475,15 @@ const CSS = `
     .lb-pts { font-size: 1.6rem; }
   }
 `;
+
+// Coconut data: random positions, speeds, delays for the splash
+const COCONUTS = Array.from({ length: 22 }, (_, i) => ({
+  left: `${3 + (i * 4.4)}%`,
+  delay: `${(i * 0.37) % 4}s`,
+  duration: `${5 + (i % 5)}s`,
+  swayDuration: `${2 + (i % 3)}s`,
+  size: i % 3 === 0 ? "1.9rem" : i % 3 === 1 ? "1.4rem" : "1.1rem",
+}));
 
 export default function App() {
   const [splashDismissed, setSplashDismissed] = useState(() => {
@@ -482,10 +514,13 @@ export default function App() {
 
   const season50 = SEASONS.find(s => s.id === 50);
 
+  // Active players worth 12 pts each
+  const ACTIVE_POINTS = 12;
+
   const scores = useMemo(() => {
     return TEAMS.map(team => {
       const picks = castaways.filter(c => c.draftedBy === team.id);
-      const total = picks.reduce((sum, c) => sum + (c.eliminationOrder ? calcPoints(c.eliminationOrder, season50.totalCastaways) : 10), 0);
+      const total = picks.reduce((sum, c) => sum + (c.eliminationOrder ? calcPoints(c.eliminationOrder, season50.totalCastaways) : ACTIVE_POINTS), 0);
       return { ...team, picks, total };
     }).sort((a, b) => b.total - a.total);
   }, [castaways, season50]);
@@ -504,18 +539,36 @@ export default function App() {
           flexDirection: "column", alignItems: "center", justifyContent: "center",
           padding: "2rem", textAlign: "center", position: "relative", overflow: "hidden",
         }}>
-          <img
-            src="data:image/jpeg;base64,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"
-            alt=""
-            aria-hidden="true"
-            style={{
-              position: "absolute", inset: 0, width: "100%", height: "100%",
-              objectFit: "cover", objectPosition: "top center",
-              opacity: 0.15, pointerEvents: "none", userSelect: "none",
-            }}
-          />
+          {/* Falling coconuts */}
+          {COCONUTS.map((c, i) => (
+            <div
+              key={i}
+              className="coconut"
+              style={{
+                left: c.left,
+                top: 0,
+                fontSize: c.size,
+                animationName: "coconutFall, coconutSway",
+                animationDuration: `${c.duration}, ${c.swayDuration}`,
+                animationDelay: `${c.delay}, ${c.delay}`,
+                animationTimingFunction: "linear, ease-in-out",
+                animationIterationCount: "infinite, infinite",
+                zIndex: 0,
+              }}
+            >
+              🥥
+            </div>
+          ))}
+
+          {/* Subtle background texture */}
+          <div style={{
+            position: "absolute", inset: 0,
+            background: "radial-gradient(ellipse at 50% 40%, rgba(40,90,40,0.18) 0%, transparent 65%)",
+            pointerEvents: "none",
+          }} />
+
           <div style={{ position: "relative", zIndex: 1, display: "flex", flexDirection: "column", alignItems: "center" }}>
-            <div style={{ fontSize: "2.8rem", marginBottom: "1rem" }}>⚖️🔥</div>
+            <div style={{ fontSize: "3rem", marginBottom: "0.75rem", filter: "drop-shadow(0 0 18px rgba(100,200,100,0.4))" }}>🥥</div>
             <div style={{
               fontFamily: "'Playfair Display', serif", fontSize: "1rem",
               letterSpacing: "0.25em", textTransform: "uppercase",
@@ -525,32 +578,32 @@ export default function App() {
               fontFamily: "'Playfair Display', serif", fontWeight: 900,
               fontSize: "clamp(1.6rem, 5vw, 2.4rem)", color: "#f0ebe0",
               lineHeight: 1.2, marginBottom: "1.25rem",
-            }}>Scores have been updated<br/>for Episode 7</div>
+            }}>Scores have been updated<br/>for Episode 8</div>
             <div style={{
               fontStyle: "italic",
               fontSize: "0.82rem",
-              color: "#d8c08a",
+              color: "#a8d88a",
               marginBottom: "1rem",
               maxWidth: 420,
               lineHeight: 1.7,
             }}>
-              "The Dragon Slayer<br />
-              speaks in honor, fire, and fate —<br />
-              one torch fades tonight."
+              "Stack the coconuts high —<br />
+              Cirie's steady hand prevails.<br />
+              Two torches fade tonight."
             </div>
-            <div style={{ fontSize: "0.78rem", color: "#999", marginBottom: "2.5rem", maxWidth: 360, lineHeight: 1.6 }}>
-              The Dragon Slayer declared war and the largest Tribal Council in Survivor history delivered. Watch Episode 7 before continuing to avoid spoilers.
+            <div style={{ fontSize: "0.78rem", color: "#999", marginBottom: "2.5rem", maxWidth: 380, lineHeight: 1.6 }}>
+              Chrissy and Coach were both voted out in Episode 8. Watch before continuing to avoid spoilers.
             </div>
             <button
               onClick={dismissSplash}
               style={{
-                background: "rgba(200,146,42,0.12)", border: "1px solid rgba(200,146,42,0.5)",
-                color: "#c8922a", fontFamily: "'DM Mono', monospace", fontSize: "0.8rem",
+                background: "rgba(100,180,80,0.1)", border: "1px solid rgba(100,180,80,0.4)",
+                color: "#8fcc72", fontFamily: "'DM Mono', monospace", fontSize: "0.8rem",
                 letterSpacing: "0.12em", textTransform: "uppercase", padding: "0.85rem 2.5rem",
                 borderRadius: "2px", cursor: "pointer",
               }}
-              onMouseEnter={e => e.target.style.background="rgba(200,146,42,0.22)"}
-              onMouseLeave={e => e.target.style.background="rgba(200,146,42,0.12)"}
+              onMouseEnter={e => e.target.style.background="rgba(100,180,80,0.2)"}
+              onMouseLeave={e => e.target.style.background="rgba(100,180,80,0.1)"}
             >
               Click to Continue →
             </button>
@@ -576,10 +629,10 @@ export default function App() {
         </header>
 
         <div className="container">
-          {page === "leaderboard" && <Leaderboard season={season50} scores={scores} castaways={castaways} showOdds={showOdds} />}
+          {page === "leaderboard" && <Leaderboard season={season50} scores={scores} castaways={castaways} showOdds={showOdds} activePoints={ACTIVE_POINTS} />}
           {page === "castaways"   && <Castaways   season={season50} castaways={castaways} showOdds={showOdds} />}
           {page === "history"     && <History historySeason={historySeason} setHistorySeason={setHistorySeason} />}
-          {page === "points"      && <Points season={season50} castaways={castaways} />}
+          {page === "points"      && <Points season={season50} castaways={castaways} activePoints={ACTIVE_POINTS} />}
           {page === "recap"       && <Recap />}
         </div>
 
@@ -596,7 +649,7 @@ function oddsToImplied(odds) {
   return 100 / (n + 100);
 }
 
-function projectedPts(picks, totalCastaways) {
+function projectedPts(picks, totalCastaways, activePoints) {
   const maxPts = calcPoints(totalCastaways, totalCastaways);
   return picks
     .filter(c => !c.eliminationOrder && c.odds)
@@ -604,7 +657,7 @@ function projectedPts(picks, totalCastaways) {
     .toFixed(1);
 }
 
-function Leaderboard({ season, scores, castaways, showOdds }) {
+function Leaderboard({ season, scores, castaways, showOdds, activePoints }) {
   const eliminated = castaways.filter(c => c.eliminationOrder).length;
   const remaining = season.totalCastaways - eliminated;
   const champs = getChampionshipsThrough(49);
@@ -627,7 +680,7 @@ function Leaderboard({ season, scores, castaways, showOdds }) {
       <div className="leaderboard">
         {scores.map((team, i) => {
           const oddsDisplay = teamOddsSummary(team.picks);
-          const proj = projectedPts(team.picks, season.totalCastaways);
+          const proj = projectedPts(team.picks, season.totalCastaways, activePoints);
           const rank = i === 0 ? 1 : (scores[i].total < scores[i-1].total ? i + 1 : scores.findIndex(s => s.total === team.total) + 1);
           return (
             <div key={team.id} className={`lb-card ${rank === 1 ? "first" : ""}`}>
@@ -650,7 +703,7 @@ function Leaderboard({ season, scores, castaways, showOdds }) {
                     <span key={c.id} className={`c-tag ${c.eliminationOrder ? "eliminated" : "alive"}`}>
                       {c.name}{c.eliminationOrder
                         ? ` · ${calcPoints(c.eliminationOrder, season.totalCastaways)}pt`
-                        : (showOdds && c.odds ? ` · ${c.odds} · 10pt` : " · 10pt")}
+                        : (showOdds && c.odds ? ` · ${c.odds} · ${activePoints}pt` : ` · ${activePoints}pt`)}
                     </span>
                   ))}
                   {team.picks.length === 0 && <span style={{ fontSize: "0.65rem", color: "#aaa" }}>No picks</span>}
@@ -821,7 +874,7 @@ const DRAFT_ORDER = [
   "Jenna Lewis-Dougherty",
 ];
 
-function Points({ season, castaways }) {
+function Points({ season, castaways, activePoints }) {
   const [sortCol, setSortCol] = useState("default");
   const [sortDir, setSortDir] = useState("asc");
 
@@ -916,11 +969,19 @@ function Points({ season, castaways }) {
   const eliminated = castaways.filter(c => c.eliminationOrder).length;
   const remaining = season.totalCastaways - eliminated;
 
+  // Build full scoring reference: all 24 finish positions
+  const scoringRef = Array.from({ length: season.totalCastaways }, (_, i) => {
+    const finishPos = i + 1; // 1 = winner, 24 = first boot
+    const elimOrder = season.totalCastaways - finishPos + 1;
+    const pts = calcPoints(elimOrder, season.totalCastaways);
+    return { finishPos, elimOrder, pts };
+  });
+
   return (
     <div>
       <div className="page-title">Points</div>
       <div className="page-subtitle">
-        Season {season.id} · {eliminated} Eliminated · {remaining} Remaining
+        Season {season.id} · {eliminated} Eliminated · {remaining} Remaining · Active players worth {activePoints} pts
       </div>
 
       <div style={{ marginBottom: "0.75rem" }}>
@@ -1000,7 +1061,7 @@ function Points({ season, castaways }) {
                   <td style={{ padding: "0.6rem 0.85rem", textAlign: "center", borderBottom: "1px solid rgba(255,255,255,0.04)" }}>
                     {row.pts !== null
                       ? <span style={{ fontFamily: "'Playfair Display', serif", fontWeight: 900, fontSize: "0.9rem", color: "#c8922a" }}>{row.pts}</span>
-                      : <span style={{ fontSize: "0.72rem", color: "#6db86d" }}>10</span>}
+                      : <span style={{ fontSize: "0.72rem", color: "#6db86d" }}>{activePoints}</span>}
                   </td>
                 </tr>
               );
@@ -1012,7 +1073,7 @@ function Points({ season, castaways }) {
       <div style={{ marginTop: "1.5rem", display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(180px, 1fr))", gap: "0.75rem" }}>
         {TEAMS.map(t => {
           const teamRows = rows.filter(r => r.teamName === t.name);
-          const scored = teamRows.reduce((sum, r) => sum + (r.pts !== null ? r.pts : 10), 0);
+          const scored = teamRows.reduce((sum, r) => sum + (r.pts !== null ? r.pts : activePoints), 0);
           const alive = teamRows.filter(r => r.eliminationOrder === null).length;
           return (
             <div key={t.id} className="panel" style={{ borderColor: `${t.color}33` }}>
@@ -1032,23 +1093,112 @@ function Points({ season, castaways }) {
           );
         })}
       </div>
+
+      {/* Scoring Reference Table */}
+      <div style={{ marginTop: "2.5rem" }}>
+        <div className="section-title">Scoring Reference — All {season.totalCastaways} Positions</div>
+        <div style={{
+          border: "1px solid rgba(255,255,255,0.07)", borderRadius: 4, overflow: "hidden",
+          opacity: 0.85,
+        }}>
+          <div style={{
+            display: "grid",
+            gridTemplateColumns: "repeat(auto-fill, minmax(90px, 1fr))",
+            gap: 0,
+          }}>
+            {/* Header */}
+            <div style={{
+              gridColumn: "1 / -1",
+              display: "grid",
+              gridTemplateColumns: "repeat(auto-fill, minmax(90px, 1fr))",
+              background: "rgba(255,255,255,0.03)",
+              borderBottom: "1px solid rgba(255,255,255,0.08)",
+            }}>
+              {/* intentionally empty — labels inline below */}
+            </div>
+
+            {scoringRef.map(({ finishPos, pts }, i) => {
+              const isWinner = finishPos === 1;
+              const isRunnerup = finishPos === 2 || finishPos === 3;
+              const isFirstBoot = finishPos === season.totalCastaways;
+              const isSecondBoot = finishPos === season.totalCastaways - 1;
+              const highlight = isWinner
+                ? { bg: "rgba(200,146,42,0.12)", border: "rgba(200,146,42,0.3)", color: "#c8922a" }
+                : isRunnerup
+                ? { bg: "rgba(200,146,42,0.06)", border: "rgba(200,146,42,0.15)", color: "#a07830" }
+                : pts === 0
+                ? { bg: "rgba(255,255,255,0.01)", border: "rgba(255,255,255,0.04)", color: "#555" }
+                : { bg: "transparent", border: "rgba(255,255,255,0.04)", color: "#888" };
+
+              return (
+                <div
+                  key={finishPos}
+                  style={{
+                    padding: "0.5rem 0.6rem",
+                    background: highlight.bg,
+                    borderRight: "1px solid rgba(255,255,255,0.04)",
+                    borderBottom: "1px solid rgba(255,255,255,0.04)",
+                    display: "flex",
+                    flexDirection: "column",
+                    alignItems: "center",
+                    gap: "0.15rem",
+                  }}
+                >
+                  <div style={{
+                    fontSize: "0.55rem",
+                    color: highlight.color,
+                    letterSpacing: "0.06em",
+                    textTransform: "uppercase",
+                    opacity: 0.8,
+                  }}>
+                    {ordinal(finishPos)}
+                  </div>
+                  <div style={{
+                    fontFamily: "'Playfair Display', serif",
+                    fontWeight: 900,
+                    fontSize: pts >= 10 ? "1.05rem" : "0.95rem",
+                    color: pts === 0 ? "#444" : highlight.color !== "#888" ? highlight.color : "#c8922a",
+                    lineHeight: 1,
+                  }}>
+                    {pts}
+                  </div>
+                  <div style={{ fontSize: "0.48rem", color: "#555", letterSpacing: "0.05em" }}>pts</div>
+                </div>
+              );
+            })}
+          </div>
+        </div>
+        <div style={{ fontSize: "0.6rem", color: "#555", marginTop: "0.5rem", letterSpacing: "0.06em" }}>
+          Final 3 positions score double increments. 1st &amp; 2nd place score 0 pts (voted out at FTC).
+        </div>
+      </div>
     </div>
   );
 }
 
 const S50_EPISODES = [
   {
+    number: 8,
+    title: "Episode 8",
+    airDate: "April 15, 2026",
+    eliminated: "Chrissy Hofbeck, Benjamin \"Coach\" Wade",
+    advantages: [ 
+      { holder: "Rick Devens", kind: "advantage", type: "Fake Idol", status: "active", note: "Rick revealed his (fake) idol at tribal council.  He did not play it, quietly telling Aubrey "it can't be played until next week" },
+      { holder: "Benjamin (Coach) Wade", kind: "advantage", type: "Shot in the Dark", status: "applied", note: "Coach played his Shot in the Dark for his 2-person team with Chrissy, but it returend "Not Safe". },],
+    recap: "Episode 8, 'Double the Fun, Double the Demise,' built around a big pairs twist. The castaways had to divide themselves into duos, and that choice ended up mattering a lot because the episode’s central shock was a double elimination: one vote at Tribal sent both members of a pair home.  At the immunity challenge, Tiffany and Joe won and earned safety plus a food reward, which gave them extra time to talk strategy and strengthen connections. Meanwhile, Cirie had a major side mission on Exile Island, where she had to search through a huge pile of coconuts to protect her vote, and she returned ready to make a move.  Back at camp and at Tribal, the power shifted. Cirie helped flip the game, and Rick Devens added chaos with a fake-idol stunt that rattled people and made the vote even more unpredictable. In the end, the twist and the strategy came together to take out Coach Wade and Chrissy Hofbeck, making them the two people eliminated in the same Tribal Council.",
+  },
+  {
     number: 7,
     title: "Episode 7",
     airDate: "April 8, 2026",
     eliminated: "Dee Valladares",
     advantages: [
+     
       { holder: "Rizo Velovic", kind: "advantage", type: "Idol", status: "active", note: "Rizo's Boomerang Idol remains active, but its secrecy is fully gone — Emily blabbed to Rizo that Dee had told her about it. Now essentially the whole tribe knows." },
       { holder: "Ozzy Lusth", kind: "advantage", type: "Idol", status: "active", note: "Ozzy's Boomerang Idol remains active. He won individual immunity this episode (his 8th career win), which kept him safe regardless." },
-      { holder: "Ozzy Lusth", kind: "advantage", type: "Extra Vote", status: "active", note: "Ozzy's Extra Vote remains unplayed." },
       { holder: "Cirie Fields", kind: "advantage", type: "Extra Vote", status: "active", note: "Cirie's Extra Vote remains secret. She saw straight through Stephenie's lie about her journey advantage — but kept quiet." },
       { holder: "Stephenie LaGrossa", kind: "advantage", type: "Steal-a-Vote", status: "active", note: "Stephenie went on a journey and was challenged to keep her arm raised for a full hour.  She earned a Steal-a-Vote advantage. She tried to lie about earning it, but Cirie immediately saw through her." },
-      { holder: "Aubry Bracco", kind: "advantage", type: "Idol", status: "used", note: "Aubry played her Boomerang Idol on herself at Tribal Council as promised. It did not return to the finder (Devens) because Aubry played it herself rather than being voted out holding it. The idol is now spent." },
+      { holder: "Aubry Bracco", kind: "advantage", type: "Idol", status: "applied", note: "Aubry played her Boomerang Idol on herself at Tribal Council as promised. It did not return to the finder (Devens) because Aubry played it herself rather than being voted out holding it. The idol is now spent." },
       { holder: "Dee Valladares", kind: "advantage", type: "Shot in the Dark", status: "applied", note: "Dee played her Shot in the Dark at Tribal — it came up 'Not Safe,' so all votes against her counted. She was eliminated 9-4-1 (4 votes for Tiffany, 1 for Coach). First jury member." },
     ],
     recap: "Episode 7, 'That's Not How I Play Survivor,' opened to a fractured camp processing the Blood Moon fallout. Tiffany was furious about Kamilla's blindside; Coach emerged from his hammock fully recharged as the Dragon Slayer, declaring war on liars and naming Dee chief among them. Emily — incapable of keeping a secret — told Rizo that Dee had shared his idol information, blowing up what little cover Rizo had left. Coach then recruited Rizo into his Four Horsemen alliance alongside Jonathan and Joe, positioning him as Colby's replacement. Aubry, heat on her back for 'forgetting' to play her idol at the Blood Moon, promised the tribe she'd play it tonight — a move that doubled as a shield and a target. Stephenie was randomly selected for a journey: hold your arm above your head for one hour to win an advantage, or give up and keep your vote. With a surgically repaired shoulder from her Heroes vs. Villains injury, she couldn't use her right arm, yet she held on for the full hour and won a Steal-a-Vote. She tried to lie about earning it; Cirie immediately saw through her. At the immunity challenge — a beam-balance endurance — the final three came down to Dee, Ozzy, and Joe. Dee fell first, then Joe, giving Ozzy his 8th career immunity win, closing in on Boston Rob's record of nine. At Tribal, 14 players packed in for the largest single Tribal Council in show history. Coach monologued about honor while Dee and Tiffany's eyes rolled. Dee tried to spark a live Tribal, warning that 'the people who feel safe tonight should be scared.' As promised, Aubry played her Boomerang Idol on herself. Dee played her Shot in the Dark — Not Safe. The votes came in 9-4-1: Dee eliminated, becoming the first jury member. All five previous winners are now out of the game.",
@@ -1059,9 +1209,6 @@ const S50_EPISODES = [
     airDate: "April 1, 2026",
     eliminated: "Kamilla Karthigesu, Genevieve Mushaluk, Colby Donaldson",
     advantages: [
-      { holder: "Rizo Velovic", kind: "advantage", type: "Idol", status: "active", note: "Rizo's Boomerang Idol remains active. Ozzy now knows about it after Rizo revealed it during their Exile Island bonding session, where they solidified an alliance." },
-      { holder: "Aubry Bracco", kind: "advantage", type: "Idol", status: "active", note: "Aubry announced she was playing her idol before the Purple group's tribal, but ultimately no idols were played — the vote went cleanly 3-0 against Genevieve. Aubry's idol remains active heading into Episode 7." },
-      { holder: "Ozzy Lusth", kind: "advantage", type: "Extra Vote", status: "active", note: "Ozzy's Extra Vote remains unplayed." },
       { holder: "Cirie Fields", kind: "advantage", type: "Extra Vote", status: "active", note: "Cirie's Extra Vote remains secret. She survived the Blood Moon in the Teal group by steering the unanimous vote onto Colby." },
       { holder: "Genevieve Mushaluk", kind: "advantage", type: "Shot in the Dark", status: "applied", note: "Genevieve used her Shot in the Dark at the Purple group tribal — it came up 'not safe,' so all votes against her counted. She was eliminated 3-0." },
       { holder: "Colby Donaldson", kind: "disadvantage", type: "Lost Vote", status: "applied", note: "Colby's lost vote finally triggered at the Teal group's tribal. He had no vote and was eliminated unanimously." },
@@ -1074,10 +1221,7 @@ const S50_EPISODES = [
     airDate: "March 25, 2026",
     eliminated: "Angelina Keeley, Charlie Davis",
     advantages: [
-      { holder: "Rizo Velovic", kind: "advantage", type: "Idol", status: "active", note: "Rizo's Boomerang Idol remains active and is now widely known — he revealed it to Dee to earn her trust, and also told Kamilla about it. Cirie also knows." },
-      { holder: "Aubry Bracco", kind: "advantage", type: "Idol", status: "active", note: "Aubry's Boomerang Idol remains active heading into the merge." },
       { holder: "Ozzy Lusth", kind: "advantage", type: "Idol", status: "active", note: "Ozzy's Boomerang Idol remains active." },
-      { holder: "Ozzy Lusth", kind: "advantage", type: "Extra Vote", status: "active", note: "Ozzy's Extra Vote remains unplayed." },
       { holder: "Cirie Fields", kind: "advantage", type: "Extra Vote", status: "active", note: "Cirie's Extra Vote remains secret. She revealed it to Rizo when they committed to a final-two deal." },
     ],
     recap: "Episode 5, 'Open Wounds,' opened with Ozzy fuming over the Mike White blindside — a throwback to Cochran's betrayal in South Pacific. Christian took blame and handed Ozzy his Shot in the Dark as a gesture of trust, leaving himself vulnerable. Ozzy considered revenge but ultimately voted with the tribe: Angelina went out 4-1, giving her jacket to Christian on the way out — a full-circle callback to jacket-gate. At Cila, the episode's title fit Charlie perfectly: still wounded by Maria's Season 46 vote and now set off by Rizo admitting he also skipped his ally's win vote on S49. Jonathan and Devens pulled together an old-Kalo majority targeting Rizo, but Dee flipped the script — building a women's alliance with Rizo, who earned her trust by revealing his Billie Eilish Idol, and committed to a final-two with Cirie. Kamilla was the swing vote; Rizo got to her first with a Kyle Fraser name-drop (a lie) and the idol info. Charlie came second and felt too slow. Rizo delivered a Taylor Swift-coded speech at Tribal: 'This is no love story between us. Bad blood. RizGod-style getaway car.' Charlie was blindsided 4-3. The merge is next.",
@@ -1089,7 +1233,6 @@ const S50_EPISODES = [
     eliminated: "Mike White",
     advantages: [
       { holder: "Ozzy Lusth", kind: "advantage", type: "Idol", status: "active", note: "Ozzy's Boomerang Idol (originally sent by Genevieve) remains active." },
-      { holder: "Ozzy Lusth", kind: "advantage", type: "Extra Vote", status: "active", note: "Ozzy's Extra Vote, won at Exile Island in Episode 1, remains unplayed." },
       { holder: "Cirie Fields", kind: "advantage", type: "Extra Vote", status: "active", note: "Cirie's Extra Vote (given by Ozzy in Episode 2) remains secret and unused." },
     ],
     recap: "Cila held a camp talent show won by Rizo's Mickey Mouse impression. On Kalo, Genevieve found a third Boomerang Idol while shadowing Aubry and sent it to Rizo, planning to blindside him later and get it back. The combined reward/immunity challenge had tribes raise a submerged boat, then solve a letter-cube arch puzzle spelling CELEBRATION — Kalo won first, earning a Sanctuary visit with country star Zac Brown, while Vatu lost and went to Tribal. At Vatu, Mike wanted Emily gone; Christian wanted Mike out. Ozzy wanted Angelina gone. Christian told Emily she was the target and they'd blindside Mike, but if Ozzy found out he might blow up the vote. She immediately told Ozzy that Mike wanted to vote her out but stopped short of revealing the full plan. This confirmed to Christian that Emily can't keep a secret. He went ahead anyway: Stephenie and Emily joined him to vote Mike out 3-2-1. Ozzy was kept in the dark and somehow more devastated than Mike.",
@@ -1100,7 +1243,6 @@ const S50_EPISODES = [
     airDate: "March 11, 2026",
     eliminated: "Q Burdette",
     advantages: [
-      { holder: "Aubry Bracco", kind: "advantage", type: "Idol", status: "active", note: "Aubry's Boomerang Idol is now widely known — Christian told Emily before the swap, Emily immediately told Q and Ozzy, then told Angelina. Essentially the whole new Vatu tribe knows." },
       { holder: "Ozzy Lusth", kind: "advantage", type: "Idol", status: "active", note: "Ozzy's Boomerang Idol (from Genevieve) remains active." },
       { holder: "Cirie Fields", kind: "advantage", type: "Extra Vote", status: "active", note: "Cirie's Extra Vote remains secret and unused. She is now on the new Cila tribe, outnumbered by four original Kalo members." },
     ],
@@ -1112,7 +1254,6 @@ const S50_EPISODES = [
     airDate: "March 4, 2026",
     eliminated: "Savannah Louie",
     advantages: [
-      { holder: "Aubry Bracco", kind: "advantage", type: "Idol", status: "active", note: "Christian found Cila's Boomerang Idol and gave it to Aubry, bringing her to tears. Like Ozzy's, it returns to the finder if the recipient is voted out with it." },
       { holder: "Cirie Fields", kind: "advantage", type: "Extra Vote", status: "active", note: "Ozzy gave Cirie his Extra Vote — the first advantage of Cirie's entire Survivor career — after she campaigned to protect him from the vote." },
     ],
     recap: "Cila went to Tribal again. Savannah was on the outs — no one believed her Journey story — and Cirie steered the vote her way to flush the Block-a-Vote and eliminate a winner in one shot. Savannah voted out 6-1. Christian found Cila's Boomerang Idol and gave it to Aubry; Ozzy gave Cirie his Extra Vote, her first-ever advantage. Rick Devens capped the episode by planting a fake idol at Tribal (made from Christian's packaging) while Christian created a distraction by face-planting on the way out of the set.",
