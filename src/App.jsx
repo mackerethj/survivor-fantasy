@@ -592,7 +592,7 @@ export default function App() {
               Two torches fade tonight."
             </div>
             <div style={{ fontSize: "0.78rem", color: "#999", marginBottom: "2.5rem", maxWidth: 380, lineHeight: 1.6 }}>
-              Chrissy and Coach were both voted out in Episode 8. Watch before continuing to avoid spoilers.
+              Watch episode 8 before continuing to avoid spoilers.
             </div>
             <button
               onClick={dismissSplash}
