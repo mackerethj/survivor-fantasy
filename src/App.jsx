@@ -2,8 +2,8 @@
 import { useEffect, useMemo, useState } from "react";
 
 // Bump this each time you commit/publish to force the splash page to reappear for everyone
-const SPLASH_VERSION = "ep9_v1.2";
-const SPLASH_IMAGE = "";
+const SPLASH_VERSION = "ep9_v1.1";
+const SPLASH_IMAGE = "/jeff-probst-splash.png";
 
 function calcPoints(eliminationOrder, totalCastaways) {
   if (!eliminationOrder || eliminationOrder <= 2) return 0;
@@ -373,8 +373,165 @@ function proxyPhoto(url) {
 
 function Photo({ src, alt, className }) {
   const [err, setErr] = useState(false);
-  if (!src || err) return
-<div style={{
+  if (!src || err) return <div className={className + "-placeholder"}><span>👤</span></div>;
+  return <img src={proxyPhoto(src)} alt={alt} className={className} onError={() => setErr(true)} loading="lazy" />;
+}
+
+function ordinal(n) {
+  const s = ["th","st","nd","rd"], v = n % 100;
+  return n + (s[(v-20)%10] || s[v] || s[0]);
+}
+
+const CSS = `
+  @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;900&family=DM+Mono:wght@400;500&display=swap');
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { background: #0a0a0a; color: #f0ebe0; font-family: 'DM Mono', monospace; }
+  .app { min-height: 100vh; background: #0a0a0a; background-image: radial-gradient(ellipse at 20% 20%, rgba(180,120,40,0.08) 0%, transparent 60%), radial-gradient(ellipse at 80% 80%, rgba(120,60,20,0.06) 0%, transparent 60%); }
+  .header { border-bottom: 1px solid rgba(180,120,40,0.3); padding: 0.85rem 1.5rem; display: flex; align-items: center; justify-content: space-between; gap: 1rem; background: rgba(10,10,10,0.95); position: sticky; top: 0; z-index: 100; backdrop-filter: blur(8px); flex-wrap: wrap; }
+  .logo { font-family: 'Playfair Display', serif; font-size: 1.3rem; font-weight: 900; color: #c8922a; letter-spacing: 0.05em; white-space: nowrap; }
+  .logo span { color: #f0ebe0; font-weight: 700; }
+  .nav { display: flex; gap: 0.25rem; flex-wrap: wrap; }
+  .nav-btn { background: none; border: 1px solid transparent; color: #bbb; padding: 0.4rem 0.75rem; font-family: 'DM Mono', monospace; font-size: 0.68rem; cursor: pointer; letter-spacing: 0.08em; text-transform: uppercase; transition: all 0.2s; border-radius: 2px; white-space: nowrap; }
+  .nav-btn:hover { color: #f0ebe0; border-color: rgba(180,120,40,0.3); }
+  .nav-btn.active { color: #c8922a; border-color: rgba(200,146,42,0.5); background: rgba(200,146,42,0.06); }
+  .container { max-width: 1200px; margin: 0 auto; padding: 1.5rem; }
+  .season-bar { display: flex; align-items: center; gap: 0.5rem; margin-bottom: 2rem; padding-bottom: 1.25rem; border-bottom: 1px solid rgba(255,255,255,0.07); flex-wrap: wrap; }
+  .season-label { font-size: 0.62rem; color: #bbb; letter-spacing: 0.1em; text-transform: uppercase; margin-right: 0.5rem; }
+  .season-btn { font-family: 'DM Mono', monospace; font-size: 0.65rem; padding: 0.35rem 0.75rem; border-radius: 2px; cursor: pointer; letter-spacing: 0.08em; text-transform: uppercase; border: 1px solid rgba(255,255,255,0.1); background: none; color: #ccc; transition: all 0.15s; }
+  .season-btn.active { background: rgba(200,146,42,0.1); border-color: rgba(200,146,42,0.4); color: #c8922a; }
+  .season-btn:hover:not(.active) { color: #f0ebe0; border-color: rgba(255,255,255,0.2); }
+  .page-title { font-family: 'Playfair Display', serif; font-size: 2rem; font-weight: 900; color: #f0ebe0; margin-bottom: 0.3rem; }
+  .page-subtitle { font-size: 0.68rem; color: #bbb; letter-spacing: 0.1em; text-transform: uppercase; margin-bottom: 2rem; }
+  .section-title { font-size: 0.65rem; letter-spacing: 0.12em; text-transform: uppercase; color: #bbb; margin-bottom: 1rem; padding-bottom: 0.5rem; border-bottom: 1px solid rgba(255,255,255,0.06); }
+  .leaderboard { display: flex; flex-direction: column; gap: 1rem; }
+  .lb-card { background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.07); border-radius: 4px; padding: 1.25rem 1.5rem; display: grid; grid-template-columns: 2.5rem 1fr auto; align-items: center; gap: 1.5rem; }
+  .lb-card.first { border-color: rgba(200,146,42,0.4); background: rgba(200,146,42,0.06); }
+  .lb-rank { font-family: 'Playfair Display', serif; font-size: 1.5rem; font-weight: 900; color: #555; }
+  .lb-card.first .lb-rank { color: #c8922a; }
+  .lb-tribe { font-size: 1rem; font-weight: 500; margin-bottom: 0.15rem; }
+  .lb-tags { display: flex; flex-wrap: wrap; gap: 0.3rem; }
+  .c-tag { font-size: 0.6rem; padding: 0.15rem 0.45rem; border-radius: 2px; letter-spacing: 0.05em; text-transform: uppercase; }
+  .c-tag.alive { background: rgba(80,180,80,0.1); color: #6db86d; border: 1px solid rgba(80,180,80,0.2); }
+  .c-tag.eliminated { background: rgba(255,255,255,0.03); color: #aaa; border: 1px solid rgba(255,255,255,0.07); text-decoration: line-through; }
+  .lb-score { text-align: right; }
+  .lb-pts { font-family: 'Playfair Display', serif; font-size: 2.2rem; font-weight: 900; color: #c8922a; line-height: 1; }
+  .lb-pts-label { font-size: 0.58rem; color: #bbb; letter-spacing: 0.1em; text-transform: uppercase; margin-top: 0.1rem; }
+  .castaways-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(160px,1fr)); gap: 0.75rem; margin-bottom: 2rem; }
+  .castaway-card { background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.07); border-radius: 4px; overflow: hidden; position: relative; transition: border-color 0.2s; }
+  .castaway-card::after { content:''; position:absolute; top:0; left:0; right:0; height:2px; }
+  .castaway-card.alive::after { background: #6db86d; }
+  .castaway-card.eliminated { opacity: 0.45; }
+  .castaway-card.undrafted::after { background: #2a2a2a; }
+  .castaway-card:hover { border-color: rgba(200,146,42,0.3); }
+  .c-photo { width: 100%; aspect-ratio: 3/4; object-fit: cover; object-position: top; display: block; background: #111; }
+  .c-photo-placeholder { width: 100%; aspect-ratio: 3/4; background: #111; display: flex; align-items: center; justify-content: center; font-size: 1.5rem; color: #bbb; }
+  .c-info { padding: 0.65rem 0.75rem; }
+  .c-name { font-size: 0.75rem; font-weight: 500; margin-bottom: 0.15rem; line-height: 1.3; }
+  .c-bio { font-size: 0.56rem; color: #ccc; margin-bottom: 0.35rem; line-height: 1.4; }
+  .c-row { display: flex; justify-content: space-between; align-items: center; margin-top: 0.25rem; }
+  .c-status { font-size: 0.58rem; letter-spacing: 0.08em; text-transform: uppercase; }
+  .c-status.alive { color: #6db86d; }
+  .c-status.eliminated { color: #bbb; }
+  .c-status.undrafted { color: #aaa; }
+  .c-pts { font-family: 'Playfair Display', serif; font-size: 1rem; color: #c8922a; font-weight: 900; margin-top: 0.15rem; }
+  .divider { height: 1px; background: rgba(255,255,255,0.06); margin: 1.5rem 0; }
+  .action-btn { font-family: 'DM Mono', monospace; font-size: 0.68rem; padding: 0.5rem 1rem; border-radius: 2px; cursor: pointer; letter-spacing: 0.08em; text-transform: uppercase; transition: all 0.15s; border: 1px solid; margin-bottom: 1rem; background: rgba(255,255,255,0.03); border-color: rgba(255,255,255,0.1); color: #ccc; }
+  .action-btn.primary { background: rgba(200,146,42,0.15); border-color: rgba(200,146,42,0.4); color: #c8922a; }
+  .action-btn.primary:hover { background: rgba(200,146,42,0.25); }
+  .action-btn.danger { background: rgba(200,60,60,0.08); border-color: rgba(200,60,60,0.3); color: #cc6060; }
+  .toast { position: fixed; bottom: 2rem; right: 2rem; background: #1a1a1a; border: 1px solid rgba(200,146,42,0.4); color: #f0ebe0; padding: 0.75rem 1.25rem; border-radius: 4px; font-size: 0.75rem; z-index: 999; animation: fadeUp 0.2s ease; }
+  @keyframes fadeUp { from { transform: translateY(8px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
+  .panel { background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.07); border-radius: 4px; padding: 1rem 1.25rem; }
+  .grid2 { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; }
+  .select, .input { background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.12); color: #f0ebe0; border-radius: 3px; padding: 0.55rem 0.65rem; font-family: 'DM Mono', monospace; font-size: 0.75rem; outline: none; }
+  .row { display:flex; gap:0.75rem; align-items:center; flex-wrap:wrap; }
+  .hint { font-size:0.65rem; color:#bbb; line-height:1.4; }
+  .hist-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px,1fr)); gap: 1rem; margin-bottom: 1.5rem; }
+  .hist-card { background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.07); border-radius: 4px; padding: 1rem 1.25rem; }
+  .hist-card.champ { border-color: rgba(200,146,42,0.4); background: rgba(200,146,42,0.06); }
+  .hist-score { font-family: 'Playfair Display', serif; font-size: 1.8rem; font-weight: 900; }
+  .hist-table { width: 100%; border-collapse: collapse; font-size: 0.7rem; }
+  .hist-table th { text-align: left; color: #bbb; font-size: 0.58rem; letter-spacing: 0.08em; text-transform: uppercase; padding: 0.4rem 0.75rem; border-bottom: 1px solid rgba(255,255,255,0.07); font-weight: 400; }
+  .hist-table td { padding: 0.45rem 0.75rem; border-bottom: 1px solid rgba(255,255,255,0.04); }
+  .hist-table tr:last-child td { border-bottom: none; }
+  .hist-table tr:hover td { background: rgba(255,255,255,0.02); }
+  .elim-row { display: flex; align-items: center; justify-content: space-between; padding: 0.55rem 0.75rem; border: 1px solid rgba(255,255,255,0.06); border-radius: 4px; background: rgba(255,255,255,0.02); gap: 0.5rem; }
+  .elim-row.done { opacity: 0.5; }
+
+  @media (max-width: 700px) {
+    .container { padding: 1rem; }
+    .grid2 { grid-template-columns: 1fr; }
+    .lb-card { padding: 0.9rem 1rem; grid-template-columns: 2rem 1fr auto; gap: 0.75rem; }
+    .lb-rank { font-size: 1.1rem; }
+    .lb-pts { font-size: 1.6rem; }
+  }
+`;
+
+
+export default function App() {
+  const [splashDismissed, setSplashDismissed] = useState(() => {
+    try { return localStorage.getItem(`sf_splash_${SPLASH_VERSION}`) === "1"; } catch { return false; }
+  });
+  const [page, setPage] = useState("leaderboard");
+  const [historySeason, setHistorySeason] = useState(49);
+  const [toast, setToast] = useState(null);
+  const [showOdds, setShowOdds] = useState(false);
+
+  const [castaways, setCastawaysRaw] = useState(() => {
+    const saved = loadState();
+    if (saved?.castaways?.length) return applyLockedDraft(saved.castaways);
+    return buildCastawaysForSeason50();
+  });
+
+  const [draftOrder, setDraftOrderRaw] = useState(() => {
+    const saved = loadState();
+    return saved?.draftOrder || TEAMS.map(t => t.id);
+  });
+
+  useEffect(() => { saveState({ castaways, draftOrder, showOdds }); }, [castaways, draftOrder, showOdds]);
+
+  const setCastaways = (fn) => setCastawaysRaw(prev => typeof fn === "function" ? fn(prev) : fn);
+  const setDraftOrder = (o) => setDraftOrderRaw(o);
+  const showToast = (msg) => { setToast(msg); setTimeout(() => setToast(null), 2500); };
+  const resetSeason = () => { setCastawaysRaw(buildCastawaysForSeason50()); setDraftOrderRaw(TEAMS.map(t => t.id)); setShowOdds(false); showToast("Season 50 reset."); };
+
+  const season50 = SEASONS.find(s => s.id === 50);
+
+  // Active players worth 13 pts each
+  const ACTIVE_POINTS = 13;
+
+  const scores = useMemo(() => {
+    return TEAMS.map(team => {
+      const picks = castaways.filter(c => c.draftedBy === team.id);
+      const total = picks.reduce((sum, c) => sum + (c.eliminationOrder ? calcPoints(c.eliminationOrder, season50.totalCastaways) : ACTIVE_POINTS), 0);
+      return { ...team, picks, total };
+    }).sort((a, b) => b.total - a.total);
+  }, [castaways, season50]);
+
+  const dismissSplash = () => {
+    try { localStorage.setItem(`sf_splash_${SPLASH_VERSION}`, "1"); } catch {}
+    setSplashDismissed(true);
+  };
+
+  if (!splashDismissed) {
+    return (
+      <>
+        <style>{CSS}</style>
+        <div style={{
+          minHeight: "100vh", background: "#0a0a0a", display: "flex",
+          flexDirection: "column", alignItems: "center", justifyContent: "center",
+          padding: "2rem", textAlign: "center", position: "relative", overflow: "hidden",
+        }}>
+
+          {/* Subtle background texture */}
+          <div style={{
+            position: "absolute", inset: 0,
+            background: "radial-gradient(ellipse at 50% 40%, rgba(40,90,40,0.18) 0%, transparent 65%)",
+            pointerEvents: "none",
+          }} />
+
+          <div style={{ position: "relative", zIndex: 1, display: "flex", flexDirection: "column", alignItems: "center" }}>
+            <div style={{
               fontFamily: "'Playfair Display', serif", fontSize: "1rem",
               letterSpacing: "0.25em", textTransform: "uppercase",
               color: "#c8922a", marginBottom: "0.5rem",
