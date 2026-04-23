@@ -2,7 +2,7 @@
 import { useEffect, useMemo, useState } from "react";
 
 // Bump this each time you commit/publish to force the splash page to reappear for everyone
-const SPLASH_VERSION = "ep8_v1.0";
+const SPLASH_VERSION = "ep9_v1.0";
 
 function calcPoints(eliminationOrder, totalCastaways) {
   if (!eliminationOrder || eliminationOrder <= 2) return 0;
@@ -319,6 +319,8 @@ const EP1_ELIMINATIONS = {
   // Episode 8
   "Chrissy Hofbeck": 12,
   'Benjamin "Coach" Wade': 13,
+  // Episode 9
+  "Christian Hubicki": 14,
 };
 
 function buildCastawaysForSeason50() {
@@ -494,8 +496,8 @@ export default function App() {
 
   const season50 = SEASONS.find(s => s.id === 50);
 
-  // Active players worth 12 pts each
-  const ACTIVE_POINTS = 12;
+  // Active players worth 13 pts each
+  const ACTIVE_POINTS = 13;
 
   const scores = useMemo(() => {
     return TEAMS.map(team => {
@@ -538,7 +540,7 @@ export default function App() {
               fontFamily: "'Playfair Display', serif", fontWeight: 900,
               fontSize: "clamp(1.6rem, 5vw, 2.4rem)", color: "#f0ebe0",
               lineHeight: 1.2, marginBottom: "1.25rem",
-            }}>Scores have been updated<br/>for Episode 8</div>
+            }}>Scores have been updated<br/>for Episode 9</div>
             <div style={{
               fontStyle: "italic",
               fontSize: "0.82rem",
@@ -547,11 +549,11 @@ export default function App() {
               maxWidth: 420,
               lineHeight: 1.7,
             }}>
-              "Stack the coconuts high —<br />
-              Two torches fade tonight."
+              "A puzzle falls into the sea —<br />
+              The professor meets his fate."
             </div>
             <div style={{ fontSize: "0.78rem", color: "#999", marginBottom: "2.5rem", maxWidth: 380, lineHeight: 1.6 }}>
-              Watch episode 8 before continuing to avoid spoilers.
+              Watch episode 9 before continuing to avoid spoilers.
             </div>
             <button
               onClick={dismissSplash}
@@ -1137,18 +1139,62 @@ function Points({ season, castaways, activePoints }) {
 
 const S50_EPISODES = [
   {
-    number: 8,
-    title: "Episode 8",
-    airDate: "April 15, 2026",
-    eliminated: 'Chrissy Hofbeck, Benjamin "Coach" Wade',
+    number: 9,
+    title: "Episode 9",
+    airDate: "April 22, 2026",
+    eliminated: "Christian Hubicki",
     advantages: [
+      {
+        holder: "Christian Hubicki",
+        kind: "disadvantage",
+        type: "Jimmy Fallon One in the Urn",
+        status: "applied",
+        note: 'Christian failed the Journey puzzle and was forced to vote for himself at Tribal Council — a Survivor first. He had some choice words for Jimmy Fallon: "This idea you had is terrible. No more ideas for you. I look forward to your apology."',
+      },
       {
         holder: "Rick Devens",
         kind: "advantage",
         type: "Fake Idol",
         status: "active",
-        note: 'Rick revealed his fake idol at Tribal Council. He did not play it, quietly telling Aubry, "It can\'t be played until next week."',
+        note: "Rick's fake idol (made from Christian's packaging) somehow kept him safe again despite putting a massive target on his back after last episode's stunt.",
       },
+      {
+        holder: "Cirie Fields",
+        kind: "advantage",
+        type: "Extra Vote",
+        status: "active",
+        note: "Cirie's Extra Vote remains secret and unused. She brilliantly played along when both Christian and Emily pitched an Ozzy blindside — then worked behind the scenes to do the exact opposite.",
+      },
+      {
+        holder: "Stephenie LaGrossa",
+        kind: "advantage",
+        type: "Steal-a-Vote",
+        status: "active",
+        note: "Stephenie's Steal-a-Vote remains active and unused.",
+      },
+      {
+        holder: "Rizo Velovic",
+        kind: "advantage",
+        type: "Idol",
+        status: "active",
+        note: "Rizo's Boomerang Idol remains active. He was seen doing the robot while casting his vote against Christian.",
+      },
+      {
+        holder: "Ozzy Lusth",
+        kind: "advantage",
+        type: "Idol",
+        status: "active",
+        note: "Ozzy's Boomerang Idol remains active.",
+      },
+    ],
+    recap: `Episode 9 opened with the fallout from Rick Devens' fake idol stunt at the previous Tribal Council. Nearly everyone in the game — allies and adversaries alike — was furious. Jonathan mocked Devens' ego, Joe started imitating his idol retrieval antics, and Cirie's alliance marveled at how Rick had painted a bullseye on his own back. Even Emily, supposedly Rick's ally, was incensed: "He put our entire alliance in jeopardy with his antics." Meanwhile, Jeff Probst — citing a deal apparently struck with Jimmy Fallon during a Tonight Show appearance — announced a twist for the immunity challenge: the tribe could earn rice if four players could outlast the host himself in the challenge. After some negotiation (Jonathan bargained him down from five players to four), it was on. Probst lasted about seven and a half minutes, outlasting Emily, Rizo, Rick, and Cirie before bowing out — but all four side-bettors (Jonathan, Joe, Ozzy, and Tiffany) held on, winning the rice. Probst's takeaway: "I bow down. I'll never talk the same trash again. Until next season." Following the immunity win, Joe was given the power to send someone on a Journey. Rather than strategizing, he asked for volunteers and had them play rock-paper-scissors — a move criticized for allowing Christian, someone Joe's alliance didn't want gaining an advantage, to attend. On the Journey platform, Christian faced a Survivor-logo puzzle that had to be solved before anchors dragged it into the ocean — the "Jimmy Fallon One in the Urn" twist. A win would let him pre-load a vote against any player in the urn before Tribal. Christian failed the puzzle. The punishment: he had to vote for himself at Tribal Council — a Survivor first — and announce it to the whole tribe. His fate was likely sealed when he and Emily separately pitched an Ozzy blindside to Cirie, Ozzy's closest ally, who played along brilliantly before working to take out Christian instead. At Tribal, Christian lit into Fallon at every opportunity. His self-vote combined with the majority's resolve sent him home. His exit words: "I hope you enjoyed watching me play, because I enjoyed playing."`,
+  },
+  {
+    number: 8,
+    title: "Episode 8",
+    airDate: "April 15, 2026",
+    eliminated: 'Chrissy Hofbeck, Benjamin "Coach" Wade',
+    advantages: [
       {
         holder: 'Benjamin "Coach" Wade',
         kind: "advantage",
@@ -1285,7 +1331,7 @@ function Recap() {
                 }}>
                   {statusLabel}
                 </span>
-                <span style={{ fontSize: "0.6rem", color: "#a78bda" }}>{adv.epTitle}</span>
+                <span style={{ fontSize: "0.6rem", color: "#a78bda" }}>{adv.title || adv.epTitle}</span>
                 <span style={{ fontSize: "0.6rem", color: adv.kind === "disadvantage" ? "#c8922a" : "#6ab4d8" }}>
                   {adv.kind === "disadvantage" ? "⬇ " : "⬆ "}{adv.type}
                 </span>
