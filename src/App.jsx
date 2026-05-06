@@ -2,7 +2,7 @@
 import { useEffect, useMemo, useState } from "react";
 
 // Bump this each time you commit/publish to force the splash page to reappear for everyone
-const SPLASH_VERSION = "ep10_v1.1";
+const SPLASH_VERSION = "ep10_v1.2";
 const SPLASH_IMAGE = "/jeff-probst-splash.png";
 
 function calcPoints(eliminationOrder, totalCastaways) {
@@ -525,7 +525,7 @@ export default function App() {
           padding: "2rem", textAlign: "center", position: "relative", overflow: "hidden",
         }}>
 
-          {/* Subtle background texture */}
+          {/* Background glow */}
           <div style={{
             position: "absolute", inset: 0,
             background: "radial-gradient(ellipse at 50% 40%, rgba(180,120,40,0.15) 0%, transparent 65%)",
@@ -538,22 +538,51 @@ export default function App() {
               letterSpacing: "0.25em", textTransform: "uppercase",
               color: "#c8922a", marginBottom: "0.5rem",
             }}>Fantasy Survivor · Season 50</div>
+
             <div style={{
               fontFamily: "'Playfair Display', serif", fontWeight: 900,
               fontSize: "clamp(1.6rem, 5vw, 2.4rem)", color: "#f0ebe0",
-              lineHeight: 1.2, marginBottom: "1.25rem",
+              lineHeight: 1.2, marginBottom: "1.5rem",
             }}>Scores have been updated<br/>for Episode 10</div>
+
+            {/* MrBeast cameo card */}
             <div style={{
-              fontStyle: "italic",
-              fontSize: "0.82rem",
-              color: "#d4a84b",
-              marginBottom: "1rem",
-              maxWidth: 420,
-              lineHeight: 1.7,
+              display: "flex", alignItems: "center", gap: "1rem",
+              background: "rgba(200,146,42,0.07)", border: "1px solid rgba(200,146,42,0.3)",
+              borderRadius: "6px", padding: "0.85rem 1.25rem",
+              marginBottom: "1.5rem", maxWidth: 420, width: "100%",
+            }}>
+              <img
+                src={"https://images.weserv.nl/?url=" + encodeURIComponent("https://upload.wikimedia.org/wikipedia/commons/thumb/e/e4/MrBeast_at_the_2022_Time100_Summit_%28cropped%29.jpg/440px-MrBeast_at_the_2022_Time100_Summit_%28cropped%29.jpg") + "&w=120&h=120&fit=cover&output=jpg"}
+                alt="MrBeast"
+                style={{
+                  width: 64, height: 64, borderRadius: "50%",
+                  objectFit: "cover", objectPosition: "top",
+                  border: "2px solid rgba(200,146,42,0.5)",
+                  flexShrink: 0,
+                }}
+                onError={e => { e.target.style.display = "none"; }}
+              />
+              <div style={{ textAlign: "left" }}>
+                <div style={{ fontSize: "0.6rem", letterSpacing: "0.12em", textTransform: "uppercase", color: "#c8922a", marginBottom: "0.2rem" }}>
+                  Special Guest · Episode 10
+                </div>
+                <div style={{ fontSize: "0.9rem", fontWeight: 600, color: "#f0ebe0", marginBottom: "0.2rem" }}>
+                  MrBeast flipped the coin
+                </div>
+                <div style={{ fontSize: "0.68rem", color: "#bbb", lineHeight: 1.4 }}>
+                  Devens called it. Prize doubled to{" "}
+                  <span style={{ color: "#c8922a", fontFamily: "'Playfair Display', serif", fontWeight: 900 }}>$2,000,000</span>
+                </div>
+              </div>
+            </div>
+
+            <div style={{
+              fontStyle: "italic", fontSize: "0.82rem", color: "#d4a84b",
+              marginBottom: "1rem", maxWidth: 420, lineHeight: 1.7,
             }}>
               "A coin spins in the air —<br />
               One million becomes two."
-              
             </div>
             <div style={{ fontSize: "0.78rem", color: "#999", marginBottom: "2.5rem", maxWidth: 380, lineHeight: 1.6 }}>
               Watch episode 10 before continuing to avoid spoilers.
