@@ -2,7 +2,7 @@
 import { useEffect, useMemo, useState } from "react";
 
 // Bump this each time you commit/publish to force the splash page to reappear for everyone
-const SPLASH_VERSION = "ep10_v1";
+const SPLASH_VERSION = "ep10_v1.1";
 const SPLASH_IMAGE = "/jeff-probst-splash.png";
 
 function calcPoints(eliminationOrder, totalCastaways) {
