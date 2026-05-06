@@ -552,8 +552,8 @@ export default function App() {
               lineHeight: 1.7,
             }}>
               "A coin spins in the air —<br />
-              One million becomes two.<br />
-              Stephenie goes home."
+              One million becomes two."
+              
             </div>
             <div style={{ fontSize: "0.78rem", color: "#999", marginBottom: "2.5rem", maxWidth: 380, lineHeight: 1.6 }}>
               Watch episode 10 before continuing to avoid spoilers.
