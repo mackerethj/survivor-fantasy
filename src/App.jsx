@@ -2,7 +2,7 @@
 import { useEffect, useMemo, useState } from "react";
 
 // Bump this each time you commit/publish to force the splash page to reappear for everyone
-const SPLASH_VERSION = "ep9_v1.1";
+const SPLASH_VERSION = "ep10_v1";
 const SPLASH_IMAGE = "/jeff-probst-splash.png";
 
 function calcPoints(eliminationOrder, totalCastaways) {
@@ -322,6 +322,8 @@ const EP1_ELIMINATIONS = {
   'Benjamin "Coach" Wade': 13,
   // Episode 9
   "Christian Hubicki": 14,
+  // Episode 10
+  "Stephenie LaGrossa": 15,
 };
 
 function buildCastawaysForSeason50() {
@@ -497,8 +499,8 @@ export default function App() {
 
   const season50 = SEASONS.find(s => s.id === 50);
 
-  // Active players worth 13 pts each
-  const ACTIVE_POINTS = 13;
+  // Active players worth 14 pts each
+  const ACTIVE_POINTS = 14;
 
   const scores = useMemo(() => {
     return TEAMS.map(team => {
@@ -526,7 +528,7 @@ export default function App() {
           {/* Subtle background texture */}
           <div style={{
             position: "absolute", inset: 0,
-            background: "radial-gradient(ellipse at 50% 40%, rgba(40,90,40,0.18) 0%, transparent 65%)",
+            background: "radial-gradient(ellipse at 50% 40%, rgba(180,120,40,0.15) 0%, transparent 65%)",
             pointerEvents: "none",
           }} />
 
@@ -540,31 +542,32 @@ export default function App() {
               fontFamily: "'Playfair Display', serif", fontWeight: 900,
               fontSize: "clamp(1.6rem, 5vw, 2.4rem)", color: "#f0ebe0",
               lineHeight: 1.2, marginBottom: "1.25rem",
-            }}>Scores have been updated<br/>for Episode 9</div>
+            }}>Scores have been updated<br/>for Episode 10</div>
             <div style={{
               fontStyle: "italic",
               fontSize: "0.82rem",
-              color: "#a8d88a",
+              color: "#d4a84b",
               marginBottom: "1rem",
               maxWidth: 420,
               lineHeight: 1.7,
             }}>
-              "A puzzle falls into the sea —<br />
-              The professor meets his fate."
+              "A coin spins in the air —<br />
+              One million becomes two.<br />
+              Stephenie goes home."
             </div>
             <div style={{ fontSize: "0.78rem", color: "#999", marginBottom: "2.5rem", maxWidth: 380, lineHeight: 1.6 }}>
-              Watch episode 9 before continuing to avoid spoilers.
+              Watch episode 10 before continuing to avoid spoilers.
             </div>
             <button
               onClick={dismissSplash}
               style={{
-                background: "rgba(100,180,80,0.1)", border: "1px solid rgba(100,180,80,0.4)",
-                color: "#8fcc72", fontFamily: "'DM Mono', monospace", fontSize: "0.8rem",
+                background: "rgba(200,146,42,0.1)", border: "1px solid rgba(200,146,42,0.4)",
+                color: "#c8922a", fontFamily: "'DM Mono', monospace", fontSize: "0.8rem",
                 letterSpacing: "0.12em", textTransform: "uppercase", padding: "0.85rem 2.5rem",
                 borderRadius: "2px", cursor: "pointer",
               }}
-              onMouseEnter={e => e.target.style.background="rgba(100,180,80,0.2)"}
-              onMouseLeave={e => e.target.style.background="rgba(100,180,80,0.1)"}
+              onMouseEnter={e => e.target.style.background="rgba(200,146,42,0.2)"}
+              onMouseLeave={e => e.target.style.background="rgba(200,146,42,0.1)"}
             >
               Click to Continue →
             </button>
@@ -637,7 +640,7 @@ function Leaderboard({ season, scores, castaways, showOdds, activePoints }) {
   return (
     <div>
       <div className="page-title">Leaderboard</div>
-      <div className="page-subtitle">Season {season.id} · {season.totalCastaways} Castaways · {eliminated} Eliminated · {remaining} Remaining · Jury phase underway</div>
+      <div className="page-subtitle">Season {season.id} · {season.totalCastaways} Castaways · {eliminated} Eliminated · {remaining} Remaining · Jury phase underway · $2M prize</div>
       <div className="leaderboard">
         {scores.map((team, i) => {
           const oddsDisplay = teamOddsSummary(team.picks);
@@ -1139,6 +1142,50 @@ function Points({ season, castaways, activePoints }) {
 
 const S50_EPISODES = [
   {
+    number: 10,
+    title: "Episode 10",
+    airDate: "April 30, 2026",
+    eliminated: "Stephenie LaGrossa Kendrick",
+    advantages: [
+      {
+        holder: "Rick Devens",
+        kind: "advantage",
+        type: "Hidden Immunity Idol",
+        status: "active",
+        note: "Devens won a real hidden immunity idol as part of the MrBeast coin flip prize — his 5th idol across his Survivor career and the first non-Boomerang idol this season. He also revealed his fake idol was fake to the tribe, hoping to reset trust.",
+      },
+      {
+        holder: "Stephenie LaGrossa Kendrick",
+        kind: "advantage",
+        type: "Steal-a-Vote",
+        status: "applied",
+        note: "Stephenie played her Steal-a-Vote on Devens, stripping him of his vote. It wasn't enough — she was voted out 8-2 anyway, becoming the 5th jury member.",
+      },
+      {
+        holder: "Rizo Velovic",
+        kind: "advantage",
+        type: "Idol",
+        status: "active",
+        note: "Rizo's Boomerang Idol remains active.",
+      },
+      {
+        holder: "Ozzy Lusth",
+        kind: "advantage",
+        type: "Idol",
+        status: "active",
+        note: "Ozzy's Boomerang Idol remains active.",
+      },
+      {
+        holder: "Cirie Fields",
+        kind: "advantage",
+        type: "Extra Vote",
+        status: "active",
+        note: "Cirie's Extra Vote remains secret and unused. Her perfect voting record remains intact.",
+      },
+    ],
+    recap: `Episode 10, "A Side Dish of Chaos," opened with the tribe processing Christian's elimination and Devens making a bold gamble: he came clean to everyone that his idol was fake, hoping honesty would buy him goodwill. The mood shifted dramatically when Jeff Probst revealed the Survivor auction — the first one in years — where castaways bid on food, comfort items, and a few nasty surprises. Emily dropped $100 on a milkshake; Cirie paid $20 for toothpaste and mouthwash; Aubry got chocolate chip cookies and milk for $280. Some items came with punishments (sea slugs made an appearance). The crowd pooled cash to buy letters from home, which is when MrBeast made his entrance. Jeff introduced him as the biggest YouTuber on the planet, and MrBeast said he was a lifelong Survivor fan — but he hadn't come empty-handed. He brought the "Super Beware Advantage": a gold coin with his face on one side and a stack of torches on the other. One castaway could flip it. If they called it correctly, they'd win safety for the night plus a hidden immunity idol, and the season's prize would double to $2 million. Miss the call, and they'd be automatically eliminated on the spot. Nobody wanted the pressure — until Devens, feeling on the bottom and channeling his wife's advice to embrace playfulness, volunteered. He called heads. It landed on heads. The camp erupted. Devens was safe, holding a real idol, and every remaining castaway — whether they wanted to vote him out or not — was now playing for twice the money. At camp, the target settled on Stephenie after Devens blew up her alliance with Jonathan at Tribal, outing their plans to the group. Tiffany won individual immunity. Stephenie played her Steal-a-Vote on Devens to strip his vote, but the numbers weren't there — she was voted out 8-2, becoming the 5th jury member. Nine players remain.`,
+  },
+  {
     number: 9,
     title: "Episode 9",
     airDate: "April 22, 2026",
@@ -1155,8 +1202,8 @@ const S50_EPISODES = [
         holder: "Rick Devens",
         kind: "advantage",
         type: "Fake Idol",
-        status: "active",
-        note: "Rick's fake idol (made from Christian's packaging) somehow kept him safe again despite putting a massive target on his back after last episode's stunt.",
+        status: "applied",
+        note: "Rick's fake idol was revealed to be fake — he came clean to the tribe in Episode 10 hoping to reset trust.",
       },
       {
         holder: "Cirie Fields",
@@ -1164,13 +1211,6 @@ const S50_EPISODES = [
         type: "Extra Vote",
         status: "active",
         note: "Cirie's Extra Vote remains secret and unused. She brilliantly played along when both Christian and Emily pitched an Ozzy blindside — then worked behind the scenes to do the exact opposite.",
-      },
-      {
-        holder: "Stephenie LaGrossa",
-        kind: "advantage",
-        type: "Steal-a-Vote",
-        status: "active",
-        note: "Stephenie's Steal-a-Vote remains active and unused.",
       },
       {
         holder: "Rizo Velovic",
@@ -1211,11 +1251,10 @@ const S50_EPISODES = [
     airDate: "April 8, 2026",
     eliminated: "Dee Valladares",
     advantages: [
-     
       { holder: "Rizo Velovic", kind: "advantage", type: "Idol", status: "active", note: "Rizo's Boomerang Idol remains active, but its secrecy is fully gone — Emily blabbed to Rizo that Dee had told her about it. Now essentially the whole tribe knows." },
       { holder: "Ozzy Lusth", kind: "advantage", type: "Idol", status: "active", note: "Ozzy's Boomerang Idol remains active. He won individual immunity this episode (his 8th career win), which kept him safe regardless." },
       { holder: "Cirie Fields", kind: "advantage", type: "Extra Vote", status: "active", note: "Cirie's Extra Vote remains secret. She saw straight through Stephenie's lie about her journey advantage — but kept quiet." },
-      { holder: "Stephenie LaGrossa", kind: "advantage", type: "Steal-a-Vote", status: "active", note: "Stephenie went on a journey and was challenged to keep her arm raised for a full hour.  She earned a Steal-a-Vote advantage. She tried to lie about earning it, but Cirie immediately saw through her." },
+      { holder: "Stephenie LaGrossa", kind: "advantage", type: "Steal-a-Vote", status: "applied", note: "Stephenie went on a journey and was challenged to keep her arm raised for a full hour. She earned a Steal-a-Vote advantage. She tried to lie about earning it, but Cirie immediately saw through her." },
       { holder: "Aubry Bracco", kind: "advantage", type: "Idol", status: "applied", note: "Aubry played her Boomerang Idol on herself at Tribal Council as promised. It did not return to the finder (Devens) because Aubry played it herself rather than being voted out holding it. The idol is now spent." },
       { holder: "Dee Valladares", kind: "advantage", type: "Shot in the Dark", status: "applied", note: "Dee played her Shot in the Dark at Tribal — it came up 'Not Safe,' so all votes against her counted. She was eliminated 9-4-1 (4 votes for Tiffany, 1 for Coach). First jury member." },
     ],
