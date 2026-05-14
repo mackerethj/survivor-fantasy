@@ -1155,6 +1155,29 @@ function Points({ season, castaways, activePoints }) {
 
 const S50_EPISODES = [
   {
+    number: 12,
+    title: "Episode 12",
+    airDate: "May 13, 2026",
+    eliminated: "Rick Devens, Cirie Fields",
+    advantages: [
+      {
+        holder: "Rizo Velovic",
+        kind: "advantage",
+        type: "Idol",
+        status: "active",
+        note: "Rizo's idol remains active heading into the finale. His idol threat shaped the endgame by making a direct shot at him risky and helping push the vote toward Cirie after Tiffany won immunity.",
+      },
+      {
+        holder: "Rick Devens",
+        kind: "advantage",
+        type: "Shot in the Dark",
+        status: "applied",
+        note: "Devens played his Shot in the Dark as a last-ditch move at Tribal Council. It came up Not Safe, so the votes against him counted and he was eliminated.",
+      },
+    ],
+    recap: `Episode 12, "Inconceivable," narrowed the game from seven to five in a painful double boot. Joe won the first immunity challenge, leaving Rick Devens exposed after he failed to find another idol; Tiffany tried to use him as a smokescreen for a Rizo blindside, but the tribe stayed on Rick, and his Shot in the Dark came back Not Safe. At the second immunity challenge, Aubry, Rizo, Joe, and Jonathan tried to coordinate around the puzzle to keep Tiffany vulnerable, but Tiffany staged a comeback and won immunity, forcing the vote elsewhere. With Tiffany safe and Rizo still protected by the threat of his idol, the majority turned on Cirie as the most dangerous final Tribal opponent, and even her allies concluded she could not be allowed to reach the end. Cirie made one last scramble by trying to implicate Aubry, but the votes landed on her, sending Rick and Cirie to the jury and leaving Aubry, Joe, Jonathan, Rizo, and Tiffany as the final five.`,
+  },
+  {
     number: 11,
     title: "Episode 11",
     airDate: "May 7, 2026",
@@ -1216,7 +1239,8 @@ const S50_EPISODES = [
         kind: "advantage",
         type: "Idol",
         status: "active",
-        note: "Rizo's Boomerang Idol remains active.",
+        title: "Episode 12",
+        note: "Rizo's Boomerang Idol remains active through Episode 12 and into the finale.",
       },
       {
         holder: "Ozzy Lusth",
