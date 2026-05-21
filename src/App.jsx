@@ -286,7 +286,45 @@ const S49_RESULTS = {
   ],
 };
 
-const HISTORICAL = { 43: S43_RESULTS, 44: S44_RESULTS, 45: S45_RESULTS, 46: S46_RESULTS, 47: S47_RESULTS, 48: S48_RESULTS, 49: S49_RESULTS };
+
+const S50_RESULTS = {
+  season: 50,
+  teamScores: [
+    { name: "Jinga",   members: "Team Mackereth", color: "#6a9fd8", score: 84, winner: true },
+    { name: "Weloki",  members: "Team Wells",     color: "#c46ab0", score: 71 },
+    { name: "Ojalu",   members: "Team Lestan",    color: "#6db86d", score: 52 },
+    { name: "Miloa",   members: "Team Miller",    color: "#c8922a", score: 41 },
+    { name: "Nochoso", members: "The Unchosen",   color: "#888888", score: 14 },
+  ],
+  placements: [
+    { place: 24, points: 26, player: "Aubry Bracco",           team: "Weloki",  teamColor: "#c46ab0" },
+    { place: 23, points: 24, player: "Jonathan Young",         team: "Jinga",   teamColor: "#6a9fd8" },
+    { place: 22, points: 22, player: "Joe Hunter",             team: "Ojalu",   teamColor: "#6db86d" },
+    { place: 21, points: 19, player: "Rizo Velovic",           team: "Jinga",   teamColor: "#6a9fd8" },
+    { place: 20, points: 18, player: "Tiffany Ervin",          team: "Jinga",   teamColor: "#6a9fd8" },
+    { place: 19, points: 17, player: "Cirie Fields",           team: "Weloki",  teamColor: "#c46ab0" },
+    { place: 18, points: 16, player: "Rick Devens",            team: "Weloki",  teamColor: "#c46ab0" },
+    { place: 17, points: 15, player: "Ozzy Lusth",             team: "Jinga",   teamColor: "#6a9fd8" },
+    { place: 16, points: 14, player: "Emily Flippen",          team: "Miloa",   teamColor: "#c8922a" },
+    { place: 15, points: 13, player: "Stephenie LaGrossa",     team: "Ojalu",   teamColor: "#6db86d" },
+    { place: 14, points: 12, player: "Christian Hubicki",      team: "Miloa",   teamColor: "#c8922a" },
+    { place: 13, points: 11, player: 'Benjamin "Coach" Wade',  team: "Miloa",   teamColor: "#c8922a" },
+    { place: 12, points: 10, player: "Chrissy Hofbeck",        team: "Nochoso", teamColor: "#888888" },
+    { place: 11, points: 9,  player: "Dee Valladares",         team: "Ojalu",   teamColor: "#6db86d" },
+    { place: 10, points: 8,  player: "Colby Donaldson",        team: "Jinga",   teamColor: "#6a9fd8" },
+    { place: 9,  points: 7,  player: "Genevieve Mushaluk",     team: "Weloki",  teamColor: "#c46ab0" },
+    { place: 8,  points: 6,  player: "Kamilla Karthigesu",     team: "Ojalu",   teamColor: "#6db86d" },
+    { place: 7,  points: 5,  player: "Charlie Davis",          team: "Weloki",  teamColor: "#c46ab0" },
+    { place: 6,  points: 4,  player: "Angelina Keeley",        team: "Nochoso", teamColor: "#888888" },
+    { place: 5,  points: 3,  player: "Mike White",             team: "Miloa",   teamColor: "#c8922a" },
+    { place: 4,  points: 2,  player: "Q Burdette",             team: "Ojalu",   teamColor: "#6db86d" },
+    { place: 3,  points: 1,  player: "Savannah Louie",         team: "Miloa",   teamColor: "#c8922a" },
+    { place: 2,  points: 0,  player: "Kyle Fraser",            team: "Nochoso", teamColor: "#888888" },
+    { place: 1,  points: 0,  player: "Jenna Lewis-Dougherty",  team: "Nochoso", teamColor: "#888888" },
+  ],
+};
+
+const HISTORICAL = { 43: S43_RESULTS, 44: S44_RESULTS, 45: S45_RESULTS, 46: S46_RESULTS, 47: S47_RESULTS, 48: S48_RESULTS, 49: S49_RESULTS, 50: S50_RESULTS };
 
 const SEASON_WINNERS = [
   { season: 43, winner: "Jinga"  },
@@ -489,7 +527,7 @@ export default function App() {
     try { return localStorage.getItem(`sf_splash_${SPLASH_VERSION}`) === "1"; } catch { return false; }
   });
   const [page, setPage] = useState("leaderboard");
-  const [historySeason, setHistorySeason] = useState(49);
+  const [historySeason, setHistorySeason] = useState(50);
   const [toast, setToast] = useState(null);
   const [showOdds, setShowOdds] = useState(false);
 
@@ -780,7 +818,7 @@ function History({ historySeason, setHistorySeason }) {
       <div className="page-subtitle">Past season results</div>
       <div className="season-bar">
         <span className="season-label">Season</span>
-        {[49,48,47,46,45,44,43].map(id => (
+        {[50,49,48,47,46,45,44,43].map(id => (
           <button key={id} className={`season-btn ${historySeason === id ? "active" : ""}`} onClick={() => setHistorySeason(id)}>{id}</button>
         ))}
       </div>
