@@ -797,7 +797,7 @@ const RUMORS_DATA = [
       {
         status: "confirmed",
         title: "All-new, first-time-player cast",
-        body: "CBS/Paramount+ has confirmed the cast consists of first-time players. That is why the previous Rupert-returnee rumor has been removed from this build.",
+        body: "CBS/Paramount+ has confirmed the cast consists of first-time players.",
         source: "CBS/Paramount+, May 2026",
       },
       {
@@ -814,21 +814,16 @@ const RUMORS_DATA = [
       },
       {
         status: "rumored",
-        title: "21 players instead of the expected 18 or 20",
-        body: "The most interesting structural rumor is the 21-player cast. That number is awkward if the season starts with two tribes of 10.  Rumors of a Day 1 twist, limbo player, or unusual marooning format.",
-        source: "Inside Survivor / community speculation, May-June 2026",
-      },
-      {
-        status: "rumored",
-        title: "Two-tribe start is plausible, but not locked",
-        body: "Early chatter points to two tribes of 10. The 21-name list makes that less clean, so this app now treats tribe format as TBD rather than confirmed.",
+        title: "Two-tribe start",
+        body: "Early chatter points to two tribes of 10.",
         source: "EntertainmentNow / fan speculation, May 2026",
       },
+
       {
-        status: "speculation",
-        title: "Opening twist could echo Palau or Fiji",
-        body: "Because of the 21st-player problem, fans are speculating about an opening unpicked-player, exile, captain, or delayed-entry mechanic. Fun theory, but not confirmed.",
-        source: "Fan speculation",
+        status: "rumored",
+        title: "21 players instead of the expected 18 or 20",
+        body: "The most interesting structural rumor is the 21-player cast.  Fans are speculating it's a Day 1 twist, limbo player, or unusual marooning format.",
+        source: "Inside Survivor / community speculation, May-June 2026",
       },
     ],
   },
