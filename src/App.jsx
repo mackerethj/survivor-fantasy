@@ -39,7 +39,7 @@ const SEASONS = [
 
 // ─── Season 51 Rumored Cast ───────────────────────────────────────────────────
 // Source: Inside Survivor / EntertainmentNow leaks (May-June 2026, unconfirmed)
-// 21 rumored first-time players. CBS has not announced names yet. draftedBy null until draft.
+// 21 rumored first-time players. CBS has not officially announced names. draftedBy null until draft.
 const S51_CASTAWAYS = [
   {
     name: "Aaliyah Puglia",
@@ -47,6 +47,7 @@ const S51_CASTAWAYS = [
     hometown: "Providence, RI",
     occupation: "Chef",
     bio: "Professional chef with culinary nutrition training from Johnson & Wales. Reportedly worked with the New England Patriots and specializes in plant-based cuisine.",
+    photoUrl: "https://inside-survivor.ams3.digitaloceanspaces.com/wp-content/uploads/2026/05/aaliyaj-12%C2%A71.png",
     tribe: "TBD", draftedBy: null,
   },
   {
@@ -55,6 +56,7 @@ const S51_CASTAWAYS = [
     hometown: "Atlanta, GA",
     occupation: "Attorney",
     bio: "Criminal defense attorney and Emory Law graduate. Public-interest/legal-reform profile makes her a strong talker and potential social strategist.",
+    photoUrl: "https://inside-survivor.ams3.digitaloceanspaces.com/wp-content/uploads/2026/05/alex-asdasd.png",
     tribe: "TBD", draftedBy: null,
   },
   {
@@ -63,6 +65,7 @@ const S51_CASTAWAYS = [
     hometown: "Bloomington, IN",
     occupation: "Sociology Professor",
     bio: "Indiana University sociology professor whose research focuses on racialization, identity, embodiment, and political engagement.",
+    photoUrl: "https://inside-survivor.ams3.digitaloceanspaces.com/wp-content/uploads/2026/05/jelly-q44.png",
     tribe: "TBD", draftedBy: null,
   },
   {
@@ -71,6 +74,7 @@ const S51_CASTAWAYS = [
     hometown: "Toronto, ON",
     occupation: "Actress / Voice Actor",
     bio: "Award-winning Canadian actor known for animation voice work including Strawberry Shortcake and My Little Pony, plus a live-action role on The Boys.",
+    photoUrl: "https://inside-survivor.ams3.digitaloceanspaces.com/wp-content/uploads/2026/05/ana2424.png",
     tribe: "TBD", draftedBy: null,
   },
   {
@@ -79,6 +83,7 @@ const S51_CASTAWAYS = [
     hometown: "LaSalle, IL → Orlando, FL",
     occupation: "Pro Wrestler / Trainer",
     bio: "Former WWE/NXT performer Bodhi Hayward and former college football player. Likely one of the most obvious early physical-threat profiles.",
+    photoUrl: "https://inside-survivor.ams3.digitaloceanspaces.com/wp-content/uploads/2026/05/bradyb-113.png",
     tribe: "TBD", draftedBy: null,
   },
   {
@@ -87,6 +92,7 @@ const S51_CASTAWAYS = [
     hometown: "Rock Rapids, IA",
     occupation: "Farmer / Cattle Rancher",
     bio: "Runs Moon Creek Farms. Former University of Sioux Falls football player with farm/ranch life experience that should translate well to camp.",
+    photoUrl: "https://inside-survivor.ams3.digitaloceanspaces.com/wp-content/uploads/2026/05/carter_1313.png",
     tribe: "TBD", draftedBy: null,
   },
   {
@@ -95,6 +101,7 @@ const S51_CASTAWAYS = [
     hometown: "Salt Lake City, UT",
     occupation: "Human Resources Executive",
     bio: "Reported S47 alternate who finally made it on. Mr. USU Congeniality winner with an oddball gem-collector hook.",
+    photoUrl: "https://inside-survivor.ams3.digitaloceanspaces.com/wp-content/uploads/2026/05/cc_508.png",
     tribe: "TBD", draftedBy: null,
   },
   {
@@ -103,6 +110,7 @@ const S51_CASTAWAYS = [
     hometown: "London, Ontario, Canada",
     occupation: "Game Studio Founder",
     bio: "Founder of Noodle Goose Games and co-host of The Winner's Edit Survivor podcast. Superfan/game-theory profile.",
+    photoUrl: "https://inside-survivor.ams3.digitaloceanspaces.com/wp-content/uploads/2026/05/dk_5w4.png",
     tribe: "TBD", draftedBy: null,
   },
   {
@@ -111,6 +119,7 @@ const S51_CASTAWAYS = [
     hometown: "Lufkin, TX → West Hollywood, CA",
     occupation: "Actor / Model",
     bio: "Actor/model with credits including Grey's Anatomy, Queer as Folk, and Sistas. Charisma archetype with a built-in threat-management question.",
+    photoUrl: "https://inside-survivor.ams3.digitaloceanspaces.com/wp-content/uploads/2026/05/devin_4242.png",
     tribe: "TBD", draftedBy: null,
   },
   {
@@ -119,6 +128,7 @@ const S51_CASTAWAYS = [
     hometown: "Sunderland, MA",
     occupation: "Mental Health Therapist",
     bio: "Former Clark University swimmer and theater performer. Counselor background could help with emotional reads and tribe management.",
+    photoUrl: "https://inside-survivor.ams3.digitaloceanspaces.com/wp-content/uploads/2026/05/ericm-adsad.png",
     tribe: "TBD", draftedBy: null,
   },
   {
@@ -127,6 +137,7 @@ const S51_CASTAWAYS = [
     hometown: "Maumee, OH → Arizona",
     occupation: "Wedding Videographer",
     bio: "Wedding photographer/videographer and dedicated Survivor fan. Creative storyteller type who may read people well.",
+    photoUrl: "https://inside-survivor.ams3.digitaloceanspaces.com/wp-content/uploads/2026/05/jenna-31313.png",
     tribe: "TBD", draftedBy: null,
   },
   {
@@ -135,6 +146,7 @@ const S51_CASTAWAYS = [
     hometown: "Santa Barbara, CA",
     occupation: "Former Pride Director",
     bio: "Oldest rumored castaway. JD from Willamette; reportedly raised $20M+ for HIV services and has applied for years.",
+    photoUrl: "https://inside-survivor.ams3.digitaloceanspaces.com/wp-content/uploads/2026/05/kristin_24424.png",
     tribe: "TBD", draftedBy: null,
   },
   {
@@ -143,6 +155,7 @@ const S51_CASTAWAYS = [
     hometown: "Dublin, Ireland → Puerto Rico",
     occupation: "Influencer / Model",
     bio: "TikTok creator/model and reportedly the first Irish-born castaway. Became a U.S. citizen in 2025 after moving to Puerto Rico.",
+    photoUrl: "https://inside-survivor.ams3.digitaloceanspaces.com/wp-content/uploads/2026/05/lewis_asdad.png",
     tribe: "TBD", draftedBy: null,
   },
   {
@@ -151,6 +164,7 @@ const S51_CASTAWAYS = [
     hometown: "Kearny, NJ → New York City",
     occupation: "Sex Store Owner",
     bio: "Co-owner of Afterglow in NYC with her brother. Former soccer/lacrosse athlete; likely comfortable in direct conversations.",
+    photoUrl: "https://inside-survivor.ams3.digitaloceanspaces.com/wp-content/uploads/2026/05/linnea_dsafas.png",
     tribe: "TBD", draftedBy: null,
   },
   {
@@ -159,6 +173,7 @@ const S51_CASTAWAYS = [
     hometown: "Charles Town, WV",
     occupation: "Camp Counselor / Farmer",
     bio: "Reportedly the first West Virginia castaway. Homeschools three kids while working as a camp counselor and farmer.",
+    photoUrl: "https://inside-survivor.ams3.digitaloceanspaces.com/wp-content/uploads/2026/05/mag.png",
     tribe: "TBD", draftedBy: null,
   },
   {
@@ -167,6 +182,7 @@ const S51_CASTAWAYS = [
     hometown: "New York, NY",
     occupation: "Baseball Operations",
     bio: "Assistant Director of Baseball Operations for the New York Yankees. Princeton grad with a sports-analytics/front-office profile.",
+    photoUrl: "https://inside-survivor.ams3.digitaloceanspaces.com/wp-content/uploads/2026/05/mike-assa.png",
     tribe: "TBD", draftedBy: null,
   },
   {
@@ -175,6 +191,7 @@ const S51_CASTAWAYS = [
     hometown: "Monsey, NY",
     occupation: "Personal Trainer / Youth Director",
     bio: "'Coach O' — Director of Youth Services at the MLK Center of Rockland and former University at Albany linebacker.",
+    photoUrl: "https://inside-survivor.ams3.digitaloceanspaces.com/wp-content/uploads/2026/05/ojads.jpg",
     tribe: "TBD", draftedBy: null,
   },
   {
@@ -183,6 +200,7 @@ const S51_CASTAWAYS = [
     hometown: "Norfolk, VA",
     occupation: "U.S. Navy Attorney",
     bio: "Attorney for the U.S. Navy. JD from Washington University in St. Louis; runs a boxing club for at-risk youth.",
+    photoUrl: "https://inside-survivor.ams3.digitaloceanspaces.com/wp-content/uploads/2026/05/pattc_252.png",
     tribe: "TBD", draftedBy: null,
   },
   {
@@ -191,6 +209,7 @@ const S51_CASTAWAYS = [
     hometown: "Boston, MA",
     occupation: "Airport Operations",
     bio: "JetBlue/Logan Airport operations worker and aspiring comedian who hosts The Rob Show podcast.",
+    photoUrl: "https://inside-survivor.ams3.digitaloceanspaces.com/wp-content/uploads/2026/05/roba_2q131.png",
     tribe: "TBD", draftedBy: null,
   },
   {
@@ -199,6 +218,7 @@ const S51_CASTAWAYS = [
     hometown: "Berea, KY",
     occupation: "OBGYN",
     bio: "OBGYN and avid traveler. Reported medical-background player with a polished professional presence.",
+    photoUrl: "https://inside-survivor.ams3.digitaloceanspaces.com/wp-content/uploads/2026/05/sharo-424.png",
     tribe: "TBD", draftedBy: null,
   },
   {
@@ -207,6 +227,7 @@ const S51_CASTAWAYS = [
     hometown: "Fort Worth, TX",
     occupation: "Medical Student",
     bio: "TCU medical student and marathon runner. Young, high-achieving profile with endurance upside.",
+    photoUrl: "https://inside-survivor.ams3.digitaloceanspaces.com/wp-content/uploads/2026/05/thien-asdas.png",
     tribe: "TBD", draftedBy: null,
   },
 ];
@@ -482,6 +503,30 @@ function saveState(s) {
   try { localStorage.setItem(STORAGE_KEY, JSON.stringify(s)); } catch {}
 }
 
+function hydrateCastaways(savedCastaways = []) {
+  const savedByName = new Map(savedCastaways.map(c => [c.name, c]));
+  return S51_CASTAWAYS.map((base, i) => {
+    const saved = savedByName.get(base.name) || {};
+    return {
+      ...base,
+      draftedBy: saved.draftedBy ?? base.draftedBy ?? null,
+      eliminationOrder: saved.eliminationOrder ?? null,
+      tribe: saved.tribe ?? base.tribe ?? "TBD",
+      id: i + 1,
+    };
+  });
+}
+
+function initials(name = "") {
+  return name
+    .replace(/'[^']*'/g, "")
+    .split(/\s+/)
+    .filter(Boolean)
+    .slice(0, 2)
+    .map(part => part[0]?.toUpperCase())
+    .join("") || "?";
+}
+
 function ordinal(n) {
   const s = ["th","st","nd","rd"], v = n % 100;
   return n + (s[(v-20)%10] || s[v] || s[0]);
@@ -523,7 +568,7 @@ const CSS = `
   .lb-score { text-align: right; }
   .lb-pts { font-family: 'Playfair Display', serif; font-size: 2.2rem; font-weight: 900; line-height: 1; }
   .lb-pts-label { font-size: 0.58rem; color: #bbb; letter-spacing: 0.1em; text-transform: uppercase; margin-top: 0.1rem; }
-  .castaways-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(170px,1fr)); gap: 0.75rem; margin-bottom: 2rem; }
+  .castaways-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(190px,1fr)); gap: 0.9rem; margin-bottom: 2rem; }
   .castaway-card { background: rgba(255,255,255,0.025); border: 1px solid rgba(255,255,255,0.07); border-radius: 4px; overflow: hidden; position: relative; transition: border-color 0.2s; }
   .castaway-card::after { content:''; position:absolute; top:0; left:0; right:0; height:2px; }
   .castaway-card.alive::after { background: #5aaa72; }
@@ -531,7 +576,11 @@ const CSS = `
   .castaway-card.rumored-player::after { background: #c8922a; }
   .castaway-card.unknown-player { opacity: 0.45; }
   .castaway-card:hover { border-color: rgba(90,170,114,0.3); }
-  .c-info { padding: 0.65rem 0.75rem; }
+  .c-photo-wrap { position: relative; width: 100%; aspect-ratio: 1 / 1; background: radial-gradient(circle at 50% 30%, rgba(90,170,114,0.16), rgba(255,255,255,0.03) 62%, rgba(0,0,0,0.18)); border-bottom: 1px solid rgba(255,255,255,0.06); overflow: hidden; }
+  .c-photo { width: 100%; height: 100%; object-fit: cover; display: block; filter: saturate(0.96) contrast(1.02); }
+  .c-photo-fallback { width: 100%; height: 100%; display: flex; align-items: center; justify-content: center; font-family: 'Playfair Display', serif; font-size: 2.4rem; font-weight: 900; color: rgba(240,235,224,0.72); letter-spacing: 0.04em; background: radial-gradient(circle at 50% 30%, rgba(90,170,114,0.18), rgba(255,255,255,0.04) 62%, rgba(0,0,0,0.18)); }
+  .c-photo-fallback.with-photo { display: none; }
+  .c-info { padding: 0.75rem 0.85rem 0.85rem; }
   .c-name { font-size: 0.75rem; font-weight: 500; margin-bottom: 0.15rem; line-height: 1.3; }
   .c-age { font-size: 0.6rem; color: #888; margin-bottom: 0.1rem; }
   .c-occ { font-size: 0.58rem; color: #5aaa72; margin-bottom: 0.2rem; font-weight: 500; line-height: 1.3; }
@@ -640,11 +689,11 @@ export default function App() {
   const [page, setPage] = useState("overview");
   const [historySeason, setHistorySeason] = useState(50);
 
-  // Season 51 castaways (pre-draft — all draftedBy null)
+  // Season 51 castaways. Hydrate from defaults so new fields, including remote photo URLs,
+  // still appear even if an older localStorage draft already exists.
   const [castaways, setCastaways] = useState(() => {
     const saved = loadState();
-    if (saved?.castaways?.length) return saved.castaways;
-    return S51_CASTAWAYS.map((c, i) => ({ ...c, id: i + 1, eliminationOrder: null }));
+    return hydrateCastaways(saved?.castaways);
   });
 
   useEffect(() => { saveState({ castaways }); }, [castaways]);
@@ -668,8 +717,8 @@ export default function App() {
           <nav className="nav">
             {[
               { key: "overview",  label: "Overview"  },
-              { key: "rumors",    label: "Rumors"     },
               { key: "castaways", label: "Cast"       },
+              { key: "rumors",    label: "Rumors"     },
               { key: "history",   label: "History"    },
             ].map(p => (
               <button key={p.key} className={`nav-btn ${page === p.key ? "active" : ""}`} onClick={() => setPage(p.key)}>
@@ -681,8 +730,8 @@ export default function App() {
 
         <div className="container">
           {page === "overview"  && <Overview  />}
-          {page === "rumors"    && <Rumors />}
           {page === "castaways" && <Castaways castaways={castaways} />}
+          {page === "rumors"    && <Rumors />}
           {page === "history"   && <History historySeason={historySeason} setHistorySeason={setHistorySeason} />}
         </div>
       </div>
@@ -700,7 +749,10 @@ function Overview() {
       <div className="section-title">The Open Era</div>
       <div className="panel" style={{ marginBottom: "1.5rem" }}>
         <p style={{ fontSize: "0.78rem", color: "#d0cab8", lineHeight: 1.75, marginBottom: "0.75rem" }}>
-          Survivor 51 is the first regular season under the Open Era framework. CBS/Paramount+ describes it as a first-time-player season, with all previous advantages, idols, and twists available.
+          Survivor 51 is the first regular season under the Open Era framework. CBS/Paramount+ describes it as a first-time-player season, with Jeff Probst back as host and previous advantages, idols, and twists available to appear again.
+        </p>
+        <p style={{ fontSize: "0.78rem", color: "#d0cab8", lineHeight: 1.75 }}>
+          For fantasy purposes, the app is set up as a preseason hub: track the cast list, keep rumor confidence separated from confirmed details, and wait to run the draft until CBS releases the official cast and format details.
         </p>
       </div>
 
@@ -773,6 +825,23 @@ function CastawayCard({ c }) {
   const cls = c.unknown ? "unknown-player" : "alive";
   return (
     <div className={`castaway-card ${cls}`}>
+      <div className="c-photo-wrap">
+        {c.photoUrl && (
+          <img
+            className="c-photo"
+            src={c.photoUrl}
+            alt={`${c.name} profile`}
+            loading="lazy"
+            referrerPolicy="no-referrer"
+            onError={e => {
+              e.currentTarget.style.display = "none";
+              const fallback = e.currentTarget.nextElementSibling;
+              if (fallback) fallback.style.display = "flex";
+            }}
+          />
+        )}
+        <div className={`c-photo-fallback ${c.photoUrl ? "with-photo" : ""}`}>{initials(c.name)}</div>
+      </div>
       <div className="c-info">
         <div className="c-name">{c.name}</div>
         {c.age && <div className="c-age">Age {c.age}{c.hometown ? ` · ${c.hometown}` : ""}</div>}
@@ -797,7 +866,7 @@ const RUMORS_DATA = [
       {
         status: "confirmed",
         title: "All-new, first-time-player cast",
-        body: "CBS/Paramount+ has confirmed the cast consists of first-time players.",
+        body: "CBS/Paramount+ has confirmed the cast consists of first-time players. That is why the previous Rupert-returnee rumor has been removed from this build.",
         source: "CBS/Paramount+, May 2026",
       },
       {
@@ -814,16 +883,132 @@ const RUMORS_DATA = [
       },
       {
         status: "rumored",
-        title: "Two-tribe start",
-        body: "Early chatter points to two tribes of 10.",
-        source: "EntertainmentNow / fan speculation, May 2026",
+        title: "21 players instead of the expected 18 or 20",
+        body: "The most interesting structural rumor is the 21-player cast. That number is awkward if the season starts with two clean tribes of 10, which is why fans are watching for a Day 1 twist, limbo player, or unusual marooning format.",
+        source: "Inside Survivor / community speculation, May-June 2026",
       },
-
       {
         status: "rumored",
-        title: "21 players instead of the expected 18 or 20",
-        body: "The most interesting structural rumor is the 21-player cast.  Fans are speculating it's a Day 1 twist, limbo player, or unusual marooning format.",
-        source: "Inside Survivor / community speculation, May-June 2026",
+        title: "Two-tribe start is plausible, but not locked",
+        body: "Early chatter pointed toward two tribes of 10. The 21-name list makes that less clean, so this app now treats tribe format as TBD rather than confirmed.",
+        source: "EntertainmentNow / fan speculation, May 2026",
+      },
+      {
+        status: "speculation",
+        title: "Opening twist could echo Palau or Fiji",
+        body: "Because of the 21st-player problem, fans are speculating about an opening unpicked-player, exile, captain, or delayed-entry mechanic. Fun theory, but not confirmed.",
+        source: "Fan speculation",
+      },
+    ],
+  },
+  {
+    category: "Cast",
+    items: [
+      {
+        status: "likely",
+        title: "21 named castaways are now circulating",
+        body: "The updated rumored list contains 21 names: Aaliyah Puglia, Alexis Levine, Angelica 'Jelly' Loblack, Ana Sani, Brady Booker, Carter Krull, Cristian Chavez, Daniel Kilby, Devin Way, Eric Macksoud, Jenna Greenawalt, Kristin Flickinger, Lewis Kelly, Linnea Capobianco, Maggie Nestor, Michael Pinsky, Ori Jean-Charles, Patt Cannaday, Rob Antonson, Sharonda Renee, and Thien An Nguyen.",
+        source: "Inside Survivor, May 2026",
+      },
+      {
+        status: "likely",
+        title: "Brady Booker appears to be the trailer-visible physical threat",
+        body: "Former WWE/NXT performer Brady Booker, ring name Bodhi Hayward, was reported by Inside Survivor and later identified by wrestling media as appearing in CBS's S51 preview.",
+        source: "Inside Survivor / wrestling media, May 2026",
+      },
+      {
+        status: "likely",
+        title: "Devin Way is the Grey's Anatomy actor",
+        body: "The earlier vague 'Grey's Anatomy actor' rumor appears to be Devin Way, a 33-year-old actor/model from Lufkin, Texas, with credits on Grey's Anatomy, Queer as Folk, and Sistas.",
+        source: "Inside Survivor / EntertainmentNow, May 2026",
+      },
+      {
+        status: "likely",
+        title: "Lewis Kelly could be the first Irish-born castaway",
+        body: "Dublin-born influencer/model Lewis Kelly is rumored for the cast and has been described by outlets as a historic first Irish-born Survivor player.",
+        source: "Inside Survivor / EntertainmentNow, May 2026",
+      },
+      {
+        status: "likely",
+        title: "Maggie Nestor could be the first West Virginia castaway",
+        body: "Maggie Nestor, a camp counselor/farmer from Charles Town, WV, is being billed in preseason coverage as the first Survivor castaway from West Virginia.",
+        source: "Inside Survivor / EntertainmentNow, May 2026",
+      },
+      {
+        status: "likely",
+        title: "Michael Pinsky adds a sports-front-office archetype",
+        body: "Michael Pinsky is listed as Assistant Director of Baseball Operations for the New York Yankees, giving this cast a very different analytics/sports-ops profile.",
+        source: "Inside Survivor / EntertainmentNow, May 2026",
+      },
+      {
+        status: "likely",
+        title: "Ana Sani adds a recognizable voice-actor lane",
+        body: "Ana Sani, an award-winning Canadian actor/voice actor, is one of the newer names missing from the earlier app build.",
+        source: "Inside Survivor / EntertainmentNow, May 2026",
+      },
+      {
+        status: "likely",
+        title: "Sharonda Renee adds the medical-professional archetype",
+        body: "Sharonda Renee, listed as an OBGYN from Berea, Kentucky, replaces the earlier unknown-slot treatment and gives the cast another high-achieving professional profile.",
+        source: "Inside Survivor / EntertainmentNow, May 2026",
+      },
+      {
+        status: "speculation",
+        title: "No reliable bootlist yet",
+        body: "There are boot-order and winner claims floating around spoiler forums, but none are strong enough to build into the app. Treat any current bootlist as entertainment, not draft intelligence.",
+        source: "Fan speculation",
+      },
+    ],
+  },
+  {
+    category: "Strategy & Game Dynamics",
+    items: [
+      {
+        status: "speculation",
+        title: "Physical threats may be easier to identify early",
+        body: "Brady, Ori, Carter, Lewis, and Thien all have athletic/endurance hooks. In a two-tribe or challenge-heavy opening, they could be valuable; in a paranoia-heavy Open Era, they could become visible threats quickly.",
+        source: "Fantasy-league analysis",
+      },
+      {
+        status: "speculation",
+        title: "Professional communicators dominate the board",
+        body: "Attorneys, performers, influencers, a professor, a therapist, a videographer, a podcaster, and an HR executive create a cast with a lot of people trained to talk, present, persuade, or read others.",
+        source: "Fantasy-league analysis",
+      },
+      {
+        status: "speculation",
+        title: "Open Era rewards flexible players, not just superfans",
+        body: "If production really can pull from the entire twist library, players who adapt calmly may be better fantasy picks than players who simply know Survivor history.",
+        source: "Fantasy-league analysis",
+      },
+      {
+        status: "speculation",
+        title: "A 21-player format could create an unfair early score swing",
+        body: "If one player gets booted, exiled, or delayed before the normal tribe game starts, your league should decide before the draft how to score any Day 0/Day 1 twist.",
+        source: "League-rules note",
+      },
+    ],
+  },
+  {
+    category: "Fantasy League",
+    items: [
+      {
+        status: "confirmed",
+        title: "Draft should wait for the official CBS cast reveal",
+        body: "The app can preload the rumored list, but the league draft should wait until CBS confirms the final cast and any obvious tribe/format details.",
+        source: "League setup",
+      },
+      {
+        status: "confirmed",
+        title: "Nochoso still makes sense for undrafted players",
+        body: "With five fantasy teams and a possible 21-player field, the Unchosen team remains useful for any leftover or late-added player.",
+        source: "League rules",
+      },
+      {
+        status: "speculation",
+        title: "Opening-night scoring rule to settle now",
+        body: "Before the S51 draft, decide whether a non-standard opening elimination, quit, medevac, exile, or non-tribe limbo player earns normal placement points, zero, or a special minimum.",
+        source: "League-rules recommendation",
       },
     ],
   },
