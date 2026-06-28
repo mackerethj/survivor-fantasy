@@ -39,7 +39,7 @@ const SEASONS = [
 
 // ─── Season 51 Rumored Cast ───────────────────────────────────────────────────
 // Source: Inside Survivor / EntertainmentNow leaks (May-June 2026, unconfirmed)
-// 21 rumored first-time players. CBS has not officially announced names. draftedBy null until draft.
+// 21 rumored first-time players. CBS has not announced names yet. draftedBy null until draft.
 const S51_CASTAWAYS = [
   {
     name: "Aaliyah Puglia",
@@ -818,13 +818,13 @@ const RUMORS_DATA = [
       {
         status: "rumored",
         title: "21 players instead of the expected 18 or 20",
-        body: "The most interesting structural rumor is the 21-player cast. That number is awkward if the season starts with two clean tribes of 10, which is why fans are watching for a Day 1 twist, limbo player, or unusual marooning format.",
+        body: "The most interesting structural rumor is the 21-player cast. That number is awkward if the season starts with two tribes of 10.  Rumors of a Day 1 twist, limbo player, or unusual marooning format.",
         source: "Inside Survivor / community speculation, May-June 2026",
       },
       {
         status: "rumored",
         title: "Two-tribe start is plausible, but not locked",
-        body: "Early chatter pointed toward two tribes of 10. The 21-name list makes that less clean, so this app now treats tribe format as TBD rather than confirmed.",
+        body: "Early chatter points to two tribes of 10. The 21-name list makes that less clean, so this app now treats tribe format as TBD rather than confirmed.",
         source: "EntertainmentNow / fan speculation, May 2026",
       },
       {
