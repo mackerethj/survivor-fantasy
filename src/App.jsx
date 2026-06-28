@@ -668,8 +668,8 @@ export default function App() {
           <nav className="nav">
             {[
               { key: "overview",  label: "Overview"  },
-              { key: "castaways", label: "Cast"       },
               { key: "rumors",    label: "Rumors"     },
+              { key: "castaways", label: "Cast"       },
               { key: "history",   label: "History"    },
             ].map(p => (
               <button key={p.key} className={`nav-btn ${page === p.key ? "active" : ""}`} onClick={() => setPage(p.key)}>
@@ -681,8 +681,8 @@ export default function App() {
 
         <div className="container">
           {page === "overview"  && <Overview  />}
-          {page === "castaways" && <Castaways castaways={castaways} />}
           {page === "rumors"    && <Rumors />}
+          {page === "castaways" && <Castaways castaways={castaways} />}
           {page === "history"   && <History historySeason={historySeason} setHistorySeason={setHistorySeason} />}
         </div>
       </div>
