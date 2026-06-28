@@ -1,7 +1,7 @@
 // src/App.jsx  —  Fantasy Survivor · Season 51 Edition
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useState } from "react";
 
-const SPLASH_VERSION = "s51_preseason_v1.1";
+const SPLASH_VERSION = "s51_preseason_v1.3";
 
 // ─── Scoring ──────────────────────────────────────────────────────────────────
 function calcPoints(eliminationOrder, totalCastaways) {
@@ -545,7 +545,6 @@ const CSS = `
   .action-btn { font-family: 'DM Mono', monospace; font-size: 0.68rem; padding: 0.5rem 1rem; border-radius: 2px; cursor: pointer; letter-spacing: 0.08em; text-transform: uppercase; transition: all 0.15s; border: 1px solid; margin-bottom: 1rem; background: rgba(255,255,255,0.02); border-color: rgba(255,255,255,0.1); color: #ccc; }
   .action-btn.primary { background: rgba(90,170,114,0.12); border-color: rgba(90,170,114,0.4); color: #5aaa72; }
   .action-btn.primary:hover { background: rgba(90,170,114,0.22); }
-  .toast { position: fixed; bottom: 2rem; right: 2rem; background: #111; border: 1px solid rgba(90,170,114,0.4); color: #f0ebe0; padding: 0.75rem 1.25rem; border-radius: 4px; font-size: 0.75rem; z-index: 999; animation: fadeUp 0.2s ease; }
   @keyframes fadeUp { from { transform: translateY(8px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
   .panel { background: rgba(255,255,255,0.025); border: 1px solid rgba(255,255,255,0.07); border-radius: 4px; padding: 1rem 1.25rem; }
   .select, .input { background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.12); color: #f0ebe0; border-radius: 3px; padding: 0.55rem 0.65rem; font-family: 'DM Mono', monospace; font-size: 0.75rem; outline: none; width: 100%; }
@@ -574,11 +573,6 @@ const CSS = `
   .rumor-title { font-size: 0.82rem; font-weight: 500; color: #f0ebe0; margin-bottom: 0.35rem; line-height: 1.4; }
   .rumor-body { font-size: 0.68rem; color: #ccc; line-height: 1.65; }
   .rumor-source { font-size: 0.58rem; color: #666; margin-top: 0.4rem; letter-spacing: 0.06em; }
-  .standings-banner { background: rgba(90,170,114,0.06); border: 1px solid rgba(90,170,114,0.2); border-radius: 4px; padding: 1rem 1.5rem; margin-bottom: 2rem; }
-  .standings-row { display: flex; gap: 2rem; flex-wrap: wrap; align-items: center; }
-  .standings-item { display: flex; flex-direction: column; align-items: center; gap: 0.1rem; }
-  .standings-num { font-family: 'Playfair Display', serif; font-size: 2rem; font-weight: 900; line-height: 1; }
-  .standings-lbl { font-size: 0.55rem; color: #888; letter-spacing: 0.1em; text-transform: uppercase; }
   .draft-table { width: 100%; border-collapse: collapse; font-size: 0.72rem; }
   .draft-table th { font-size: 0.58rem; letter-spacing: 0.1em; text-transform: uppercase; color: #888; padding: 0.5rem 0.85rem; border-bottom: 1px solid rgba(255,255,255,0.07); text-align: left; font-weight: 400; }
   .draft-table td { padding: 0.55rem 0.85rem; border-bottom: 1px solid rgba(255,255,255,0.04); vertical-align: top; }
@@ -588,7 +582,6 @@ const CSS = `
     .lb-card { padding: 0.9rem 1rem; grid-template-columns: 2rem 1fr auto; gap: 0.75rem; }
     .lb-rank { font-size: 1.1rem; }
     .lb-pts { font-size: 1.6rem; }
-    .standings-row { gap: 1rem; }
   }
 `;
 
@@ -617,32 +610,7 @@ function Splash({ onDismiss }) {
         The Open Era
       </div>
       <div style={{ maxWidth: 520, fontSize: "clamp(0.7rem, 1.4vw, 0.85rem)", color: "#bbb", lineHeight: 1.7, padding: "0 1rem" }}>
-        Every advantage, every idol, every twist from 50 seasons — all in play at any time, in any order, without warning. All-new cast. 21 rumored names. Premieres fall 2026.
-      </div>
-
-      <div style={{ display: "grid", gridTemplateColumns: "repeat(5, 1fr)", gap: "0.5rem", marginTop: "0.5rem" }}>
-        {TEAMS.map(t => (
-          <div key={t.id} style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: "0.3rem" }}>
-            <div style={{ width: 10, height: 10, borderRadius: 99, background: t.color }} />
-            <div style={{ fontSize: "0.55rem", color: t.color, letterSpacing: "0.08em", textTransform: "uppercase" }}>{t.name}</div>
-            <div style={{ fontSize: "0.5rem", color: "#666", whiteSpace: "nowrap" }}>
-              {["★★★★★","★★★★★","★★","★★","—"][t.id-1]}
-            </div>
-          </div>
-        ))}
-      </div>
-
-      <div style={{ display: "flex", gap: "1.5rem", marginTop: "0.5rem" }}>
-        {[
-          { label: "Jinga Titles", value: "5" },
-          { label: "Weloki Titles", value: "2" },
-          { label: "Miloa Titles", value: "1" },
-        ].map(s => (
-          <div key={s.label} style={{ textAlign: "center" }}>
-            <div style={{ fontFamily: "'Playfair Display',serif", fontSize: "clamp(1.5rem,4vw,2.5rem)", fontWeight: 900, color: "#5aaa72", lineHeight: 1 }}>{s.value}</div>
-            <div style={{ fontSize: "0.55rem", color: "#888", letterSpacing: "0.08em", textTransform: "uppercase", marginTop: "0.2rem" }}>{s.label}</div>
-          </div>
-        ))}
+        Every advantage, every idol, every twist from 50 seasons — all in play at any time, in any order, without warning. All-new cast. Premieres fall 2026.
       </div>
 
       <button
@@ -671,7 +639,6 @@ export default function App() {
   });
   const [page, setPage] = useState("overview");
   const [historySeason, setHistorySeason] = useState(50);
-  const [toast, setToast] = useState(null);
 
   // Season 51 castaways (pre-draft — all draftedBy null)
   const [castaways, setCastaways] = useState(() => {
@@ -686,10 +653,6 @@ export default function App() {
     try { localStorage.setItem(`sf_splash_${SPLASH_VERSION}`, "1"); } catch {}
     setSplashDismissed(true);
   };
-
-  const showToast = msg => { setToast(msg); setTimeout(() => setToast(null), 2500); };
-
-  const season = SEASONS.find(s => s.id === 51);
 
   if (!splashDismissed) return (<><style>{CSS}</style><Splash onDismiss={dismissSplash} /></>);
 
@@ -708,7 +671,6 @@ export default function App() {
               { key: "castaways", label: "Cast"       },
               { key: "rumors",    label: "Rumors"     },
               { key: "history",   label: "History"    },
-              { key: "standings", label: "Standings"  },
             ].map(p => (
               <button key={p.key} className={`nav-btn ${page === p.key ? "active" : ""}`} onClick={() => setPage(p.key)}>
                 {p.label}
@@ -722,10 +684,7 @@ export default function App() {
           {page === "castaways" && <Castaways castaways={castaways} />}
           {page === "rumors"    && <Rumors />}
           {page === "history"   && <History historySeason={historySeason} setHistorySeason={setHistorySeason} />}
-          {page === "standings" && <Standings showToast={showToast} />}
         </div>
-
-        {toast && <div className="toast">{toast}</div>}
       </div>
     </>
   );
@@ -733,26 +692,21 @@ export default function App() {
 
 // ─── Overview page ────────────────────────────────────────────────────────────
 function Overview() {
-  const champs = getChampionshipsThrough(50);
-  const teamOrder = [...TEAMS].sort((a, b) => (champs[b.name] || 0) - (champs[a.name] || 0));
-
   return (
     <div>
       <div className="page-title">Season 51</div>
       <div className="page-subtitle">The Open Era · Fall 2026 on CBS/Paramount+ · Mamanuca Islands, Fiji · 26-day game</div>
 
-      {/* What is the Open Era */}
       <div className="section-title">The Open Era</div>
       <div className="panel" style={{ marginBottom: "1.5rem" }}>
         <p style={{ fontSize: "0.78rem", color: "#d0cab8", lineHeight: 1.75, marginBottom: "0.75rem" }}>
-          Survivor 51 is the first regular season after the S50 milestone and the official launch of the "Open Era." CBS/Paramount+ describes it as a first-time-player season, with Jeff Probst back as host and every previous advantage, idol, and twist available to appear at any point.
+          Survivor 51 is the first regular season under the Open Era framework. CBS/Paramount+ describes it as a first-time-player season, with Jeff Probst back as host and previous advantages, idols, and twists available to appear again.
         </p>
         <p style={{ fontSize: "0.78rem", color: "#d0cab8", lineHeight: 1.75 }}>
-          The big preseason wrinkle is the <strong style={{ color: "#f0ebe0" }}>21-player rumored cast</strong>. That does not fit cleanly into the early two-tribes-of-10 rumor, so the smartest read is: 21 names are circulating, CBS has not announced the cast, and the tribe setup/opening twist should be treated as unconfirmed until the official cast reveal.
+          For fantasy purposes, the app is set up as a preseason hub: track the cast list, keep rumor confidence separated from confirmed details, and wait to run the draft until CBS releases the official cast and format details.
         </p>
       </div>
 
-      {/* Key facts */}
       <div className="section-title">Key Details</div>
       <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(160px,1fr))", gap: "0.75rem", marginBottom: "2rem" }}>
         {[
@@ -760,11 +714,10 @@ function Overview() {
           { label: "Network",        value: "CBS",              sub: "Wednesdays 8/7c" },
           { label: "Streaming",      value: "Paramount+",       sub: "live/on demand by plan" },
           { label: "Episodes",       value: "90 min",           sub: "confirmed return" },
-          { label: "Castaways",      value: "21 rumored",       sub: "CBS names TBA" },
-          { label: "Days",           value: "26",               sub: "reported by Inside Survivor" },
+          { label: "Castaways",      value: "21 listed",        sub: "CBS names TBA" },
+          { label: "Days",           value: "26",               sub: "reported format" },
           { label: "Location",       value: "Fiji",             sub: "Mamanuca Islands" },
-          { label: "Prize",          value: "$1M",              sub: "reported standard prize" },
-          { label: "Tribes Start",   value: "TBD",              sub: "2×10 rumor conflicts with 21 names" },
+          { label: "Tribe Format",   value: "TBD",              sub: "official setup pending" },
         ].map(f => (
           <div key={f.label} className="panel" style={{ padding: "0.85rem 1rem" }}>
             <div style={{ fontSize: "0.55rem", color: "#777", letterSpacing: "0.1em", textTransform: "uppercase", marginBottom: "0.3rem" }}>{f.label}</div>
@@ -774,81 +727,18 @@ function Overview() {
         ))}
       </div>
 
-      {/* Rumor pulse */}
-      <div className="section-title">Preseason Pulse</div>
+      <div className="section-title">Preseason Notes</div>
       <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(220px,1fr))", gap: "0.75rem", marginBottom: "2rem" }}>
         {[
-          { label: "Most Bankable", text: "First-time players, Fall 2026, CBS/Paramount+, 90-minute Wednesday episodes, Open Era mechanics.", color: "#5aaa72" },
-          { label: "Best Rumor", text: "A full 21-name cast is out, led by Inside Survivor/Redmond and echoed by entertainment outlets.", color: "#6a9fd8" },
-          { label: "Messiest Question", text: "Is it really two tribes of 10, or does the 21st player trigger a Palau/Fiji-style opening twist?", color: "#c8922a" },
-          { label: "Do Not Trust Yet", text: "Any bootlist, winner claim, or Rupert-returnee theory. CBS says first-time players.", color: "#888" },
+          { label: "Official Details", text: "Fall 2026 season, CBS/Paramount+, 90-minute Wednesday episodes, first-time players, and Open Era mechanics.", color: "#5aaa72" },
+          { label: "Cast Tracking", text: "The app currently includes 21 preseason cast names so the league can start scouting before the official cast reveal.", color: "#6a9fd8" },
+          { label: "Format Watch", text: "The final tribe setup and any opening twist should stay marked as pending until CBS confirms the season structure.", color: "#c8922a" },
         ].map(card => (
           <div key={card.label} className="panel" style={{ borderColor: card.color+"33", background: card.color+"0c" }}>
             <div style={{ fontSize: "0.58rem", color: card.color, letterSpacing: "0.1em", textTransform: "uppercase", marginBottom: "0.45rem" }}>{card.label}</div>
             <p style={{ fontSize: "0.7rem", color: "#d0cab8", lineHeight: 1.65 }}>{card.text}</p>
           </div>
         ))}
-      </div>
-
-      {/* All-time standings */}
-      <div className="section-title">All-Time Championship Standings (Through S50)</div>
-      <div style={{ display: "flex", flexDirection: "column", gap: "0.6rem", marginBottom: "2rem" }}>
-        {teamOrder.map((t, i) => {
-          const wins = champs[t.name] || 0;
-          return (
-            <div key={t.id} style={{ display: "flex", alignItems: "center", gap: "1rem", padding: "0.75rem 1rem", background: "rgba(255,255,255,0.02)", border: `1px solid ${wins > 0 ? t.color+"33" : "rgba(255,255,255,0.06)"}`, borderRadius: 4 }}>
-              <div style={{ fontFamily: "'Playfair Display',serif", fontSize: "1.4rem", fontWeight: 900, color: "#333", width: 28, textAlign: "center" }}>{i+1}</div>
-              <div style={{ flex: 1 }}>
-                <div style={{ fontSize: "0.9rem", fontWeight: 500, color: t.color }}>{t.name} <span style={{ fontSize: "0.65rem", color: "#888", fontWeight: 400 }}>{t.members}</span></div>
-                <div style={{ display: "flex", gap: "0.2rem", marginTop: "0.25rem" }}>
-                  {[...Array(wins)].map((_, j) => <span key={j} style={{ color: t.color, fontSize: "0.75rem" }}>★</span>)}
-                  {wins === 0 && <span style={{ fontSize: "0.6rem", color: "#555" }}>No titles yet</span>}
-                </div>
-              </div>
-              <div style={{ fontFamily: "'Playfair Display',serif", fontWeight: 900, fontSize: "1.75rem", color: wins > 0 ? t.color : "#333" }}>{wins}</div>
-            </div>
-          );
-        })}
-      </div>
-
-      {/* Jinga dynasty note */}
-      <div className="panel" style={{ borderColor: "rgba(106,159,216,0.25)", background: "rgba(106,159,216,0.04)", marginBottom: "1.5rem" }}>
-        <div style={{ fontSize: "0.62rem", color: "#6a9fd8", letterSpacing: "0.1em", textTransform: "uppercase", marginBottom: "0.4rem" }}>Dynasty Watch</div>
-        <p style={{ fontSize: "0.75rem", color: "#d0cab8", lineHeight: 1.7 }}>
-          Team Jinga (Team Mackereth) has won 5 of 8 seasons, including 4 of the last 5. A 6th title would be the most dominant run in league history. Can any team stop the dynasty in Season 51?
-        </p>
-      </div>
-
-      {/* Season-by-season */}
-      <div className="section-title">Season History at a Glance</div>
-      <div style={{ border: "1px solid rgba(255,255,255,0.07)", borderRadius: 4, overflow: "hidden" }}>
-        <table className="hist-table">
-          <thead>
-            <tr>
-              <th>Season</th>
-              <th>Champion</th>
-              <th>Score</th>
-              <th>Runner-up</th>
-            </tr>
-          </thead>
-          <tbody>
-            {SEASON_WINNERS.map(sw => {
-              const data = HISTORICAL[sw.season];
-              if (!data) return null;
-              const sorted = [...data.teamScores].sort((a,b) => (b.score||0)-(a.score||0));
-              const winner = sorted[0];
-              const runnerup = sorted[1];
-              return (
-                <tr key={sw.season}>
-                  <td style={{ color: "#f0ebe0" }}>Season {sw.season}</td>
-                  <td style={{ color: winner?.color }}>{winner?.name} — {winner?.members}</td>
-                  <td style={{ color: "#5aaa72", fontFamily: "'Playfair Display',serif", fontWeight: 900 }}>{winner?.score}</td>
-                  <td style={{ color: runnerup?.color, opacity: 0.7 }}>{runnerup?.name}</td>
-                </tr>
-              );
-            }).reverse()}
-          </tbody>
-        </table>
       </div>
     </div>
   );
@@ -862,30 +752,9 @@ function Castaways({ castaways }) {
   return (
     <div>
       <div className="page-title">Season 51 Cast</div>
-      <div className="page-subtitle">Rumored 21-name list · Unconfirmed by CBS · Updated June 2026</div>
+      <div className="page-subtitle">Preseason cast board · Updated June 2026</div>
 
-      <div className="panel" style={{ marginBottom: "1.5rem", borderColor: "rgba(200,146,42,0.25)", background: "rgba(200,146,42,0.04)" }}>
-        <div style={{ fontSize: "0.62rem", color: "#c8922a", letterSpacing: "0.1em", textTransform: "uppercase", marginBottom: "0.35rem" }}>⚠ Spoiler Warning</div>
-        <p style={{ fontSize: "0.7rem", color: "#ccc", lineHeight: 1.65 }}>
-          This page uses the rumored 21-name cast list published by Inside Survivor and echoed by other entertainment outlets. CBS/Paramount+ has confirmed Season 51 is a first-time-player season, but has not officially announced the cast names. Draft choices should wait until the CBS reveal.
-        </p>
-      </div>
-
-      <div style={{ display: "flex", gap: "0.75rem", flexWrap: "wrap", marginBottom: "1.5rem" }}>
-        {[
-          { label: "Rumored Names", n: listed.length, color: "#5aaa72" },
-          { label: "Confirmed by CBS", n: 0, color: "#888" },
-          { label: "Draft Status", n: "Pre-Draft", color: "#c8922a" },
-          { label: "Tribe Format", n: "TBD", color: "#6a9fd8" },
-        ].map(s => (
-          <div key={s.label} className="panel" style={{ padding: "0.65rem 1rem" }}>
-            <div style={{ fontFamily: "'Playfair Display',serif", fontWeight: 900, fontSize: "1.3rem", color: s.color, lineHeight: 1 }}>{s.n}</div>
-            <div style={{ fontSize: "0.55rem", color: "#888", letterSpacing: "0.08em", textTransform: "uppercase", marginTop: "0.15rem" }}>{s.label}</div>
-          </div>
-        ))}
-      </div>
-
-      <div className="section-title">Rumored New Castaways — {listed.length}</div>
+      <div className="section-title">Castaways — {listed.length}</div>
       <div className="castaways-grid">
         {listed.map(c => <CastawayCard key={c.id} c={c} />)}
       </div>
@@ -912,12 +781,6 @@ function CastawayCard({ c }) {
         {c.age && <div className="c-age">Age {c.age}{c.hometown ? ` · ${c.hometown}` : ""}</div>}
         {c.occupation && <div className="c-occ">{c.occupation}</div>}
         {c.bio && <div className="c-bio">{c.bio}</div>}
-        <div style={{ marginTop: "0.35rem" }}>
-          {c.unknown
-            ? <span className="c-status unknown">Unidentified</span>
-            : <span className="c-status predraft">Rumored · Pre-Draft</span>
-          }
-        </div>
       </div>
     </div>
   );
@@ -968,7 +831,7 @@ const RUMORS_DATA = [
         status: "speculation",
         title: "Opening twist could echo Palau or Fiji",
         body: "Because of the 21st-player problem, fans are speculating about an opening unpicked-player, exile, captain, or delayed-entry mechanic. Fun theory, but not confirmed.",
-        source: "Spoiler-community speculation",
+        source: "Fan speculation",
       },
     ],
   },
@@ -1027,7 +890,7 @@ const RUMORS_DATA = [
         status: "speculation",
         title: "No reliable bootlist yet",
         body: "There are boot-order and winner claims floating around spoiler forums, but none are strong enough to build into the app. Treat any current bootlist as entertainment, not draft intelligence.",
-        source: "Spoiler-community speculation",
+        source: "Fan speculation",
       },
     ],
   },
@@ -1076,14 +939,8 @@ const RUMORS_DATA = [
         source: "League rules",
       },
       {
-        status: "rumored",
-        title: "Jinga enters S51 as the dynasty target",
-        body: "Team Mackereth (Jinga) has won 5 of 8 seasons, including 4 of the last 5. Everyone else should draft like they are trying to stop a dynasty.",
-        source: "League record",
-      },
-      {
         status: "speculation",
-        title: "Pre-draft scoring rule to settle now",
+        title: "Opening-night scoring rule to settle now",
         body: "Before the S51 draft, decide whether a non-standard opening elimination, quit, medevac, exile, or non-tribe limbo player earns normal placement points, zero, or a special minimum.",
         source: "League-rules recommendation",
       },
@@ -1109,8 +966,8 @@ function Rumors() {
 
   return (
     <div>
-      <div className="page-title">Rumors & Spoilers</div>
-      <div className="page-subtitle">Season 51 intelligence · Updated June 2026 · CBS-confirmed vs rumor-labeled</div>
+      <div className="page-title">Rumors</div>
+      <div className="page-subtitle">Season 51 preseason intelligence · Updated June 2026</div>
 
       <div style={{ display: "flex", gap: "0.5rem", flexWrap: "wrap", marginBottom: "1.5rem" }}>
         <button
@@ -1192,7 +1049,7 @@ function History({ historySeason, setHistorySeason }) {
                 <div className="hist-score" style={{ color: t.na ? "#444" : t.color }}>{t.na ? "—" : t.score}{!t.na && <span style={{ fontSize: "0.7rem", color: "#777", marginLeft: "0.35rem" }}>pts</span>}</div>
                 <div style={{ fontSize: "0.82rem", color: t.color, marginTop: "0.25rem", fontWeight: 500 }}>{t.name}</div>
                 <div style={{ fontSize: "0.62rem", color: "#777" }}>{t.members}</div>
-                {(champs[t.name]||0) > 0 && <div style={{ fontSize: "0.6rem", color: "#5aaa72", marginTop: "0.3rem" }}>{"★".repeat(champs[t.name])} {champs[t.name]} title{champs[t.name]>1?"s":""}</div>}
+                {(champs[t.name]||0) > 0 && <div style={{ fontSize: "0.6rem", color: "#5aaa72", marginTop: "0.3rem", letterSpacing: "0.08em" }}>{"★".repeat(champs[t.name])}</div>}
                 {t.na && <div style={{ fontSize: "0.6rem", color: "#555", marginTop: "0.25rem" }}>Did not participate</div>}
               </div>
             ))}
@@ -1222,99 +1079,6 @@ function History({ historySeason, setHistorySeason }) {
       ) : (
         <div className="hint">No data for this season.</div>
       )}
-    </div>
-  );
-}
-
-// ─── Standings page ───────────────────────────────────────────────────────────
-function Standings({ showToast }) {
-  const champs = getChampionshipsThrough(50);
-  const sorted = [...TEAMS].sort((a,b) => (champs[b.name]||0) - (champs[a.name]||0));
-
-  // Season-by-season records
-  const records = TEAMS.map(t => {
-    const wins = Object.values(HISTORICAL).filter(d => d.teamScores.find(s => s.name === t.name && s.winner)).length;
-    const scored = Object.values(HISTORICAL).map(d => {
-      const s = d.teamScores.find(ts => ts.name === t.name);
-      return s ? (s.score || 0) : 0;
-    });
-    const totalPts = scored.reduce((a,b) => a+b, 0);
-    const best = Math.max(...scored.filter(Boolean));
-    return { ...t, wins, totalPts, best, seasons: Object.keys(HISTORICAL).length };
-  }).sort((a,b) => b.wins - a.wins || b.totalPts - a.totalPts);
-
-  return (
-    <div>
-      <div className="page-title">League Standings</div>
-      <div className="page-subtitle">All-time records through Season 50 · Season 51 draft pending</div>
-
-      <div className="section-title">All-Time Titles</div>
-      <div style={{ display: "flex", flexDirection: "column", gap: "0.6rem", marginBottom: "2rem" }}>
-        {records.map((t, i) => (
-          <div key={t.id} style={{ display: "grid", gridTemplateColumns: "2rem 1fr repeat(3, auto)", gap: "1.25rem", alignItems: "center", padding: "1rem 1.25rem", background: "rgba(255,255,255,0.02)", border: `1px solid ${t.wins > 0 ? t.color+"33" : "rgba(255,255,255,0.06)"}`, borderRadius: 4 }}>
-            <div style={{ fontFamily: "'Playfair Display',serif", fontSize: "1.3rem", fontWeight: 900, color: "#333" }}>{i+1}</div>
-            <div>
-              <div style={{ fontSize: "0.9rem", fontWeight: 500, color: t.color }}>{t.name}</div>
-              <div style={{ fontSize: "0.62rem", color: "#777" }}>{t.members}</div>
-              <div style={{ display: "flex", gap: "0.15rem", marginTop: "0.25rem" }}>
-                {[...Array(t.wins)].map((_,j) => <span key={j} style={{ color: t.color, fontSize: "0.7rem" }}>★</span>)}
-              </div>
-            </div>
-            <div style={{ textAlign: "center" }}>
-              <div style={{ fontFamily: "'Playfair Display',serif", fontWeight: 900, fontSize: "1.75rem", color: t.wins ? t.color : "#444", lineHeight: 1 }}>{t.wins}</div>
-              <div style={{ fontSize: "0.52rem", color: "#666", letterSpacing: "0.08em", textTransform: "uppercase" }}>Titles</div>
-            </div>
-            <div style={{ textAlign: "center" }}>
-              <div style={{ fontFamily: "'Playfair Display',serif", fontWeight: 900, fontSize: "1.3rem", color: "#f0ebe0", lineHeight: 1 }}>{t.totalPts}</div>
-              <div style={{ fontSize: "0.52rem", color: "#666", letterSpacing: "0.08em", textTransform: "uppercase" }}>Total Pts</div>
-            </div>
-            <div style={{ textAlign: "center" }}>
-              <div style={{ fontFamily: "'Playfair Display',serif", fontWeight: 900, fontSize: "1.3rem", color: "#f0ebe0", lineHeight: 1 }}>{t.best}</div>
-              <div style={{ fontSize: "0.52rem", color: "#666", letterSpacing: "0.08em", textTransform: "uppercase" }}>Best Score</div>
-            </div>
-          </div>
-        ))}
-      </div>
-
-      <div className="section-title">Season-by-Season Breakdown</div>
-      <div style={{ border: "1px solid rgba(255,255,255,0.07)", borderRadius: 4, overflow: "hidden", marginBottom: "2rem" }}>
-        <table className="draft-table">
-          <thead>
-            <tr>
-              <th>Season</th>
-              {TEAMS.map(t => <th key={t.id} style={{ color: t.color }}>{t.name}</th>)}
-              <th>Winner</th>
-            </tr>
-          </thead>
-          <tbody>
-            {Object.entries(HISTORICAL).sort((a,b) => Number(b[0]) - Number(a[0])).map(([sid, data]) => {
-              const winner = data.teamScores.find(t => t.winner);
-              return (
-                <tr key={sid}>
-                  <td style={{ color: "#f0ebe0", fontWeight: 500 }}>S{sid}</td>
-                  {TEAMS.map(t => {
-                    const ts = data.teamScores.find(s => s.name === t.name);
-                    const isWinner = ts?.winner;
-                    return (
-                      <td key={t.id} style={{ color: isWinner ? t.color : "#888", fontFamily: isWinner ? "'Playfair Display',serif" : "inherit", fontWeight: isWinner ? 900 : 400 }}>
-                        {ts ? (ts.na ? "—" : ts.score) : "—"}{isWinner ? " ★" : ""}
-                      </td>
-                    );
-                  })}
-                  <td style={{ color: winner?.color, fontWeight: 500 }}>{winner?.name || "—"}</td>
-                </tr>
-              );
-            })}
-          </tbody>
-        </table>
-      </div>
-
-      <div className="panel" style={{ borderColor: "rgba(106,159,216,0.25)", background: "rgba(106,159,216,0.04)" }}>
-        <div style={{ fontSize: "0.62rem", color: "#6a9fd8", letterSpacing: "0.1em", textTransform: "uppercase", marginBottom: "0.5rem" }}>Season 51 Draft</div>
-        <p style={{ fontSize: "0.72rem", color: "#d0cab8", lineHeight: 1.7 }}>
-          The league draft for Season 51 should be held once CBS officially announces the full cast and clarifies the opening format. All 5 teams will participate. Players not drafted will go to the Nochoso (The Unchosen) team as in previous seasons.
-        </p>
-      </div>
     </div>
   );
 }
