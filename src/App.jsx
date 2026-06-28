@@ -700,10 +700,7 @@ function Overview() {
       <div className="section-title">The Open Era</div>
       <div className="panel" style={{ marginBottom: "1.5rem" }}>
         <p style={{ fontSize: "0.78rem", color: "#d0cab8", lineHeight: 1.75, marginBottom: "0.75rem" }}>
-          Survivor 51 is the first regular season under the Open Era framework. CBS/Paramount+ describes it as a first-time-player season, with Jeff Probst back as host and previous advantages, idols, and twists available to appear again.
-        </p>
-        <p style={{ fontSize: "0.78rem", color: "#d0cab8", lineHeight: 1.75 }}>
-          For fantasy purposes, the app is set up as a preseason hub: track the cast list, keep rumor confidence separated from confirmed details, and wait to run the draft until CBS releases the official cast and format details.
+          Survivor 51 is the first regular season under the Open Era framework. CBS/Paramount+ describes it as a first-time-player season, with all previous advantages, idols, and twists available.
         </p>
       </div>
 
