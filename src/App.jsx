@@ -39,7 +39,7 @@ const SEASONS = [
 
 // ─── Season 51 Rumored Cast ───────────────────────────────────────────────────
 // Source: Inside Survivor / EntertainmentNow leaks (May-June 2026, unconfirmed)
-// 21 rumored first-time players. CBS has not officially announced names. draftedBy null until draft.
+// 21 rumored first-time players. CBS has not announced names yet. draftedBy null until draft.
 const S51_CASTAWAYS = [
   {
     name: "Aaliyah Puglia",
@@ -717,8 +717,8 @@ export default function App() {
           <nav className="nav">
             {[
               { key: "overview",  label: "Overview"  },
-              { key: "castaways", label: "Cast"       },
               { key: "rumors",    label: "Rumors"     },
+              { key: "castaways", label: "Cast"       },
               { key: "history",   label: "History"    },
             ].map(p => (
               <button key={p.key} className={`nav-btn ${page === p.key ? "active" : ""}`} onClick={() => setPage(p.key)}>
@@ -730,8 +730,8 @@ export default function App() {
 
         <div className="container">
           {page === "overview"  && <Overview  />}
-          {page === "castaways" && <Castaways castaways={castaways} />}
           {page === "rumors"    && <Rumors />}
+          {page === "castaways" && <Castaways castaways={castaways} />}
           {page === "history"   && <History historySeason={historySeason} setHistorySeason={setHistorySeason} />}
         </div>
       </div>
@@ -749,10 +749,7 @@ function Overview() {
       <div className="section-title">The Open Era</div>
       <div className="panel" style={{ marginBottom: "1.5rem" }}>
         <p style={{ fontSize: "0.78rem", color: "#d0cab8", lineHeight: 1.75, marginBottom: "0.75rem" }}>
-          Survivor 51 is the first regular season under the Open Era framework. CBS/Paramount+ describes it as a first-time-player season, with Jeff Probst back as host and previous advantages, idols, and twists available to appear again.
-        </p>
-        <p style={{ fontSize: "0.78rem", color: "#d0cab8", lineHeight: 1.75 }}>
-          For fantasy purposes, the app is set up as a preseason hub: track the cast list, keep rumor confidence separated from confirmed details, and wait to run the draft until CBS releases the official cast and format details.
+          Survivor 51 is the first regular season under the Open Era framework. CBS/Paramount+ describes it as a first-time-player season, with all previous advantages, idols, and twists available.
         </p>
       </div>
 
@@ -866,7 +863,7 @@ const RUMORS_DATA = [
       {
         status: "confirmed",
         title: "All-new, first-time-player cast",
-        body: "CBS/Paramount+ has confirmed the cast consists of first-time players. That is why the previous Rupert-returnee rumor has been removed from this build.",
+        body: "CBS/Paramount+ has confirmed the cast consists of first-time players.",
         source: "CBS/Paramount+, May 2026",
       },
       {
@@ -883,132 +880,16 @@ const RUMORS_DATA = [
       },
       {
         status: "rumored",
-        title: "21 players instead of the expected 18 or 20",
-        body: "The most interesting structural rumor is the 21-player cast. That number is awkward if the season starts with two clean tribes of 10, which is why fans are watching for a Day 1 twist, limbo player, or unusual marooning format.",
-        source: "Inside Survivor / community speculation, May-June 2026",
-      },
-      {
-        status: "rumored",
-        title: "Two-tribe start is plausible, but not locked",
-        body: "Early chatter pointed toward two tribes of 10. The 21-name list makes that less clean, so this app now treats tribe format as TBD rather than confirmed.",
+        title: "Two-tribe start",
+        body: "Early chatter points to two tribes of 10.",
         source: "EntertainmentNow / fan speculation, May 2026",
       },
+
       {
-        status: "speculation",
-        title: "Opening twist could echo Palau or Fiji",
-        body: "Because of the 21st-player problem, fans are speculating about an opening unpicked-player, exile, captain, or delayed-entry mechanic. Fun theory, but not confirmed.",
-        source: "Fan speculation",
-      },
-    ],
-  },
-  {
-    category: "Cast",
-    items: [
-      {
-        status: "likely",
-        title: "21 named castaways are now circulating",
-        body: "The updated rumored list contains 21 names: Aaliyah Puglia, Alexis Levine, Angelica 'Jelly' Loblack, Ana Sani, Brady Booker, Carter Krull, Cristian Chavez, Daniel Kilby, Devin Way, Eric Macksoud, Jenna Greenawalt, Kristin Flickinger, Lewis Kelly, Linnea Capobianco, Maggie Nestor, Michael Pinsky, Ori Jean-Charles, Patt Cannaday, Rob Antonson, Sharonda Renee, and Thien An Nguyen.",
-        source: "Inside Survivor, May 2026",
-      },
-      {
-        status: "likely",
-        title: "Brady Booker appears to be the trailer-visible physical threat",
-        body: "Former WWE/NXT performer Brady Booker, ring name Bodhi Hayward, was reported by Inside Survivor and later identified by wrestling media as appearing in CBS's S51 preview.",
-        source: "Inside Survivor / wrestling media, May 2026",
-      },
-      {
-        status: "likely",
-        title: "Devin Way is the Grey's Anatomy actor",
-        body: "The earlier vague 'Grey's Anatomy actor' rumor appears to be Devin Way, a 33-year-old actor/model from Lufkin, Texas, with credits on Grey's Anatomy, Queer as Folk, and Sistas.",
-        source: "Inside Survivor / EntertainmentNow, May 2026",
-      },
-      {
-        status: "likely",
-        title: "Lewis Kelly could be the first Irish-born castaway",
-        body: "Dublin-born influencer/model Lewis Kelly is rumored for the cast and has been described by outlets as a historic first Irish-born Survivor player.",
-        source: "Inside Survivor / EntertainmentNow, May 2026",
-      },
-      {
-        status: "likely",
-        title: "Maggie Nestor could be the first West Virginia castaway",
-        body: "Maggie Nestor, a camp counselor/farmer from Charles Town, WV, is being billed in preseason coverage as the first Survivor castaway from West Virginia.",
-        source: "Inside Survivor / EntertainmentNow, May 2026",
-      },
-      {
-        status: "likely",
-        title: "Michael Pinsky adds a sports-front-office archetype",
-        body: "Michael Pinsky is listed as Assistant Director of Baseball Operations for the New York Yankees, giving this cast a very different analytics/sports-ops profile.",
-        source: "Inside Survivor / EntertainmentNow, May 2026",
-      },
-      {
-        status: "likely",
-        title: "Ana Sani adds a recognizable voice-actor lane",
-        body: "Ana Sani, an award-winning Canadian actor/voice actor, is one of the newer names missing from the earlier app build.",
-        source: "Inside Survivor / EntertainmentNow, May 2026",
-      },
-      {
-        status: "likely",
-        title: "Sharonda Renee adds the medical-professional archetype",
-        body: "Sharonda Renee, listed as an OBGYN from Berea, Kentucky, replaces the earlier unknown-slot treatment and gives the cast another high-achieving professional profile.",
-        source: "Inside Survivor / EntertainmentNow, May 2026",
-      },
-      {
-        status: "speculation",
-        title: "No reliable bootlist yet",
-        body: "There are boot-order and winner claims floating around spoiler forums, but none are strong enough to build into the app. Treat any current bootlist as entertainment, not draft intelligence.",
-        source: "Fan speculation",
-      },
-    ],
-  },
-  {
-    category: "Strategy & Game Dynamics",
-    items: [
-      {
-        status: "speculation",
-        title: "Physical threats may be easier to identify early",
-        body: "Brady, Ori, Carter, Lewis, and Thien all have athletic/endurance hooks. In a two-tribe or challenge-heavy opening, they could be valuable; in a paranoia-heavy Open Era, they could become visible threats quickly.",
-        source: "Fantasy-league analysis",
-      },
-      {
-        status: "speculation",
-        title: "Professional communicators dominate the board",
-        body: "Attorneys, performers, influencers, a professor, a therapist, a videographer, a podcaster, and an HR executive create a cast with a lot of people trained to talk, present, persuade, or read others.",
-        source: "Fantasy-league analysis",
-      },
-      {
-        status: "speculation",
-        title: "Open Era rewards flexible players, not just superfans",
-        body: "If production really can pull from the entire twist library, players who adapt calmly may be better fantasy picks than players who simply know Survivor history.",
-        source: "Fantasy-league analysis",
-      },
-      {
-        status: "speculation",
-        title: "A 21-player format could create an unfair early score swing",
-        body: "If one player gets booted, exiled, or delayed before the normal tribe game starts, your league should decide before the draft how to score any Day 0/Day 1 twist.",
-        source: "League-rules note",
-      },
-    ],
-  },
-  {
-    category: "Fantasy League",
-    items: [
-      {
-        status: "confirmed",
-        title: "Draft should wait for the official CBS cast reveal",
-        body: "The app can preload the rumored list, but the league draft should wait until CBS confirms the final cast and any obvious tribe/format details.",
-        source: "League setup",
-      },
-      {
-        status: "confirmed",
-        title: "Nochoso still makes sense for undrafted players",
-        body: "With five fantasy teams and a possible 21-player field, the Unchosen team remains useful for any leftover or late-added player.",
-        source: "League rules",
-      },
-      {
-        status: "speculation",
-        title: "Opening-night scoring rule to settle now",
-        body: "Before the S51 draft, decide whether a non-standard opening elimination, quit, medevac, exile, or non-tribe limbo player earns normal placement points, zero, or a special minimum.",
-        source: "League-rules recommendation",
+        status: "rumored",
+        title: "21 players instead of the expected 18 or 20",
+        body: "The most interesting structural rumor is the 21-player cast.  Fans are speculating it's a Day 1 twist, limbo player, or unusual marooning format.",
+        source: "Inside Survivor / community speculation, May-June 2026",
       },
     ],
   },
