@@ -772,20 +772,6 @@ function Overview() {
           </div>
         ))}
       </div>
-
-      <div className="section-title">Preseason Notes</div>
-      <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(220px,1fr))", gap: "0.75rem", marginBottom: "2rem" }}>
-        {[
-          { label: "Official Details", text: "Fall 2026 season, CBS/Paramount+, 90-minute Wednesday episodes, first-time players, and Open Era mechanics.", color: "#5aaa72" },
-          { label: "Cast Tracking", text: "The app currently includes 21 preseason cast names so the league can start scouting before the official cast reveal.", color: "#6a9fd8" },
-          { label: "Format Watch", text: "The final tribe setup and any opening twist should stay marked as pending until CBS confirms the season structure.", color: "#c8922a" },
-        ].map(card => (
-          <div key={card.label} className="panel" style={{ borderColor: card.color+"33", background: card.color+"0c" }}>
-            <div style={{ fontSize: "0.58rem", color: card.color, letterSpacing: "0.1em", textTransform: "uppercase", marginBottom: "0.45rem" }}>{card.label}</div>
-            <p style={{ fontSize: "0.7rem", color: "#d0cab8", lineHeight: 1.65 }}>{card.text}</p>
-          </div>
-        ))}
-      </div>
     </div>
   );
 }
