@@ -24,6 +24,26 @@ const TEAMS = [
   { id: 5, name: "Nochoso", members: "The Unchosen",   color: "#888888" },
 ];
 
+// Five rounds, four teams. Round 5 continues the existing snake order.
+const DRAFT_ORDER = [4, 3, 2, 1, 1, 2, 3, 4, 4, 3, 2, 1, 1, 2, 3, 4, 4, 3, 2, 1];
+const DRAFT_KEY = "sf_s51_draft_v1";
+const FIRST_PICK = "Kristin Flickinger";
+function loadDraft() {
+  try {
+    const raw = JSON.parse(localStorage.getItem(DRAFT_KEY) || "null");
+    if (Array.isArray(raw)) {
+      const validNames = new Set(S51_CASTAWAYS.filter(c => c.name !== "Aaliyah Puglia").map(c => c.name));
+      const picks = [FIRST_PICK];
+      for (const name of raw.slice(1, 20)) {
+        if (!validNames.has(name) || picks.includes(name)) break;
+        picks.push(name);
+      }
+      return picks;
+    }
+  } catch {}
+  return [FIRST_PICK];
+}
+
 // ─── Season config ────────────────────────────────────────────────────────────
 const SEASONS = [
   { id: 51, label: "Season 51", totalCastaways: 21, current: true },
@@ -494,9 +514,6 @@ function getChampionshipsThrough(season) {
 
 // ─── Storage ──────────────────────────────────────────────────────────────────
 const STORAGE_KEY = "sf_s51_state";
-function loadState() {
-  try { const r = localStorage.getItem(STORAGE_KEY); return r ? JSON.parse(r) : null; } catch { return null; }
-}
 function saveState(s) {
   try { localStorage.setItem(STORAGE_KEY, JSON.stringify(s)); } catch {}
 }
@@ -699,14 +716,24 @@ export default function App() {
   const [page, setPage] = useState("overview");
   const [historySeason, setHistorySeason] = useState(50);
 
-  // Season 51 castaways. Hydrate from defaults so new fields, including remote photo URLs,
-  // still appear even if an older localStorage draft already exists.
-  const [castaways] = useState(() => {
-    const saved = loadState();
-    return hydrateCastaways(saved?.castaways);
+  const [draftPicks, setDraftPicks] = useState(loadDraft);
+  const [storageError, setStorageError] = useState(false);
+  const castaways = hydrateCastaways().map(c => {
+    const pickIndex = draftPicks.indexOf(c.name);
+    return { ...c, draftedBy: pickIndex >= 0 ? DRAFT_ORDER[pickIndex] : null };
   });
 
-  useEffect(() => { saveState({ castaways }); }, [castaways]);
+  useEffect(() => {
+    try {
+      localStorage.setItem(DRAFT_KEY, JSON.stringify(draftPicks));
+      // Keep the existing state format available for future season updates.
+      saveState({ castaways: hydrateCastaways().map(c => {
+        const index = draftPicks.indexOf(c.name);
+        return { ...c, draftedBy: index >= 0 ? DRAFT_ORDER[index] : null };
+      }) });
+      setStorageError(false);
+    } catch { setStorageError(true); }
+  }, [draftPicks]);
 
   const dismissSplash = () => {
     try { localStorage.setItem(`sf_splash_${SPLASH_VERSION}`, "1"); } catch {}
@@ -728,6 +755,7 @@ export default function App() {
             {[
               { key: "overview",  label: "Overview"  },
               { key: "results",   label: "Week 1"     },
+              { key: "draft",     label: "Draft"      },
               { key: "castaways", label: "Cast"       },
               { key: "history",   label: "History"    },
             ].map(p => (
@@ -742,10 +770,82 @@ export default function App() {
           {page === "overview"  && <Overview castaways={castaways} />}
           {page === "results"   && <WeekOne />}
           {page === "castaways" && <Castaways castaways={castaways} />}
+          {page === "draft" && <Draft castaways={castaways} picks={draftPicks} setPicks={setDraftPicks} storageError={storageError} />}
           {page === "history"   && <History historySeason={historySeason} setHistorySeason={setHistorySeason} />}
         </div>
       </div>
     </>
+  );
+}
+
+// ─── Draft page ──────────────────────────────────────────────────────────────
+function Draft({ castaways, picks, setPicks, storageError }) {
+  const [selected, setSelected] = useState("");
+  const complete = picks.length === DRAFT_ORDER.length;
+  const nextTeam = TEAMS.find(t => t.id === DRAFT_ORDER[picks.length]);
+  const available = castaways.filter(c => !c.eliminationOrder && !picks.includes(c.name))
+    .sort((a, b) => a.name.localeCompare(b.name));
+
+  function makePick(event) {
+    event.preventDefault();
+    if (complete || !available.some(c => c.name === selected)) return;
+    setPicks(previous => {
+      if (previous.length >= 20 || previous.includes(selected)) return previous;
+      return [...previous, selected];
+    });
+    setSelected("");
+  }
+
+  return (
+    <div>
+      <div className="page-title">Season 51 Draft</div>
+      <div className="page-subtitle">Snake draft · 5 rounds · 5 players per team</div>
+      <div className="panel" style={{ marginBottom: "1.5rem" }}>
+        <div className="section-title">{complete ? "Draft complete" : `On the clock · Pick ${picks.length + 1} · Round ${Math.floor(picks.length / 4) + 1}`}</div>
+        {complete ? <p className="hint">All four teams have five players.</p> : <>
+          <div style={{ color: nextTeam.color, fontSize: "1.2rem", marginBottom: "0.75rem" }}>{nextTeam.name} · {nextTeam.members}</div>
+          <form className="row" onSubmit={makePick}>
+            <select aria-label="Choose a castaway" className="select" value={selected} onChange={e => setSelected(e.target.value)} style={{ flex: "1 1 220px" }}>
+              <option value="" style={{ background: "#101810" }}>Select a player…</option>
+              {available.map(c => <option key={c.id} value={c.name} style={{ background: "#101810" }}>{c.name} · {c.tribe}</option>)}
+            </select>
+            <button className="action-btn primary" type="submit" disabled={!selected} style={{ marginBottom: 0, opacity: selected ? 1 : 0.5 }}>Confirm Pick</button>
+          </form>
+        </>}
+        <p className="hint" style={{ marginTop: "0.8rem" }}>{picks.length} of 20 picks made. Aaliyah was eliminated in Week 1 and is unavailable.</p>
+        <p className="hint" style={{ marginTop: "0.5rem" }}>Selections save on this browser and device. They do not automatically sync to other visitors.</p>
+        {storageError && <p role="alert" className="hint" style={{ color: "#e8c45b", marginTop: "0.5rem" }}>Your browser could not save the draft. Keep this page open to retain these selections.</p>}
+        {picks.length > 1 && <button className="action-btn" style={{ margin: "0.8rem 0 0" }} onClick={() => {
+          if (window.confirm(`Undo the last pick: ${picks[picks.length - 1]}?`)) {
+            setPicks(previous => previous.slice(0, -1));
+            setSelected("");
+          }
+        }}>Undo Last Pick</button>}
+      </div>
+      <div className="section-title">Draft Board</div>
+      <div style={{ overflowX: "auto", marginBottom: "1.5rem" }}>
+        <table className="hist-table">
+          <thead><tr><th>Pick</th><th>Round</th><th>Team</th><th>Player</th></tr></thead>
+          <tbody>{DRAFT_ORDER.map((teamId, index) => {
+            const team = TEAMS.find(t => t.id === teamId);
+            const onClock = !complete && index === picks.length;
+            return <tr key={index} style={{ background: onClock ? "rgba(90,170,114,0.12)" : undefined }}>
+              <td>{index + 1}</td><td>{Math.floor(index / 4) + 1}</td>
+              <td style={{ color: team.color }}>{team.name}</td>
+              <td>{picks[index] || (onClock ? "On the clock" : "—")}</td>
+            </tr>;
+          })}</tbody>
+        </table>
+      </div>
+      <div className="section-title">Team Rosters</div>
+      <div className="hist-grid">{TEAMS.filter(t => t.id !== 5).map(team => {
+        const roster = castaways.filter(c => c.draftedBy === team.id);
+        return <div className="panel" key={team.id}>
+          <div style={{ color: team.color, marginBottom: "0.5rem" }}>{team.name} · {roster.length}/5</div>
+          {Array.from({ length: 5 }, (_, i) => <div className="hint" key={i} style={{ padding: "0.35rem 0" }}>{i + 1}. {roster[i]?.name || "Open slot"}</div>)}
+        </div>;
+      })}</div>
+    </div>
   );
 }
 
@@ -789,7 +889,7 @@ function Overview({ castaways }) {
           );
         })}
       </div>
-      <p className="hint">Your scoring: the first two eliminations earn 0 points. Draft assignments saved in this browser are retained.</p>
+      <p className="hint">Your scoring: the first two eliminations earn 0 points. Draft selections save automatically in this browser.</p>
     </div>
   );
 }
