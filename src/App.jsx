@@ -1,3 +1,4 @@
+// src/App.jsx  —  Fantasy Survivor · Season 51 Edition
 import { useEffect, useState } from "react";
 
 const SPLASH_VERSION = "s51_week1_v1";
