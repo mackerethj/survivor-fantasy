@@ -1,113 +1,95 @@
-            src={c.photoUrl}
-            alt={`${c.name} profile`}
-            loading="lazy"
-            referrerPolicy="no-referrer"
-            onError={e => {
-              e.currentTarget.style.display = "none";
-              const fallback = e.currentTarget.nextElementSibling;
-              if (fallback) fallback.style.display = "flex";
-            }}
-          />
-        )}
-        <div className={`c-photo-fallback ${c.photoUrl ? "with-photo" : ""}`}>{initials(c.name)}</div>
-      </div>
-      <div className="c-info">
-        <div className="c-name">{c.name}</div>
-        {c.age && <div className="c-age">Age {c.age}{c.hometown ? ` · ${c.hometown}` : ""}</div>}
-        {c.occupation && <div className="c-occ">{c.occupation}</div>}
-        <div className="c-row">
-          <span style={{ fontSize: "0.65rem", color: c.tribe === "Toka" ? "#e8c45b" : c.tribe === "Savu" ? "#c49be8" : "#aaa" }}>{c.tribe}</span>
-          <span className={`c-tag ${c.eliminationOrder ? "eliminated" : "alive"}`}>{c.eliminationOrder ? "Out · Week 1" : "In the game"}</span>
-        </div>
-        {c.eliminationOrder && <div className="hint" style={{ marginTop: "0.4rem" }}>21st place · 0 fantasy points</div>}
-      </div>
-    </div>
-  );
+import { useEffect, useState } from "react";
+
+const SPLASH_VERSION = "s51_week1_v1";
+
+// ─── Scoring ──────────────────────────────────────────────────────────────────
+function calcPoints(eliminationOrder, totalCastaways) {
+  if (!eliminationOrder || eliminationOrder <= 2) return 0;
+  const lastThreeStart = totalCastaways - 2;
+  if (eliminationOrder >= lastThreeStart) {
+    const basePoints = lastThreeStart - 3 + 1;
+    const stepsIntoFinalThree = eliminationOrder - (lastThreeStart - 1);
+    return basePoints + stepsIntoFinalThree * 2;
+  }
+  return eliminationOrder - 2;
 }
 
-// ─── Week 1 ───────────────────────────────────────────────────────────────────
-function WeekOne({ compact = false }) {
-  return (
-    <div style={{ marginBottom: "1.5rem" }}>
-      {!compact && <>
-        <div className="page-title">Week 1</div>
-        <div className="page-subtitle">Permanent Uncertainty · September 23, 2026</div>
-      </>}
-      <div className="section-title">Week 1 Results</div>
-      <div className="panel">
-        <div style={{ fontSize: "1rem", marginBottom: "0.6rem" }}>Aaliyah Puglia was voted out first.</div>
-        <p className="hint">21st place · Toka · 0 fantasy points under your league rules.</p>
-        <ul className="hint" style={{ paddingLeft: "1.2rem", marginTop: "0.8rem", lineHeight: 1.9 }}>
-          <li>Savu won the first immunity challenge.</li>
-          <li>Rob found a hidden immunity idol.</li>
-          <li>Lewis spent the premiere on Exile Island and remains in the game.</li>
-          <li>Aaliyah and Jenna played unsuccessful Shots in the Dark.</li>
-        </ul>
-        <a className="hint" style={{ color: "#6a9fd8", display: "inline-block", marginTop: "0.8rem" }} href="https://www.paramountplus.com/sneak-peak/survivor-season-51-episode-1-recap/" target="_blank" rel="noopener noreferrer">Official Week 1 recap ↗</a>
-      </div>
-    </div>
-  );
-}
+// ─── Teams ────────────────────────────────────────────────────────────────────
+const TEAMS = [
+  { id: 1, name: "Miloa",   members: "Team Miller",    color: "#c8922a" },
+  { id: 2, name: "Jinga",   members: "Team Mackereth", color: "#6a9fd8" },
+  { id: 3, name: "Ojalu",   members: "Team Lestan",    color: "#6db86d" },
+  { id: 4, name: "Weloki",  members: "Team Wells",     color: "#c46ab0" },
+  { id: 5, name: "Nochoso", members: "The Unchosen",   color: "#888888" },
+];
 
-// ─── History page ─────────────────────────────────────────────────────────────
-function History({ historySeason, setHistorySeason }) {
-  const data = HISTORICAL[historySeason];
-  const champs = getChampionshipsThrough(historySeason);
-  const sorted = data ? [...data.teamScores].sort((a,b) => (b.score||0)-(a.score||0)) : [];
+// ─── Season config ────────────────────────────────────────────────────────────
+const SEASONS = [
+  { id: 51, label: "Season 51", totalCastaways: 21, current: true },
+  { id: 50, label: "Season 50", totalCastaways: 24 },
+  { id: 49, label: "Season 49", totalCastaways: 18 },
+  { id: 48, label: "Season 48", totalCastaways: 18 },
+  { id: 47, label: "Season 47", totalCastaways: 18 },
+  { id: 46, label: "Season 46", totalCastaways: 18 },
+  { id: 45, label: "Season 45", totalCastaways: 18 },
+  { id: 44, label: "Season 44", totalCastaways: 18 },
+  { id: 43, label: "Season 43", totalCastaways: 18 },
+];
 
-  return (
-    <div>
-      <div className="page-title">History</div>
-      <div className="page-subtitle">Past season results</div>
-      <div className="season-bar">
-        <span className="season-label">Season</span>
-        {[50,49,48,47,46,45,44,43].map(id => (
-          <button key={id} className={`season-btn ${historySeason === id ? "active" : ""}`} onClick={() => setHistorySeason(id)}>{id}</button>
-        ))}
-      </div>
-
-      {data ? (
-        <>
-          <div className="section-title">Season {historySeason} — Team Scores</div>
-          <div className="hist-grid">
-            {sorted.map((t, i) => (
-              <div key={t.name} className={`hist-card ${t.winner ? "champ" : ""}`}>
-                <div style={{ fontSize: "0.62rem", color: t.winner ? "#5aaa72" : "#777", marginBottom: "0.25rem" }}>
-                  {t.winner ? "🏆 Champion" : ordinal(i+1) + " Place"}
-                </div>
-                <div className="hist-score" style={{ color: t.na ? "#444" : t.color }}>{t.na ? "—" : t.score}{!t.na && <span style={{ fontSize: "0.7rem", color: "#777", marginLeft: "0.35rem" }}>pts</span>}</div>
-                <div style={{ fontSize: "0.82rem", color: t.color, marginTop: "0.25rem", fontWeight: 500 }}>{t.name}</div>
-                <div style={{ fontSize: "0.62rem", color: "#777" }}>{t.members}</div>
-                {(champs[t.name]||0) > 0 && <div style={{ fontSize: "0.6rem", color: "#5aaa72", marginTop: "0.3rem", letterSpacing: "0.08em" }}>{"★".repeat(champs[t.name])}</div>}
-                {t.na && <div style={{ fontSize: "0.6rem", color: "#555", marginTop: "0.25rem" }}>Did not participate</div>}
-              </div>
-            ))}
-          </div>
-
-          <div className="section-title">Placement Results — Season {historySeason}</div>
-          <div style={{ border: "1px solid rgba(255,255,255,0.07)", borderRadius: 4, overflow: "hidden" }}>
-            <table className="hist-table">
-              <thead><tr><th>Finish</th><th>Castaway</th><th>Team</th><th style={{ textAlign:"right" }}>Pts</th></tr></thead>
-              <tbody>
-                {[...data.placements].sort((a,b) => b.place - a.place).map(p => {
-                  const total = SEASONS.find(s => s.id === historySeason)?.totalCastaways || 18;
-                  const finishPos = total - p.place + 1;
-                  return (
-                    <tr key={p.place}>
-                      <td style={{ color:"#f0ebe0", fontFamily:"'Playfair Display',serif", fontWeight:900 }}>{ordinal(finishPos)}</td>
-                      <td style={{ color:"#f0ebe0" }}>{p.player}</td>
-                      <td style={{ color: p.team==="NA" ? "#555" : p.teamColor }}>{p.team==="NA" ? "—" : p.team}</td>
-                      <td style={{ color:"#5aaa72", textAlign:"right", fontFamily:"'Playfair Display',serif", fontWeight:900 }}>{p.points}</td>
-                    </tr>
-                  );
-                })}
-              </tbody>
-            </table>
-          </div>
-        </>
-      ) : (
-        <div className="hint">No data for this season.</div>
-      )}
-    </div>
-  );
-}
+// Season 51 cast. Week 1 results are applied below. Draft assignments remain local.
+const S51_CASTAWAYS = [
+  {
+    name: "Aaliyah Puglia",
+    age: 25,
+    hometown: "Providence, RI",
+    occupation: "Chef",
+    bio: "Professional chef with culinary nutrition training from Johnson & Wales. Reportedly worked with the New England Patriots and specializes in plant-based cuisine.",
+    photoUrl: "https://inside-survivor.ams3.digitaloceanspaces.com/wp-content/uploads/2026/05/aaliyaj-12%C2%A71.png",
+    tribe: "TBD", draftedBy: null,
+  },
+  {
+    name: "Alexis Levine",
+    age: 28,
+    hometown: "Atlanta, GA",
+    occupation: "Attorney",
+    bio: "Criminal defense attorney and Emory Law graduate. Public-interest/legal-reform profile makes her a strong talker and potential social strategist.",
+    photoUrl: "https://inside-survivor.ams3.digitaloceanspaces.com/wp-content/uploads/2026/05/alex-asdasd.png",
+    tribe: "TBD", draftedBy: null,
+  },
+  {
+    name: "Angelica 'Jelly' Loblack",
+    age: 29,
+    hometown: "Bloomington, IN",
+    occupation: "Sociology Professor",
+    bio: "Indiana University sociology professor whose research focuses on racialization, identity, embodiment, and political engagement.",
+    photoUrl: "https://inside-survivor.ams3.digitaloceanspaces.com/wp-content/uploads/2026/05/jelly-q44.png",
+    tribe: "TBD", draftedBy: null,
+  },
+  {
+    name: "Ana Sani",
+    age: 34,
+    hometown: "Toronto, ON",
+    occupation: "Actress / Voice Actor",
+    bio: "Award-winning Canadian actor known for animation voice work including Strawberry Shortcake and My Little Pony, plus a live-action role on The Boys.",
+    photoUrl: "https://inside-survivor.ams3.digitaloceanspaces.com/wp-content/uploads/2026/05/ana2424.png",
+    tribe: "TBD", draftedBy: null,
+  },
+  {
+    name: "Brady Booker",
+    age: 26,
+    hometown: "LaSalle, IL → Orlando, FL",
+    occupation: "Pro Wrestler / Trainer",
+    bio: "Former WWE/NXT performer Bodhi Hayward and former college football player. Likely one of the most obvious early physical-threat profiles.",
+    photoUrl: "https://inside-survivor.ams3.digitaloceanspaces.com/wp-content/uploads/2026/05/bradyb-113.png",
+    tribe: "TBD", draftedBy: null,
+  },
+  {
+    name: "Carter Krull",
+    age: 25,
+    hometown: "Rock Rapids, IA",
+    occupation: "Farmer / Cattle Rancher",
+    bio: "Runs Moon Creek Farms. Former University of Sioux Falls football player with farm/ranch life experience that should translate well to camp.",
+    photoUrl: "https://inside-survivor.ams3.digitaloceanspaces.com/wp-content/uploads/2026/05/carter_1313.png",
+    tribe: "TBD", draftedBy: null,
+  },
+  {
