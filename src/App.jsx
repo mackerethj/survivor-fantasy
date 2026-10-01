@@ -997,7 +997,7 @@ function WeekOne({ compact = false }) {
       <div className="section-title">Week 1 Results</div>
       <div className="panel">
         <div style={{ fontSize: "1rem", marginBottom: "0.6rem" }}>Aaliyah Puglia was voted out first.</div>
-        <p className="hint">21st place · Toka · 0 fantasy points under your league rules.</p>
+        <p className="hint">21st place · Toka · 0 fantasy points</p>
         <ul className="hint" style={{ paddingLeft: "1.2rem", marginTop: "0.8rem", lineHeight: 1.9 }}>
           <li>Savu won the first immunity challenge.</li>
           <li>Rob found a hidden immunity idol.</li>
