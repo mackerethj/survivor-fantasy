@@ -27,21 +27,16 @@ const TEAMS = [
 // Five rounds, four teams. Round 5 continues the existing snake order.
 const DRAFT_ORDER = [4, 3, 2, 1, 1, 2, 3, 4, 4, 3, 2, 1, 1, 2, 3, 4, 4, 3, 2, 1];
 const DRAFT_KEY = "sf_s51_draft_v1";
-const FIRST_PICK = "Kristin Flickinger";
+// Confirmed completed draft. Published picks override older browser drafts.
+const CONFIRMED_DRAFT = [
+  "Kristin Flickinger", "Danny 'Kilby' Kilby", "Ana Sani", "Sharonda Cox",
+  "Patt Cannaday", "Carter Krull", "Michael Pinsky", "Devin Way",
+  "Jenna Doore", "Maggie Nestor", "Angelica 'Jelly' Loblack", "Rob Antonson",
+  "Alexis Levine", "Eric Macksoud", "Cristian Chavez", "Ori Jean-Charles",
+  "Lewis Kelly", "Linnea Capobianco", "Thien An Nguyen", "Brady Booker",
+];
 function loadDraft() {
-  try {
-    const raw = JSON.parse(localStorage.getItem(DRAFT_KEY) || "null");
-    if (Array.isArray(raw)) {
-      const validNames = new Set(S51_CASTAWAYS.filter(c => c.name !== "Aaliyah Puglia").map(c => c.name));
-      const picks = [FIRST_PICK];
-      for (const name of raw.slice(1, 20)) {
-        if (!validNames.has(name) || picks.includes(name)) break;
-        picks.push(name);
-      }
-      return picks;
-    }
-  } catch {}
-  return [FIRST_PICK];
+  return [...CONFIRMED_DRAFT];
 }
 
 // ─── Season config ────────────────────────────────────────────────────────────
@@ -57,7 +52,7 @@ const SEASONS = [
   { id: 43, label: "Season 43", totalCastaways: 18 },
 ];
 
-// Season 51 cast. Week 1 results are applied below. Draft assignments remain local.
+// Season 51 cast. Week 1 results are applied below. Draft assignments use the confirmed published picks.
 const S51_CASTAWAYS = [
   {
     name: "Aaliyah Puglia",
@@ -716,7 +711,7 @@ export default function App() {
   const [page, setPage] = useState("overview");
   const [historySeason, setHistorySeason] = useState(50);
 
-  const [draftPicks, setDraftPicks] = useState(loadDraft);
+  const [draftPicks] = useState(loadDraft);
   const [storageError, setStorageError] = useState(false);
   const castaways = hydrateCastaways().map(c => {
     const pickIndex = draftPicks.indexOf(c.name);
@@ -767,10 +762,11 @@ export default function App() {
         </header>
 
         <div className="container">
+          {storageError && <p className="hint">Browser saving is unavailable. The confirmed draft remains available from the published site.</p>}
           {page === "overview"  && <Overview castaways={castaways} />}
           {page === "results"   && <WeekOne />}
           {page === "castaways" && <Castaways castaways={castaways} />}
-          {page === "draft" && <Draft castaways={castaways} picks={draftPicks} setPicks={setDraftPicks} storageError={storageError} />}
+          {page === "draft" && <Draft castaways={castaways} picks={draftPicks} />}
           {page === "history"   && <History historySeason={historySeason} setHistorySeason={setHistorySeason} />}
         </div>
       </div>
@@ -779,48 +775,14 @@ export default function App() {
 }
 
 // ─── Draft page ──────────────────────────────────────────────────────────────
-function Draft({ castaways, picks, setPicks, storageError }) {
-  const [selected, setSelected] = useState("");
-  const complete = picks.length === DRAFT_ORDER.length;
-  const nextTeam = TEAMS.find(t => t.id === DRAFT_ORDER[picks.length]);
-  const available = castaways.filter(c => !c.eliminationOrder && !picks.includes(c.name))
-    .sort((a, b) => a.name.localeCompare(b.name));
-
-  function makePick(event) {
-    event.preventDefault();
-    if (complete || !available.some(c => c.name === selected)) return;
-    setPicks(previous => {
-      if (previous.length >= 20 || previous.includes(selected)) return previous;
-      return [...previous, selected];
-    });
-    setSelected("");
-  }
-
+function Draft({ castaways, picks }) {
   return (
     <div>
       <div className="page-title">Season 51 Draft</div>
-      <div className="page-subtitle">Snake draft · 5 rounds · 5 players per team</div>
+      <div className="page-subtitle">Draft complete · 5 rounds · 5 players per team</div>
       <div className="panel" style={{ marginBottom: "1.5rem" }}>
-        <div className="section-title">{complete ? "Draft complete" : `On the clock · Pick ${picks.length + 1} · Round ${Math.floor(picks.length / 4) + 1}`}</div>
-        {complete ? <p className="hint">All four teams have five players.</p> : <>
-          <div style={{ color: nextTeam.color, fontSize: "1.2rem", marginBottom: "0.75rem" }}>{nextTeam.name} · {nextTeam.members}</div>
-          <form className="row" onSubmit={makePick}>
-            <select aria-label="Choose a castaway" className="select" value={selected} onChange={e => setSelected(e.target.value)} style={{ flex: "1 1 220px" }}>
-              <option value="" style={{ background: "#101810" }}>Select a player…</option>
-              {available.map(c => <option key={c.id} value={c.name} style={{ background: "#101810" }}>{c.name} · {c.tribe}</option>)}
-            </select>
-            <button className="action-btn primary" type="submit" disabled={!selected} style={{ marginBottom: 0, opacity: selected ? 1 : 0.5 }}>Confirm Pick</button>
-          </form>
-        </>}
-        <p className="hint" style={{ marginTop: "0.8rem" }}>{picks.length} of 20 picks made. Aaliyah was eliminated in Week 1 and is unavailable.</p>
-        <p className="hint" style={{ marginTop: "0.5rem" }}>Selections save on this browser and device. They do not automatically sync to other visitors.</p>
-        {storageError && <p role="alert" className="hint" style={{ color: "#e8c45b", marginTop: "0.5rem" }}>Your browser could not save the draft. Keep this page open to retain these selections.</p>}
-        {picks.length > 1 && <button className="action-btn" style={{ margin: "0.8rem 0 0" }} onClick={() => {
-          if (window.confirm(`Undo the last pick: ${picks[picks.length - 1]}?`)) {
-            setPicks(previous => previous.slice(0, -1));
-            setSelected("");
-          }
-        }}>Undo Last Pick</button>}
+        <div className="section-title">All 20 picks confirmed</div>
+        <p className="hint">All four teams have five players. Aaliyah was eliminated in Week 1 and was not drafted.</p>
       </div>
       <div className="section-title">Draft Board</div>
       <div style={{ overflowX: "auto", marginBottom: "1.5rem" }}>
@@ -828,11 +790,9 @@ function Draft({ castaways, picks, setPicks, storageError }) {
           <thead><tr><th>Pick</th><th>Round</th><th>Team</th><th>Player</th></tr></thead>
           <tbody>{DRAFT_ORDER.map((teamId, index) => {
             const team = TEAMS.find(t => t.id === teamId);
-            const onClock = !complete && index === picks.length;
-            return <tr key={index} style={{ background: onClock ? "rgba(90,170,114,0.12)" : undefined }}>
+            return <tr key={index}>
               <td>{index + 1}</td><td>{Math.floor(index / 4) + 1}</td>
-              <td style={{ color: team.color }}>{team.name}</td>
-              <td>{picks[index] || (onClock ? "On the clock" : "—")}</td>
+              <td style={{ color: team.color }}>{team.name}</td><td>{picks[index]}</td>
             </tr>;
           })}</tbody>
         </table>
@@ -842,7 +802,7 @@ function Draft({ castaways, picks, setPicks, storageError }) {
         const roster = castaways.filter(c => c.draftedBy === team.id);
         return <div className="panel" key={team.id}>
           <div style={{ color: team.color, marginBottom: "0.5rem" }}>{team.name} · {roster.length}/5</div>
-          {Array.from({ length: 5 }, (_, i) => <div className="hint" key={i} style={{ padding: "0.35rem 0" }}>{i + 1}. {roster[i]?.name || "Open slot"}</div>)}
+          {roster.map((c, i) => <div className="hint" key={c.id} style={{ padding: "0.35rem 0" }}>{i + 1}. {c.name}</div>)}
         </div>;
       })}</div>
     </div>
@@ -884,12 +844,12 @@ function Overview({ castaways }) {
                 <div className="lb-tags" style={{ marginTop: "0.5rem" }}>
                   {roster.map(c => <span key={c.id} className={`c-tag ${c.eliminationOrder ? "eliminated" : "alive"}`}>{c.name}</span>)}
                 </div>
-              </> : <div className="hint" style={{ marginTop: "0.5rem" }}>Draft assignments not entered.</div>}
+              </> : <div className="hint" style={{ marginTop: "0.5rem" }}>No players drafted.</div>}
             </div>
           );
         })}
       </div>
-      <p className="hint">Your scoring: the first two eliminations earn 0 points. Draft selections save automatically in this browser.</p>
+      <p className="hint">Your scoring: the first two eliminations earn 0 points. The completed draft and team rosters are published for everyone.</p>
     </div>
   );
 }
@@ -947,6 +907,7 @@ function CastawayCard({ c }) {
         <div className="c-name">{c.name}</div>
         {c.age && <div className="c-age">Age {c.age}{c.hometown ? ` · ${c.hometown}` : ""}</div>}
         {c.occupation && <div className="c-occ">{c.occupation}</div>}
+        <div className="hint" style={{ margin: "0.4rem 0" }}>{TEAMS.find(t => t.id === c.draftedBy)?.name || "Not drafted"}</div>
         <div className="c-row">
           <span style={{ fontSize: "0.65rem", color: c.tribe === "Toka" ? "#e8c45b" : c.tribe === "Savu" ? "#c49be8" : "#aaa" }}>{c.tribe}</span>
           <span className={`c-tag ${c.eliminationOrder ? "eliminated" : "alive"}`}>{c.eliminationOrder ? "Out · Week 1" : "In the game"}</span>
