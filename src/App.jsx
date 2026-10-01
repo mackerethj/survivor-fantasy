@@ -853,7 +853,13 @@ function Scoring({ castaways }) {
             <td style={{ color: team.color }}>{team.name}</td><td>{c.name}</td>
             <td>{c.eliminationOrder ? `${ordinal(total - c.eliminationOrder + 1)} place` : "In the game"}</td>
             <td>{calcPoints(c.eliminationOrder, total)}</td>
-          </tr>))}</tbody>
+          </tr>))}
+          {castaways.filter(c => c.eliminationOrder && !c.draftedBy).map(c => <tr key={c.id}>
+            <td style={{ color: "#888" }}>Not drafted</td><td>{c.name}</td>
+            <td>Voted out · Week 1 · {ordinal(total - c.eliminationOrder + 1)} place</td>
+            <td>{calcPoints(c.eliminationOrder, total)}</td>
+          </tr>)}
+          </tbody>
         </table>
       </div>
       <div className="section-title">Placement Points · 21-player season</div>
@@ -991,7 +997,7 @@ function WeekOne({ compact = false }) {
       <div className="section-title">Week 1 Results</div>
       <div className="panel">
         <div style={{ fontSize: "1rem", marginBottom: "0.6rem" }}>Aaliyah Puglia was voted out first.</div>
-        <p className="hint">21st place · Toka · 0 fantasy points</p>
+        <p className="hint">21st place · Toka · 0 fantasy points under your league rules.</p>
         <ul className="hint" style={{ paddingLeft: "1.2rem", marginTop: "0.8rem", lineHeight: 1.9 }}>
           <li>Savu won the first immunity challenge.</li>
           <li>Rob found a hidden immunity idol.</li>
