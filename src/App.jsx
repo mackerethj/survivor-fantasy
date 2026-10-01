@@ -21,7 +21,6 @@ const TEAMS = [
   { id: 2, name: "Jinga",   members: "Team Mackereth", color: "#6a9fd8" },
   { id: 3, name: "Ojalu",   members: "Team Lestan",    color: "#6db86d" },
   { id: 4, name: "Weloki",  members: "Team Wells",     color: "#c46ab0" },
-  { id: 5, name: "Nochoso", members: "The Unchosen",   color: "#888888" },
 ];
 
 // Five rounds, four teams. Round 5 continues the existing snake order.
@@ -751,6 +750,7 @@ export default function App() {
               { key: "overview",  label: "Overview"  },
               { key: "results",   label: "Week 1"     },
               { key: "draft",     label: "Draft"      },
+              { key: "scoring",   label: "Scoring"    },
               { key: "castaways", label: "Cast"       },
               { key: "history",   label: "History"    },
             ].map(p => (
@@ -767,6 +767,7 @@ export default function App() {
           {page === "results"   && <WeekOne />}
           {page === "castaways" && <Castaways castaways={castaways} />}
           {page === "draft" && <Draft castaways={castaways} picks={draftPicks} />}
+          {page === "scoring" && <Scoring castaways={castaways} />}
           {page === "history"   && <History historySeason={historySeason} setHistorySeason={setHistorySeason} />}
         </div>
       </div>
@@ -805,6 +806,67 @@ function Draft({ castaways, picks }) {
           {roster.map((c, i) => <div className="hint" key={c.id} style={{ padding: "0.35rem 0" }}>{i + 1}. {c.name}</div>)}
         </div>;
       })}</div>
+    </div>
+  );
+}
+
+// ─── Scoring page ─────────────────────────────────────────────────────────────
+function Scoring({ castaways }) {
+  const total = SEASONS.find(season => season.current).totalCastaways;
+  const scores = TEAMS.map(team => {
+    const roster = castaways.filter(c => c.draftedBy === team.id);
+    return { ...team, roster, score: roster.reduce((sum, c) => sum + calcPoints(c.eliminationOrder, total), 0) };
+  }).sort((a, b) => b.score - a.score);
+  return (
+    <div>
+      <div className="page-title">Scoring</div>
+      <div className="page-subtitle">Season 51 · Standings after Week 1</div>
+      <div className="section-title">League Rules</div>
+      <div className="panel" style={{ marginBottom: "1.5rem" }}>
+        <p className="hint">Each team's score is the sum of its players' placement points. Points are awarded when a player's final placement is recorded.</p>
+        <ul className="hint" style={{ paddingLeft: "1.2rem", lineHeight: 1.9, marginTop: "0.75rem" }}>
+          <li>The first two players eliminated earn 0 points.</li>
+          <li>Starting with the third elimination, points increase by 1 for each later elimination.</li>
+          <li>The final three earn 19, 21, and 23 points for third, second, and first place.</li>
+          <li>No extra points for challenges, idols, or advantages.</li>
+          <li>Players still competing show 0 earned points until their placement is recorded.</li>
+        </ul>
+      </div>
+      <div className="section-title">Team Standings</div>
+      <div className="hist-grid">
+        {scores.map(team => {
+          const rank = scores.findIndex(t => t.score === team.score) + 1;
+          const tied = scores.filter(t => t.score === team.score).length > 1;
+          return <div className="panel" key={team.id}>
+            <div className="hint">{tied ? "Tied " : ""}{ordinal(rank)} place</div>
+            <div style={{ color: team.color, margin: "0.4rem 0" }}>{team.name}</div>
+            <div className="hist-score">{team.score} pts</div>
+            <div className="hint" style={{ marginTop: "0.5rem" }}>{team.roster.filter(c => !c.eliminationOrder).length} of 5 remaining</div>
+          </div>;
+        })}
+      </div>
+      <div className="section-title">Player Points</div>
+      <div style={{ overflowX: "auto", marginBottom: "1.5rem" }}>
+        <table className="hist-table">
+          <thead><tr><th>Team</th><th>Player</th><th>Status</th><th>Points</th></tr></thead>
+          <tbody>{scores.flatMap(team => team.roster.map(c => <tr key={c.id}>
+            <td style={{ color: team.color }}>{team.name}</td><td>{c.name}</td>
+            <td>{c.eliminationOrder ? `${ordinal(total - c.eliminationOrder + 1)} place` : "In the game"}</td>
+            <td>{calcPoints(c.eliminationOrder, total)}</td>
+          </tr>))}</tbody>
+        </table>
+      </div>
+      <div className="section-title">Placement Points · 21-player season</div>
+      <div style={{ overflowX: "auto" }}>
+        <table className="hist-table">
+          <thead><tr><th>Finish</th><th>Points</th></tr></thead>
+          <tbody>{Array.from({ length: total }, (_, i) => {
+            const finish = i + 1;
+            return <tr key={finish}><td>{ordinal(finish)}</td><td>{calcPoints(total - finish + 1, total)}</td></tr>;
+          })}</tbody>
+        </table>
+      </div>
+      <p className="hint" style={{ marginTop: "1rem" }}>Aaliyah finished 21st for 0 points and was not drafted. All four teams are currently tied at 0 points.</p>
     </div>
   );
 }
