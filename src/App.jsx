@@ -1,13 +1,14 @@
 // src/App.jsx  —  Fantasy Survivor · Season 51 Edition
 import { useEffect, useState } from "react";
 
-const SPLASH_VERSION = "s51_week2_v1";
+const SPLASH_VERSION = "s51_week3_v1";
 
 // ─── Scoring ──────────────────────────────────────────────────────────────────
 // Weekly survival scoring: an eliminated player receives 0 for their
 // elimination week; survivors start earning 1 point in Week 2.
-const CURRENT_WEEK = 2;
-const ELIMINATIONS = { "Aaliyah Puglia": 1, "Ana Sani": 2 };
+const CURRENT_WEEK = 3;
+const ELIMINATIONS = { "Aaliyah Puglia": 1, "Ana Sani": 2, "Rob Antonson": 3, "Patt Cannaday": 4 };
+const ELIMINATION_WEEKS = { "Aaliyah Puglia": 1, "Ana Sani": 2, "Rob Antonson": 3, "Patt Cannaday": 3 };
 function weeklyPoints(c, week) {
   if (week < 2 || week > CURRENT_WEEK) return 0;
   return c.eliminatedWeek != null && c.eliminatedWeek <= week ? 0 : 1;
@@ -53,7 +54,7 @@ const SEASONS = [
   { id: 43, label: "Season 43", totalCastaways: 18 },
 ];
 
-// Season 51 cast. Results through Week 2 are applied below. Draft assignments use the confirmed published picks.
+// Season 51 cast. Results through Week 3 are applied below. Draft assignments use the confirmed published picks.
 const S51_CASTAWAYS = [
   {
     name: "Aaliyah Puglia",
@@ -514,11 +515,11 @@ function saveState(s) {
   try { localStorage.setItem(STORAGE_KEY, JSON.stringify(s)); } catch {}
 }
 
-// Results deliberately stop after Week 2, September 30, 2026.
+// Results deliberately stop after Week 3, October 7, 2026.
 const TOKA_NAMES = new Set([
   "Aaliyah Puglia", "Thien An Nguyen", "Angelica 'Jelly' Loblack",
   "Brady Booker", "Danny 'Kilby' Kilby", "Devin Way", "Jenna Doore",
-  "Maggie Nestor", "Michael Pinsky", "Patt Cannaday",
+  "Maggie Nestor", "Michael Pinsky", "Patt Cannaday", "Carter Krull",
 ]);
 const NAME_ALIASES = {
   "Daniel Kilby": "Danny 'Kilby' Kilby",
@@ -535,7 +536,7 @@ function hydrateCastaways(savedCastaways = []) {
     ...base,
     draftedBy: savedByName.get(base.name)?.draftedBy ?? base.draftedBy ?? null,
     eliminationOrder: ELIMINATIONS[base.name] ?? null,
-    eliminatedWeek: ELIMINATIONS[base.name] ?? null,
+    eliminatedWeek: ELIMINATION_WEEKS[base.name] ?? null,
     tribe: base.name === "Lewis Kelly" ? "Toka" : TOKA_NAMES.has(base.name) ? "Toka" : "Savu",
     id: i + 1,
   }));
@@ -683,7 +684,7 @@ function Splash({ onDismiss }) {
         The Open Era
       </div>
       <div style={{ maxWidth: 520, fontSize: "clamp(0.7rem, 1.4vw, 0.85rem)", color: "#bbb", lineHeight: 1.7, padding: "0 1rem" }}>
-        Week 2 complete · 21 castaways · 19 remaining. View the results, cast, and league history.
+        Week 3 complete · 21 castaways · 17 remaining. View the results, cast, and league history.
       </div>
 
       <button
@@ -767,7 +768,7 @@ export default function App() {
         <div className="container">
           {storageError && <p className="hint">Browser saving is unavailable. The confirmed draft remains available from the published site.</p>}
           {page === "overview"  && <Overview castaways={castaways} />}
-          {page === "results"   && <><WeekTwo /><WeekOne /></>}
+          {page === "results"   && <><WeekThree /><WeekTwo /><WeekOne /></>}
           {page === "castaways" && <Castaways castaways={castaways} />}
           {page === "draft" && <Draft castaways={castaways} picks={draftPicks} />}
           {page === "scoring" && <Scoring castaways={castaways} />}
@@ -786,7 +787,7 @@ function Draft({ castaways, picks }) {
       <div className="page-subtitle">Draft complete · 5 rounds · 5 players per team</div>
       <div className="panel" style={{ marginBottom: "1.5rem" }}>
         <div className="section-title">All 20 picks confirmed</div>
-        <p className="hint">All four teams have five players. Aaliyah was eliminated in Week 1 and was not drafted. Ana (Jinga) was eliminated in Week 2.</p>
+        <p className="hint">All four teams have five players. Aaliyah was eliminated in Week 1 and was not drafted. Ana (Jinga) was eliminated in Week 2. Rob and Patt (both Miloa) exited in Week 3.</p>
       </div>
       <div className="section-title">Draft Board</div>
       <div style={{ overflowX: "auto", marginBottom: "1.5rem" }}>
@@ -823,7 +824,7 @@ function Scoring({ castaways }) {
   return (
     <div>
       <div className="page-title">Scoring</div>
-      <div className="page-subtitle">Season 51 · Standings after Week 2</div>
+      <div className="page-subtitle">Season 51 · Standings after Week 3</div>
       <div className="section-title">League Rules</div>
       <div className="panel" style={{ marginBottom: "1.5rem" }}>
         <p className="hint">Each team's score is the sum of weekly survival points earned by its drafted players.</p>
@@ -851,21 +852,21 @@ function Scoring({ castaways }) {
       <div className="section-title">Player Points</div>
       <div style={{ overflowX: "auto", marginBottom: "1.5rem" }}>
         <table className="hist-table">
-          <thead><tr><th>Team</th><th>Player</th><th>Status</th><th>Week 2</th><th>Total</th></tr></thead>
+          <thead><tr><th>Team</th><th>Player</th><th>Status</th><th>Week 2</th><th>Week 3</th><th>Total</th></tr></thead>
           <tbody>{scores.flatMap(team => team.roster.map(c => <tr key={c.id}>
             <td style={{ color: team.color }}>{team.name}</td><td>{c.name}</td>
             <td>{c.eliminationOrder ? `${ordinal(total - c.eliminationOrder + 1)} place · Week ${c.eliminatedWeek}` : "In the game"}</td>
-            <td>{weeklyPoints(c, 2)}</td><td>{calcPoints(c)}</td>
+            <td>{weeklyPoints(c, 2)}</td><td>{weeklyPoints(c, 3)}</td><td>{calcPoints(c)}</td>
           </tr>))}
           {castaways.filter(c => c.eliminationOrder && !c.draftedBy).map(c => <tr key={c.id}>
             <td style={{ color: "#888" }}>Not drafted</td><td>{c.name}</td>
             <td>Voted out · Week {c.eliminatedWeek} · {ordinal(total - c.eliminationOrder + 1)} place</td>
-            <td>{weeklyPoints(c, 2)}</td><td>{calcPoints(c)}</td>
+            <td>{weeklyPoints(c, 2)}</td><td>{weeklyPoints(c, 3)}</td><td>{calcPoints(c)}</td>
           </tr>)}
           </tbody>
         </table>
       </div>
-      <p className="hint" style={{ marginTop: "1rem" }}>Week 2: 19 survivors earned 1 point each. Ana (Jinga) and Aaliyah (undrafted) have 0 cumulative points.</p>
+      <p className="hint" style={{ marginTop: "1rem" }}>Week 3: 17 survivors earned 1 point each. Rob and Patt (both Miloa) received 0 for Week 3 but retain their Week 2 point.</p>
     </div>
   );
 }
@@ -876,12 +877,12 @@ function Overview({ castaways }) {
   return (
     <div>
       <div className="page-title">Season 51</div>
-      <div className="page-subtitle">Week 2 complete · September 30, 2026</div>
+      <div className="page-subtitle">Week 3 complete · October 7, 2026</div>
       <div className="hist-grid">
         {[
           { label: "Remaining", value: remaining },
           { label: "Eliminated", value: castaways.length - remaining },
-          { label: "Week 2 immunity", value: "Toka" },
+          { label: "Week 3 immunity", value: "Savu" },
         ].map(item => (
           <div className="panel" key={item.label}>
             <div className="section-title">{item.label}</div>
@@ -889,7 +890,7 @@ function Overview({ castaways }) {
           </div>
         ))}
       </div>
-      <WeekTwo compact />
+      <WeekThree compact />
       <div className="section-title">Fantasy Teams</div>
       <div className="hist-grid">
         {TEAMS.map(team => {
@@ -913,7 +914,7 @@ function Overview({ castaways }) {
           );
         })}
       </div>
-      <p className="hint">Scoring: surviving castaways earn 1 point in Week 2; eliminated castaways earn 0 for their exit week. The completed draft remains unchanged.</p>
+      <p className="hint">Scoring: from Week 2 onward, each surviving castaway earns 1 point per week. Players eliminated during a week receive 0 for that week and retain previously earned points.</p>
     </div>
   );
 }
@@ -926,7 +927,7 @@ function Castaways({ castaways }) {
   return (
     <div>
       <div className="page-title">Season 51 Cast</div>
-      <div className="page-subtitle">After Week 2 · 19 remaining · 2 eliminated</div>
+      <div className="page-subtitle">After Week 3 · 17 remaining · 4 eliminated</div>
 
       <div className="section-title">Castaways — {listed.length}</div>
       <div className="castaways-grid">
@@ -977,6 +978,31 @@ function CastawayCard({ c }) {
           <span className={`c-tag ${c.eliminationOrder ? "eliminated" : "alive"}`}>{c.eliminationOrder ? `Out · Week ${c.eliminatedWeek}` : "In the game"}</span>
         </div>
         {c.eliminationOrder && <div className="hint" style={{ marginTop: "0.4rem" }}>{ordinal(22 - c.eliminationOrder)} place · {calcPoints(c)} fantasy points</div>}
+      </div>
+    </div>
+  );
+}
+
+// ─── Week 3 ───────────────────────────────────────────────────────────────────
+function WeekThree({ compact = false }) {
+  return (
+    <div style={{ marginBottom: "1.5rem" }}>
+      {!compact && <>
+        <div className="page-title">Week 3</div>
+        <div className="page-subtitle">What I’m Smellin’ Is Stinky · October 7, 2026</div>
+      </>}
+      <div className="section-title">Week 3 Results</div>
+      <div className="panel">
+        <div style={{ fontSize: "1rem", marginBottom: "0.6rem" }}>Rob Antonson and Patt Cannaday (both Miloa) exited.</div>
+        <p className="hint">Rob: 19th place · voluntary departure · Patt: 18th place · voted out · 17 remain</p>
+        <ul className="hint" style={{ paddingLeft: "1.2rem", marginTop: "0.8rem", lineHeight: 1.9 }}>
+          <li>Rob left voluntarily over concerns about a foot injury; his exit occurred before the immunity challenge.</li>
+          <li>Carter Krull moved from Savu to Toka in a mutiny twist; Lewis Kelly was also on Toka.</li>
+          <li>Savu won immunity; Toka attended Tribal Council.</li>
+          <li>Patt was blindsided at Tribal Council.</li>
+          <li>17 remaining castaways earned 1 Week 3 fantasy point. Rob and Patt earned 0 for Week 3, retaining their prior points.</li>
+        </ul>
+        <a className="hint" style={{ color: "#6a9fd8", display: "inline-block", marginTop: "0.8rem" }} href="https://www.tvline.com/2280490/survivor-51-recap-episode-3-rob-quits-patt-voted-out/" target="_blank" rel="noopener noreferrer">Week 3 recap ↗</a>
       </div>
     </div>
   );
