@@ -895,6 +895,9 @@ function Overview({ castaways }) {
         {TEAMS.map(team => {
           const roster = castaways.filter(c => c.draftedBy === team.id || c.draftedBy === team.name);
           const points = roster.reduce((sum, c) => sum + calcPoints(c), 0);
+          return { ...team, roster, points };
+        }).sort((a, b) => b.points - a.points).map(team => {
+          const { roster, points } = team;
           return (
             <div className="panel" key={team.id}>
               <div style={{ color: team.color, marginBottom: "0.4rem" }}>{team.name}</div>
@@ -910,7 +913,7 @@ function Overview({ castaways }) {
           );
         })}
       </div>
-      <p className="hint">Your scoring: surviving castaways earn 1 point in Week 2; eliminated castaways earn 0 for their exit week. The completed draft remains unchanged.</p>
+      <p className="hint">Scoring: surviving castaways earn 1 point in Week 2; eliminated castaways earn 0 for their exit week. The completed draft remains unchanged.</p>
     </div>
   );
 }
