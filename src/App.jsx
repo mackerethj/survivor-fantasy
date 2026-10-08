@@ -1,17 +1,28 @@
 // src/App.jsx  —  Fantasy Survivor · Season 51 Edition
 import { useEffect, useState } from "react";
 
-const SPLASH_VERSION = "s51_week3_placement_v2";
+const SPLASH_VERSION = "s51_week3_full_placement_guide_v4";
 
 // ─── Scoring ──────────────────────────────────────────────────────────────────
-// Placement scoring: the first castaway out earns 0, second earns 1,
-// third earns 2, etc. Survivors carry provisional points until eliminated.
+// Same placement values as the History page (Season 50): first two out score
+// zero; thereafter each successive placement adds one point until the final
+// three, which increase by two points each. Active players are provisional.
 const CURRENT_WEEK = 3;
 const ELIMINATIONS = { "Aaliyah Puglia": 1, "Ana Sani": 2, "Rob Antonson": 3, "Patt Cannaday": 4 };
 const ELIMINATION_WEEKS = { "Aaliyah Puglia": 1, "Ana Sani": 2, "Rob Antonson": 3, "Patt Cannaday": 3 };
 const COMPLETED_ELIMINATIONS = Object.keys(ELIMINATIONS).length;
+function placementPoints(eliminationOrder, totalCastaways) {
+  if (eliminationOrder <= 2) return 0;
+  const finalThreeStart = totalCastaways - 2;
+  if (eliminationOrder >= finalThreeStart) {
+    const fourthPlacePoints = finalThreeStart - 3;
+    return fourthPlacePoints + (eliminationOrder - finalThreeStart + 1) * 2;
+  }
+  return eliminationOrder - 2;
+}
 function calcPoints(c) {
-  return c.eliminationOrder == null ? COMPLETED_ELIMINATIONS : c.eliminationOrder - 1;
+  const total = SEASONS.find(season => season.current).totalCastaways;
+  return placementPoints(c.eliminationOrder ?? COMPLETED_ELIMINATIONS + 1, total);
 }
 
 // ─── Teams ────────────────────────────────────────────────────────────────────
@@ -840,6 +851,27 @@ function Scoring({ castaways }) {
           </div>;
         })}
       </div>
+      <div className="section-title">Complete Placement Scoring Guide — Season 51</div>
+      <p className="hint" style={{ marginBottom: "0.8rem" }}>All 21 finishing positions and their point values are shown below. This is the same placement-based rule used for the current standings; final-three placements increase by two points each.</p>
+      <div style={{ border: "1px solid rgba(255,255,255,0.07)", borderRadius: 4, overflowX: "auto", marginBottom: "2rem" }}>
+        <table className="hist-table">
+          <thead><tr><th>Final Placement</th><th>Elimination Order</th><th style={{ textAlign: "right" }}>Points</th></tr></thead>
+          <tbody>
+            {Array.from({ length: total }, (_, index) => {
+              const finish = index + 1;
+              const eliminationOrder = total - finish + 1;
+              const pts = placementPoints(eliminationOrder, total);
+              return (
+                <tr key={finish}>
+                  <td style={{ color: "#f0ebe0", fontWeight: 600 }}>{ordinal(finish)}{finish === 1 ? " · Winner" : ""}</td>
+                  <td>{ordinal(eliminationOrder)} out</td>
+                  <td style={{ color: "#5aaa72", textAlign: "right", fontWeight: 700 }}>{pts}</td>
+                </tr>
+              );
+            })}
+          </tbody>
+        </table>
+      </div>
       <div className="section-title">Placement Results — Season 51</div>
       <div style={{ border: "1px solid rgba(255,255,255,0.07)", borderRadius: 4, overflowX: "auto" }}>
         <table className="hist-table">
@@ -859,7 +891,7 @@ function Scoring({ castaways }) {
           </tbody>
         </table>
       </div>
-      <p className="hint" style={{ marginTop: "1rem" }}>Scoring: first eliminated = 0 points, second = 1, third = 2, fourth = 3, and so on. An eliminated player's points are final. * Active castaways have {COMPLETED_ELIMINATIONS} provisional points each, based on the eliminations completed so far. Team scores update as players advance.</p>
+      <p className="hint" style={{ marginTop: "1rem" }}>Scoring follows the History page: first and second eliminated = 0 points, third = 1, fourth = 2; each subsequent finish adds 1 point, with a 2-point increase for each of the final three placements. * Active castaways have provisional points based on their current minimum placement. Eliminated players' points are final.</p>
     </div>
   );
 }
@@ -907,7 +939,7 @@ function Overview({ castaways }) {
           );
         })}
       </div>
-      <p className="hint">Scoring: points are based on elimination order, not weeks survived. First out earns 0, second earns 1, third earns 2, and so on. Active players have provisional points.</p>
+      <p className="hint">Scoring: placement-based, matching the History page. First two eliminated earn 0, third earns 1, fourth earns 2; the final three placements receive 2-point increases. Active players have provisional points.</p>
     </div>
   );
 }
