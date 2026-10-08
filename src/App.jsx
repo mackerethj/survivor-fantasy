@@ -1,21 +1,17 @@
 // src/App.jsx  —  Fantasy Survivor · Season 51 Edition
 import { useEffect, useState } from "react";
 
-const SPLASH_VERSION = "s51_week3_v1";
+const SPLASH_VERSION = "s51_week3_placement_v2";
 
 // ─── Scoring ──────────────────────────────────────────────────────────────────
-// Weekly survival scoring: an eliminated player receives 0 for their
-// elimination week; survivors start earning 1 point in Week 2.
+// Placement scoring: the first castaway out earns 0, second earns 1,
+// third earns 2, etc. Survivors carry provisional points until eliminated.
 const CURRENT_WEEK = 3;
 const ELIMINATIONS = { "Aaliyah Puglia": 1, "Ana Sani": 2, "Rob Antonson": 3, "Patt Cannaday": 4 };
 const ELIMINATION_WEEKS = { "Aaliyah Puglia": 1, "Ana Sani": 2, "Rob Antonson": 3, "Patt Cannaday": 3 };
-function weeklyPoints(c, week) {
-  if (week < 2 || week > CURRENT_WEEK) return 0;
-  return c.eliminatedWeek != null && c.eliminatedWeek <= week ? 0 : 1;
-}
+const COMPLETED_ELIMINATIONS = Object.keys(ELIMINATIONS).length;
 function calcPoints(c) {
-  return Array.from({ length: CURRENT_WEEK - 1 }, (_, i) => weeklyPoints(c, i + 2))
-    .reduce((sum, n) => sum + n, 0);
+  return c.eliminationOrder == null ? COMPLETED_ELIMINATIONS : c.eliminationOrder - 1;
 }
 
 // ─── Teams ────────────────────────────────────────────────────────────────────
@@ -821,52 +817,49 @@ function Scoring({ castaways }) {
     const roster = castaways.filter(c => c.draftedBy === team.id);
     return { ...team, roster, score: roster.reduce((sum, c) => sum + calcPoints(c), 0) };
   }).sort((a, b) => b.score - a.score);
+  const placements = [...castaways].sort((a, b) => {
+    if (a.eliminationOrder == null && b.eliminationOrder == null) return a.name.localeCompare(b.name);
+    if (a.eliminationOrder == null) return -1;
+    if (b.eliminationOrder == null) return 1;
+    return b.eliminationOrder - a.eliminationOrder;
+  });
   return (
     <div>
       <div className="page-title">Scoring</div>
-      <div className="page-subtitle">Season 51 · Standings after Week 3</div>
-      <div className="section-title">League Rules</div>
-      <div className="panel" style={{ marginBottom: "1.5rem" }}>
-        <p className="hint">Each team's score is the sum of weekly survival points earned by its drafted players.</p>
-        <ul className="hint" style={{ paddingLeft: "1.2rem", lineHeight: 1.9, marginTop: "0.75rem" }}>
-          <li>Week 1 is the elimination baseline: all players start with 0 points.</li>
-          <li>From Week 2 onward, each castaway still in the game at the end of the episode earns 1 point for that week.</li>
-          <li>The player eliminated during a week earns 0 points for that week and earns no subsequent points.</li>
-          <li>Previously earned survival points remain in the team's cumulative total.</li>
-          <li>No extra points for challenges, idols, or advantages.</li>
-        </ul>
-      </div>
-      <div className="section-title">Team Standings</div>
+      <div className="page-subtitle">Season 51 · After Week 3 · Placement-based scoring</div>
+      <div className="section-title">Team Scores</div>
       <div className="hist-grid">
         {scores.map(team => {
           const rank = scores.findIndex(t => t.score === team.score) + 1;
           const tied = scores.filter(t => t.score === team.score).length > 1;
-          return <div className="panel" key={team.id}>
+          return <div className="hist-card" key={team.id}>
             <div className="hint">{tied ? "Tied " : ""}{ordinal(rank)} place</div>
-            <div style={{ color: team.color, margin: "0.4rem 0" }}>{team.name}</div>
-            <div className="hist-score">{team.score} pts</div>
-            <div className="hint" style={{ marginTop: "0.5rem" }}>{team.roster.filter(c => !c.eliminationOrder).length} of 5 remaining</div>
+            <div className="hist-score" style={{ color: team.color, marginTop: "0.4rem" }}>{team.score}<span style={{ fontSize: "0.7rem", color: "#888", marginLeft: "0.35rem" }}>pts</span></div>
+            <div style={{ color: team.color, marginTop: "0.3rem" }}>{team.name}</div>
+            <div className="hint">{team.members} · {team.roster.filter(c => !c.eliminationOrder).length} of 5 remaining</div>
           </div>;
         })}
       </div>
-      <div className="section-title">Player Points</div>
-      <div style={{ overflowX: "auto", marginBottom: "1.5rem" }}>
+      <div className="section-title">Placement Results — Season 51</div>
+      <div style={{ border: "1px solid rgba(255,255,255,0.07)", borderRadius: 4, overflowX: "auto" }}>
         <table className="hist-table">
-          <thead><tr><th>Team</th><th>Player</th><th>Status</th><th>Week 2</th><th>Week 3</th><th>Total</th></tr></thead>
-          <tbody>{scores.flatMap(team => team.roster.map(c => <tr key={c.id}>
-            <td style={{ color: team.color }}>{team.name}</td><td>{c.name}</td>
-            <td>{c.eliminationOrder ? `${ordinal(total - c.eliminationOrder + 1)} place · Week ${c.eliminatedWeek}` : "In the game"}</td>
-            <td>{weeklyPoints(c, 2)}</td><td>{weeklyPoints(c, 3)}</td><td>{calcPoints(c)}</td>
-          </tr>))}
-          {castaways.filter(c => c.eliminationOrder && !c.draftedBy).map(c => <tr key={c.id}>
-            <td style={{ color: "#888" }}>Not drafted</td><td>{c.name}</td>
-            <td>Voted out · Week {c.eliminatedWeek} · {ordinal(total - c.eliminationOrder + 1)} place</td>
-            <td>{weeklyPoints(c, 2)}</td><td>{weeklyPoints(c, 3)}</td><td>{calcPoints(c)}</td>
-          </tr>)}
+          <thead><tr><th>Finish</th><th>Castaway</th><th>Team</th><th style={{ textAlign: "right" }}>Pts</th></tr></thead>
+          <tbody>
+            {placements.map(c => {
+              const team = TEAMS.find(t => t.id === c.draftedBy);
+              return <tr key={c.id}>
+                <td style={{ color: "#f0ebe0", fontFamily: "'Playfair Display',serif", fontWeight: 900 }}>
+                  {c.eliminationOrder == null ? "Still in" : ordinal(total - c.eliminationOrder + 1)}
+                </td>
+                <td style={{ color: "#f0ebe0" }}>{c.name}</td>
+                <td style={{ color: team?.color || "#777" }}>{team?.name || "—"}</td>
+                <td style={{ color: "#5aaa72", textAlign: "right", fontFamily: "'Playfair Display',serif", fontWeight: 900 }}>{calcPoints(c)}{c.eliminationOrder == null ? "*" : ""}</td>
+              </tr>;
+            })}
           </tbody>
         </table>
       </div>
-      <p className="hint" style={{ marginTop: "1rem" }}>Week 3: 17 survivors earned 1 point each. Rob and Patt (both Miloa) received 0 for Week 3 but retain their Week 2 point.</p>
+      <p className="hint" style={{ marginTop: "1rem" }}>Scoring: first eliminated = 0 points, second = 1, third = 2, fourth = 3, and so on. An eliminated player's points are final. * Active castaways have {COMPLETED_ELIMINATIONS} provisional points each, based on the eliminations completed so far. Team scores update as players advance.</p>
     </div>
   );
 }
@@ -914,7 +907,7 @@ function Overview({ castaways }) {
           );
         })}
       </div>
-      <p className="hint">Scoring: from Week 2 onward, each surviving castaway earns 1 point per week. Players eliminated during a week receive 0 for that week and retain previously earned points.</p>
+      <p className="hint">Scoring: points are based on elimination order, not weeks survived. First out earns 0, second earns 1, third earns 2, and so on. Active players have provisional points.</p>
     </div>
   );
 }
