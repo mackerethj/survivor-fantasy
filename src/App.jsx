@@ -939,7 +939,12 @@ function Overview({ castaways }) {
                 <div className="hist-score" style={{ margin: "0.5rem 0" }}>{points} pts</div>
                 <div className="hint">{roster.filter(c => !c.eliminationOrder).length} of {roster.length} remaining</div>
                 <div className="lb-tags" style={{ marginTop: "0.5rem" }}>
-                  {roster.map(c => <span key={c.id} className={`c-tag ${c.eliminationOrder ? "eliminated" : "alive"}`}>{c.name}</span>)}
+                  {roster.map(c => (
+                    <span key={c.id} className={`c-tag ${c.eliminationOrder ? "eliminated" : "alive"}`} style={{ textDecoration: "none" }}>
+                      <span style={{ textDecoration: c.eliminationOrder ? "line-through" : "none" }}>{c.name}</span>
+                      <span style={{ marginLeft: "0.4rem", whiteSpace: "nowrap" }}>{calcPoints(c)} pts{c.eliminationOrder == null ? "*" : ""}</span>
+                    </span>
+                  ))}
                 </div>
               </> : <div className="hint" style={{ marginTop: "0.5rem" }}>No players drafted.</div>}
             </div>
