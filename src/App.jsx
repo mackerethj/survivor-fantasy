@@ -1,128 +1,96 @@
-// ─── Week 3 ───────────────────────────────────────────────────────────────────
-function WeekThree({ compact = false }) {
-  return (
-    <div style={{ marginBottom: "1.5rem" }}>
-      {!compact && <>
-        <div className="page-title">Week 3</div>
-        <div className="page-subtitle">What I’m Smellin’ Is Stinky · October 7, 2026</div>
-      </>}
-      <div className="section-title">Week 3 Results</div>
-      <div className="panel">
-        <div style={{ fontSize: "1rem", marginBottom: "0.6rem" }}>Rob Antonson and Patt Cannaday (both Miloa) exited.</div>
-        <p className="hint">Rob: 19th place · voluntary departure · Patt: 18th place · voted out · 17 remain</p>
-        <ul className="hint" style={{ paddingLeft: "1.2rem", marginTop: "0.8rem", lineHeight: 1.9 }}>
-          <li>Rob left voluntarily over concerns about a foot injury; his exit occurred before the immunity challenge.</li>
-          <li>Carter Krull moved from Savu to Toka in a mutiny twist; Lewis Kelly was also on Toka.</li>
-          <li>Savu won immunity; Toka attended Tribal Council.</li>
-          <li>Patt was blindsided at Tribal Council.</li>
-          <li>17 remaining castaways earned 1 Week 3 fantasy point. Rob and Patt earned 0 for Week 3, retaining their prior points.</li>
-        </ul>
-        <a className="hint" style={{ color: "#6a9fd8", display: "inline-block", marginTop: "0.8rem" }} href="https://www.tvline.com/2280490/survivor-51-recap-episode-3-rob-quits-patt-voted-out/" target="_blank" rel="noopener noreferrer">Week 3 recap ↗</a>
-      </div>
-    </div>
-  );
+// src/App.jsx  —  Fantasy Survivor · Season 51 Edition
+import { useEffect, useState } from "react";
+
+const SPLASH_VERSION = "s51_week5_results_v1";
+
+// ─── Scoring ──────────────────────────────────────────────────────────────────
+// Same placement values as the History page (Season 50): first two out score
+// zero; thereafter each successive placement adds one point until the final
+// three, which increase by two points each. Active players are provisional.
+const CURRENT_WEEK = 5;
+const ELIMINATIONS = { "Aaliyah Puglia": 1, "Ana Sani": 2, "Rob Antonson": 3, "Patt Cannaday": 4, "Jenna Doore": 5, "Alexis Levine": 6, "Linnea Capobianco": 7 };
+const ELIMINATION_WEEKS = { "Aaliyah Puglia": 1, "Ana Sani": 2, "Rob Antonson": 3, "Patt Cannaday": 3, "Jenna Doore": 4, "Alexis Levine": 5, "Linnea Capobianco": 5 };
+const COMPLETED_ELIMINATIONS = Object.keys(ELIMINATIONS).length;
+function placementPoints(eliminationOrder, totalCastaways) {
+  if (eliminationOrder <= 2) return 0;
+  const finalThreeStart = totalCastaways - 2;
+  if (eliminationOrder >= finalThreeStart) {
+    const fourthPlacePoints = finalThreeStart - 3;
+    return fourthPlacePoints + (eliminationOrder - finalThreeStart + 1) * 2;
+  }
+  return eliminationOrder - 2;
+}
+function calcPoints(c) {
+  const total = SEASONS.find(season => season.current).totalCastaways;
+  return placementPoints(c.eliminationOrder ?? COMPLETED_ELIMINATIONS + 1, total);
 }
 
-// ─── Week 2 ───────────────────────────────────────────────────────────────────
-function WeekTwo({ compact = false }) {
-  return (
-    <div style={{ marginBottom: "1.5rem" }}>
-      {!compact && <>
-        <div className="page-title">Week 2</div>
-        <div className="page-subtitle">Weaponized Honesty · September 30, 2026</div>
-      </>}
-      <div className="section-title">Week 2 Results</div>
-      <div className="panel">
-        <div style={{ fontSize: "1rem", marginBottom: "0.6rem" }}>Ana Sani (Jinga) was voted out.</div>
-        <p className="hint">20th place · Savu · 0 fantasy points · 19 castaways remain</p>
-        <ul className="hint" style={{ paddingLeft: "1.2rem", marginTop: "0.8rem", lineHeight: 1.9 }}>
-          <li>Toka won immunity; Savu attended Tribal Council.</li>
-          <li>Ana was eliminated in the second vote of the season.</li>
-          <li>Rob Antonson attempted to vote for himself, but self-voting is prohibited.</li>
-          <li>Brady Booker injured his thumb but remained in the game.</li>
-          <li>Lewis Kelly returned from Exile Island to join Toka.</li>
-          <li>All 19 remaining castaways earned 1 Week 2 fantasy point.</li>
-        </ul>
-        <a className="hint" style={{ color: "#6a9fd8", display: "inline-block", marginTop: "0.8rem" }} href="https://www.paramountplus.com/sneak-peak/survivor-season-51-episode-2-recap/" target="_blank" rel="noopener noreferrer">Official Week 2 recap ↗</a>
-      </div>
-    </div>
-  );
+// ─── Teams ────────────────────────────────────────────────────────────────────
+const TEAMS = [
+  { id: 1, name: "Miloa",   members: "Team Miller",    color: "#c8922a" },
+  { id: 2, name: "Jinga",   members: "Team Mackereth", color: "#6a9fd8" },
+  { id: 3, name: "Ojalu",   members: "Team Lestan",    color: "#6db86d" },
+  { id: 4, name: "Weloki",  members: "Team Wells",     color: "#c46ab0" },
+];
+
+// Five rounds, four teams. Round 5 continues the existing snake order.
+const DRAFT_ORDER = [4, 3, 2, 1, 1, 2, 3, 4, 4, 3, 2, 1, 1, 2, 3, 4, 4, 3, 2, 1];
+const DRAFT_KEY = "sf_s51_draft_v1";
+// Confirmed completed draft. Published picks override older browser drafts.
+const CONFIRMED_DRAFT = [
+  "Kristin Flickinger", "Danny 'Kilby' Kilby", "Ana Sani", "Sharonda Cox",
+  "Patt Cannaday", "Carter Krull", "Michael Pinsky", "Devin Way",
+  "Jenna Doore", "Maggie Nestor", "Angelica 'Jelly' Loblack", "Rob Antonson",
+  "Alexis Levine", "Eric Macksoud", "Cristian Chavez", "Ori Jean-Charles",
+  "Lewis Kelly", "Linnea Capobianco", "Thien An Nguyen", "Brady Booker",
+];
+function loadDraft() {
+  return [...CONFIRMED_DRAFT];
 }
 
-// ─── Week 1 ───────────────────────────────────────────────────────────────────
-function WeekOne({ compact = false }) {
-  return (
-    <div style={{ marginBottom: "1.5rem" }}>
-      {!compact && <>
-        <div className="page-title">Week 1</div>
-        <div className="page-subtitle">Permanent Uncertainty · September 23, 2026</div>
-      </>}
-      <div className="section-title">Week 1 Results</div>
-      <div className="panel">
-        <div style={{ fontSize: "1rem", marginBottom: "0.6rem" }}>Aaliyah Puglia was voted out first.</div>
-        <p className="hint">21st place · Toka · 0 fantasy points</p>
-        <ul className="hint" style={{ paddingLeft: "1.2rem", marginTop: "0.8rem", lineHeight: 1.9 }}>
-          <li>Savu won the first immunity challenge.</li>
-          <li>Rob found a hidden immunity idol.</li>
-          <li>Lewis spent the premiere on Exile Island and remains in the game.</li>
-          <li>Aaliyah and Jenna played unsuccessful Shots in the Dark.</li>
-        </ul>
-        <a className="hint" style={{ color: "#6a9fd8", display: "inline-block", marginTop: "0.8rem" }} href="https://www.paramountplus.com/sneak-peak/survivor-season-51-episode-1-recap/" target="_blank" rel="noopener noreferrer">Official Week 1 recap ↗</a>
-      </div>
-    </div>
-  );
-}
+// ─── Season config ────────────────────────────────────────────────────────────
+const SEASONS = [
+  { id: 51, label: "Season 51", totalCastaways: 21, current: true },
+  { id: 50, label: "Season 50", totalCastaways: 24 },
+  { id: 49, label: "Season 49", totalCastaways: 18 },
+  { id: 48, label: "Season 48", totalCastaways: 18 },
+  { id: 47, label: "Season 47", totalCastaways: 18 },
+  { id: 46, label: "Season 46", totalCastaways: 18 },
+  { id: 45, label: "Season 45", totalCastaways: 18 },
+  { id: 44, label: "Season 44", totalCastaways: 18 },
+  { id: 43, label: "Season 43", totalCastaways: 18 },
+];
 
-// ─── History page ─────────────────────────────────────────────────────────────
-function History({ historySeason, setHistorySeason }) {
-  const data = HISTORICAL[historySeason];
-  const champs = getChampionshipsThrough(historySeason);
-  const sorted = data ? [...data.teamScores].sort((a,b) => (b.score||0)-(a.score||0)) : [];
-
-  return (
-    <div>
-      <div className="page-title">History</div>
-      <div className="page-subtitle">Past season results</div>
-      <div className="season-bar">
-        <span className="season-label">Season</span>
-        {[50,49,48,47,46,45,44,43].map(id => (
-          <button key={id} className={`season-btn ${historySeason === id ? "active" : ""}`} onClick={() => setHistorySeason(id)}>{id}</button>
-        ))}
-      </div>
-
-      {data ? (
-        <>
-          <div className="section-title">Season {historySeason} — Team Scores</div>
-          <div className="hist-grid">
-            {sorted.map((t, i) => (
-              <div key={t.name} className={`hist-card ${t.winner ? "champ" : ""}`}>
-                <div style={{ fontSize: "0.62rem", color: t.winner ? "#5aaa72" : "#777", marginBottom: "0.25rem" }}>
-                  {t.winner ? "🏆 Champion" : ordinal(i+1) + " Place"}
-                </div>
-                <div className="hist-score" style={{ color: t.na ? "#444" : t.color }}>{t.na ? "—" : t.score}{!t.na && <span style={{ fontSize: "0.7rem", color: "#777", marginLeft: "0.35rem" }}>pts</span>}</div>
-                <div style={{ fontSize: "0.82rem", color: t.color, marginTop: "0.25rem", fontWeight: 500 }}>{t.name}</div>
-                <div style={{ fontSize: "0.62rem", color: "#777" }}>{t.members}</div>
-                {(champs[t.name]||0) > 0 && <div style={{ fontSize: "0.6rem", color: "#5aaa72", marginTop: "0.3rem", letterSpacing: "0.08em" }}>{"★".repeat(champs[t.name])}</div>}
-                {t.na && <div style={{ fontSize: "0.6rem", color: "#555", marginTop: "0.25rem" }}>Did not participate</div>}
-              </div>
-            ))}
-          </div>
-
-          <div className="section-title">Placement Results — Season {historySeason}</div>
-          <div style={{ border: "1px solid rgba(255,255,255,0.07)", borderRadius: 4, overflow: "hidden" }}>
-            <table className="hist-table">
-              <thead><tr><th>Finish</th><th>Castaway</th><th>Team</th><th style={{ textAlign:"right" }}>Pts</th></tr></thead>
-              <tbody>
-                {[...data.placements].sort((a,b) => b.place - a.place).map(p => {
-                  const total = SEASONS.find(s => s.id === historySeason)?.totalCastaways || 18;
-                  const finishPos = total - p.place + 1;
-                  return (
-                    <tr key={p.place}>
-                      <td style={{ color:"#f0ebe0", fontFamily:"'Playfair Display',serif", fontWeight:900 }}>{ordinal(finishPos)}</td>
-                      <td style={{ color:"#f0ebe0" }}>{p.player}</td>
-                      <td style={{ color: p.team==="NA" ? "#555" : p.teamColor }}>{p.team==="NA" ? "—" : p.team}</td>
-                      <td style={{ color:"#5aaa72", textAlign:"right", fontFamily:"'Playfair Display',serif", fontWeight:900 }}>{p.points}</td>
-                    </tr>
-                  );
-                })}
-              </tbody>
+// Season 51 cast. Results through Week 3 are applied below. Draft assignments use the confirmed published picks.
+const S51_CASTAWAYS = [
+  {
+    name: "Aaliyah Puglia",
+    age: 25,
+    hometown: "Providence, RI",
+    occupation: "Chef",
+    bio: "Professional chef with culinary nutrition training from Johnson & Wales. Reportedly worked with the New England Patriots and specializes in plant-based cuisine.",
+    photoUrl: "https://inside-survivor.ams3.digitaloceanspaces.com/wp-content/uploads/2026/05/aaliyaj-12%C2%A71.png",
+    tribe: "TBD", draftedBy: null,
+  },
+  {
+    name: "Alexis Levine",
+    age: 28,
+    hometown: "Atlanta, GA",
+    occupation: "Attorney",
+    bio: "Criminal defense attorney and Emory Law graduate. Public-interest/legal-reform profile makes her a strong talker and potential social strategist.",
+    photoUrl: "https://inside-survivor.ams3.digitaloceanspaces.com/wp-content/uploads/2026/05/alex-asdasd.png",
+    tribe: "TBD", draftedBy: null,
+  },
+  {
+    name: "Angelica 'Jelly' Loblack",
+    age: 29,
+    hometown: "Bloomington, IN",
+    occupation: "Sociology Professor",
+    bio: "Indiana University sociology professor whose research focuses on racialization, identity, embodiment, and political engagement.",
+    photoUrl: "https://inside-survivor.ams3.digitaloceanspaces.com/wp-content/uploads/2026/05/jelly-q44.png",
+    tribe: "TBD", draftedBy: null,
+  },
+  {
+    name: "Ana Sani",
+    age: 34,
+    hometown: "Toronto, ON",
