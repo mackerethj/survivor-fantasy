@@ -1,15 +1,15 @@
 // src/App.jsx  —  Fantasy Survivor · Season 51 Edition
 import { useEffect, useState } from "react";
 
-const SPLASH_VERSION = "s51_week5_results_v1";
+const SPLASH_VERSION = "s51_week3_full_placement_guide_v4";
 
 // ─── Scoring ──────────────────────────────────────────────────────────────────
 // Same placement values as the History page (Season 50): first two out score
 // zero; thereafter each successive placement adds one point until the final
 // three, which increase by two points each. Active players are provisional.
-const CURRENT_WEEK = 5;
-const ELIMINATIONS = { "Aaliyah Puglia": 1, "Ana Sani": 2, "Rob Antonson": 3, "Patt Cannaday": 4, "Jenna Doore": 5, "Alexis Levine": 6, "Linnea Capobianco": 7 };
-const ELIMINATION_WEEKS = { "Aaliyah Puglia": 1, "Ana Sani": 2, "Rob Antonson": 3, "Patt Cannaday": 3, "Jenna Doore": 4, "Alexis Levine": 5, "Linnea Capobianco": 5 };
+const CURRENT_WEEK = 3;
+const ELIMINATIONS = { "Aaliyah Puglia": 1, "Ana Sani": 2, "Rob Antonson": 3, "Patt Cannaday": 4 };
+const ELIMINATION_WEEKS = { "Aaliyah Puglia": 1, "Ana Sani": 2, "Rob Antonson": 3, "Patt Cannaday": 3 };
 const COMPLETED_ELIMINATIONS = Object.keys(ELIMINATIONS).length;
 function placementPoints(eliminationOrder, totalCastaways) {
   if (eliminationOrder <= 2) return 0;
@@ -522,7 +522,7 @@ function saveState(s) {
   try { localStorage.setItem(STORAGE_KEY, JSON.stringify(s)); } catch {}
 }
 
-// Verified aired results through Week 5, October 21, 2026.
+// Results deliberately stop after Week 3, October 7, 2026.
 const TOKA_NAMES = new Set([
   "Aaliyah Puglia", "Thien An Nguyen", "Angelica 'Jelly' Loblack",
   "Brady Booker", "Danny 'Kilby' Kilby", "Devin Way", "Jenna Doore",
@@ -539,17 +539,12 @@ function hydrateCastaways(savedCastaways = []) {
       .filter(c => c && typeof c.name === "string")
       .map(c => [NAME_ALIASES[c.name] || c.name, c])
   );
-  const currentTribes = {
-    Toka: ["Brady Booker", "Carter Krull", "Kristin Flickinger", "Maggie Nestor", "Michael Pinsky", "Thien An Nguyen"],
-    Savu: ["Alexis Levine", "Devin Way", "Angelica 'Jelly' Loblack", "Ori Jean-Charles", "Jenna Doore"],
-    Dina: ["Cristian Chavez", "Eric Macksoud", "Danny 'Kilby' Kilby", "Lewis Kelly", "Linnea Capobianco", "Sharonda Cox"],
-  };
   return S51_CASTAWAYS.map((base, i) => ({
     ...base,
     draftedBy: savedByName.get(base.name)?.draftedBy ?? base.draftedBy ?? null,
     eliminationOrder: ELIMINATIONS[base.name] ?? null,
     eliminatedWeek: ELIMINATION_WEEKS[base.name] ?? null,
-    tribe: Object.entries(currentTribes).find(([, names]) => names.includes(base.name))?.[0] || (TOKA_NAMES.has(base.name) ? "Toka" : "Savu"),
+    tribe: base.name === "Lewis Kelly" ? "Toka" : TOKA_NAMES.has(base.name) ? "Toka" : "Savu",
     id: i + 1,
   }));
 }
@@ -696,7 +691,7 @@ function Splash({ onDismiss }) {
         The Open Era
       </div>
       <div style={{ maxWidth: 520, fontSize: "clamp(0.7rem, 1.4vw, 0.85rem)", color: "#bbb", lineHeight: 1.7, padding: "0 1rem" }}>
-        Week 5 complete · 21 castaways · 14 remaining. View the results, cast, and league history.
+        Week 3 complete · 21 castaways · 17 remaining. View the results, cast, and league history.
       </div>
 
       <button
@@ -780,7 +775,7 @@ export default function App() {
         <div className="container">
           {storageError && <p className="hint">Browser saving is unavailable. The confirmed draft remains available from the published site.</p>}
           {page === "overview"  && <Overview castaways={castaways} />}
-          {page === "results"   && <><WeekFive /><WeekFour /><WeekThree /><WeekTwo /><WeekOne /></>}
+          {page === "results"   && <><WeekThree /><WeekTwo /><WeekOne /></>}
           {page === "castaways" && <Castaways castaways={castaways} />}
           {page === "draft" && <Draft castaways={castaways} picks={draftPicks} />}
           {page === "scoring" && <Scoring castaways={castaways} />}
@@ -799,7 +794,7 @@ function Draft({ castaways, picks }) {
       <div className="page-subtitle">Draft complete · 5 rounds · 5 players per team</div>
       <div className="panel" style={{ marginBottom: "1.5rem" }}>
         <div className="section-title">All 20 picks confirmed</div>
-        <p className="hint">All four teams have five players. Aaliyah was eliminated in Week 1 and was not drafted. Ana (Jinga) was eliminated in Week 2. Rob and Patt (both Miloa) exited in Week 3. Jenna (Weloki) exited in Week 4; Alexis (Miloa) and Linnea (Ojalu) exited in Week 5.</p>
+        <p className="hint">All four teams have five players. Aaliyah was eliminated in Week 1 and was not drafted. Ana (Jinga) was eliminated in Week 2. Rob and Patt (both Miloa) exited in Week 3.</p>
       </div>
       <div className="section-title">Draft Board</div>
       <div style={{ overflowX: "auto", marginBottom: "1.5rem" }}>
@@ -842,7 +837,7 @@ function Scoring({ castaways }) {
   return (
     <div>
       <div className="page-title">Scoring</div>
-      <div className="page-subtitle">Season 51 · After Week 5 · Placement-based scoring</div>
+      <div className="page-subtitle">Season 51 · After Week 3 · Placement-based scoring</div>
       <div className="section-title">Team Scores</div>
       <div className="hist-grid">
         {scores.map(team => {
@@ -907,12 +902,12 @@ function Overview({ castaways }) {
   return (
     <div>
       <div className="page-title">Season 51</div>
-      <div className="page-subtitle">Week 5 complete · October 21, 2026</div>
+      <div className="page-subtitle">Week 3 complete · October 7, 2026</div>
       <div className="hist-grid">
         {[
           { label: "Remaining", value: remaining },
           { label: "Eliminated", value: castaways.length - remaining },
-          { label: "Week 5 immunity", value: "Toka" },
+          { label: "Week 3 immunity", value: "Savu" },
         ].map(item => (
           <div className="panel" key={item.label}>
             <div className="section-title">{item.label}</div>
@@ -920,7 +915,7 @@ function Overview({ castaways }) {
           </div>
         ))}
       </div>
-      <WeekFive compact />
+      <WeekThree compact />
       <div className="section-title">Fantasy Teams</div>
       <div className="hist-grid">
         {TEAMS.map(team => {
@@ -957,7 +952,7 @@ function Castaways({ castaways }) {
   return (
     <div>
       <div className="page-title">Season 51 Cast</div>
-      <div className="page-subtitle">After Week 5 · 14 remaining · 7 eliminated</div>
+      <div className="page-subtitle">After Week 3 · 17 remaining · 4 eliminated</div>
 
       <div className="section-title">Castaways — {listed.length}</div>
       <div className="castaways-grid">
@@ -1004,51 +999,10 @@ function CastawayCard({ c }) {
         {c.occupation && <div className="c-occ">{c.occupation}</div>}
         <div className="hint" style={{ margin: "0.4rem 0" }}>{TEAMS.find(t => t.id === c.draftedBy)?.name || "Not drafted"}</div>
         <div className="c-row">
-          <span style={{ fontSize: "0.65rem", color: c.tribe === "Toka" ? "#e8c45b" : c.tribe === "Savu" ? "#c49be8" : c.tribe === "Dina" ? "#dc7979" : "#aaa" }}>{c.tribe}</span>
+          <span style={{ fontSize: "0.65rem", color: c.tribe === "Toka" ? "#e8c45b" : c.tribe === "Savu" ? "#c49be8" : "#aaa" }}>{c.tribe}</span>
           <span className={`c-tag ${c.eliminationOrder ? "eliminated" : "alive"}`}>{c.eliminationOrder ? `Out · Week ${c.eliminatedWeek}` : "In the game"}</span>
         </div>
         {c.eliminationOrder && <div className="hint" style={{ marginTop: "0.4rem" }}>{ordinal(22 - c.eliminationOrder)} place · {calcPoints(c)} fantasy points</div>}
-      </div>
-    </div>
-  );
-}
-
-// ─── Week 5 ───────────────────────────────────────────────────────────────────
-function WeekFive({ compact = false }) {
-  return (
-    <div style={{ marginBottom: "1.5rem" }}>
-      {!compact && <><div className="page-title">Week 5</div><div className="page-subtitle">Not Here to Get a Pedicure · October 21, 2026</div></>}
-      <div className="section-title">Week 5 Results</div>
-      <div className="panel">
-        <div style={{ fontSize: "1rem", marginBottom: "0.6rem" }}>Alexis Levine (Miloa) and Linnea Capobianco (Ojalu) were voted out.</div>
-        <p className="hint">Alexis: 16th place · Linnea: 15th place · 14 castaways remain</p>
-        <ul className="hint" style={{ paddingLeft: "1.2rem", marginTop: "0.8rem", lineHeight: 1.9 }}>
-          <li>Double elimination: Savu voted out Alexis; Dina voted out Linnea.</li>
-          <li>Maggie gave two extra votes to Lewis and Kilby, creating a 4–4 deadlock at Dina.</li>
-          <li>After the tied revote, Dina chose Linnea rather than risk drawing rocks.</li>
-          <li>Fantasy standings and active castaway provisional points now reflect seven eliminations.</li>
-        </ul>
-        <a className="hint" style={{ color: "#6a9fd8", display: "inline-block", marginTop: "0.8rem" }} href="https://www.tvinsider.com/1298773/survivor-51-episode-5-recap-rock-draw-double-elimination-voted-out-jeff-probst/" target="_blank" rel="noopener noreferrer">Week 5 recap ↗</a>
-      </div>
-    </div>
-  );
-}
-
-// ─── Week 4 ───────────────────────────────────────────────────────────────────
-function WeekFour({ compact = false }) {
-  return (
-    <div style={{ marginBottom: "1.5rem" }}>
-      {!compact && <><div className="page-title">Week 4</div><div className="page-subtitle">That's the Magic of Survivor · October 14, 2026</div></>}
-      <div className="section-title">Week 4 Results</div>
-      <div className="panel">
-        <div style={{ fontSize: "1rem", marginBottom: "0.6rem" }}>Jenna Doore (Weloki) was voted out.</div>
-        <p className="hint">17th place · Savu · 16 castaways remained</p>
-        <ul className="hint" style={{ paddingLeft: "1.2rem", marginTop: "0.8rem", lineHeight: 1.9 }}>
-          <li>Tribe swap formed three tribes: Toka, Savu, and Dina.</li>
-          <li>Dina and Toka won immunity; Savu attended Tribal Council.</li>
-          <li>Jenna was voted out by a 4–1 vote.</li>
-        </ul>
-        <a className="hint" style={{ color: "#6a9fd8", display: "inline-block", marginTop: "0.8rem" }} href="https://www.paramountplus.com/sneak-peak/survivor-season-51-episode-4-recap/" target="_blank" rel="noopener noreferrer">Official Week 4 recap ↗</a>
       </div>
     </div>
   );
