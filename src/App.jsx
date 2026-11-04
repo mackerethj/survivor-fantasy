@@ -1,57 +1,38 @@
-// src/App.jsx  —  Fantasy Survivor · Season 51 Edition
-import { useEffect, useState } from "react";
+// src/App.jsx
+import { useEffect, useMemo, useState } from "react";
 
-const SPLASH_VERSION = "s51_week5_results_v1";
+// Bump this each time you commit/publish to force the splash page to reappear for everyone
+const SPLASH_VERSION = "ep9_v1.1";
+const SPLASH_IMAGE = "/jeff-probst-splash.png";
 
-// ─── Scoring ──────────────────────────────────────────────────────────────────
-// Same placement values as the History page (Season 50): first two out score
-// zero; thereafter each successive placement adds one point until the final
-// three, which increase by two points each. Active players are provisional.
-const CURRENT_WEEK = 5;
-const ELIMINATIONS = { "Aaliyah Puglia": 1, "Ana Sani": 2, "Rob Antonson": 3, "Patt Cannaday": 4, "Jenna Doore": 5, "Alexis Levine": 6, "Linnea Capobianco": 7 };
-const ELIMINATION_WEEKS = { "Aaliyah Puglia": 1, "Ana Sani": 2, "Rob Antonson": 3, "Patt Cannaday": 3, "Jenna Doore": 4, "Alexis Levine": 5, "Linnea Capobianco": 5 };
-const COMPLETED_ELIMINATIONS = Object.keys(ELIMINATIONS).length;
-function placementPoints(eliminationOrder, totalCastaways) {
-  if (eliminationOrder <= 2) return 0;
-  const finalThreeStart = totalCastaways - 2;
-  if (eliminationOrder >= finalThreeStart) {
-    const fourthPlacePoints = finalThreeStart - 3;
-    return fourthPlacePoints + (eliminationOrder - finalThreeStart + 1) * 2;
+function calcPoints(eliminationOrder, totalCastaways) {
+  if (!eliminationOrder || eliminationOrder <= 2) return 0;
+  const lastThreeStart = totalCastaways - 2;
+  if (eliminationOrder >= lastThreeStart) {
+    const basePoints = lastThreeStart - 3 + 1;
+    const stepsIntoFinalThree = eliminationOrder - (lastThreeStart - 1);
+    return basePoints + stepsIntoFinalThree * 2;
   }
   return eliminationOrder - 2;
 }
-function calcPoints(c) {
-  const total = SEASONS.find(season => season.current).totalCastaways;
-  return placementPoints(c.eliminationOrder ?? COMPLETED_ELIMINATIONS + 1, total);
+
+// Returns the point value for a given finish position (1 = winner)
+function calcPointsByFinish(finishPos, totalCastaways) {
+  // finishPos 1 = winner, finishPos = totalCastaways = first boot
+  const eliminationOrder = totalCastaways - finishPos + 1;
+  return calcPoints(eliminationOrder, totalCastaways);
 }
 
-// ─── Teams ────────────────────────────────────────────────────────────────────
 const TEAMS = [
   { id: 1, name: "Miloa",   members: "Team Miller",    color: "#c8922a" },
   { id: 2, name: "Jinga",   members: "Team Mackereth", color: "#6a9fd8" },
   { id: 3, name: "Ojalu",   members: "Team Lestan",    color: "#6db86d" },
   { id: 4, name: "Weloki",  members: "Team Wells",     color: "#c46ab0" },
+  { id: 5, name: "Nochoso", members: "The Unchosen",   color: "#888888" },
 ];
 
-// Five rounds, four teams. Round 5 continues the existing snake order.
-const DRAFT_ORDER = [4, 3, 2, 1, 1, 2, 3, 4, 4, 3, 2, 1, 1, 2, 3, 4, 4, 3, 2, 1];
-const DRAFT_KEY = "sf_s51_draft_v1";
-// Confirmed completed draft. Published picks override older browser drafts.
-const CONFIRMED_DRAFT = [
-  "Kristin Flickinger", "Danny 'Kilby' Kilby", "Ana Sani", "Sharonda Cox",
-  "Patt Cannaday", "Carter Krull", "Michael Pinsky", "Devin Way",
-  "Jenna Doore", "Maggie Nestor", "Angelica 'Jelly' Loblack", "Rob Antonson",
-  "Alexis Levine", "Eric Macksoud", "Cristian Chavez", "Ori Jean-Charles",
-  "Lewis Kelly", "Linnea Capobianco", "Thien An Nguyen", "Brady Booker",
-];
-function loadDraft() {
-  return [...CONFIRMED_DRAFT];
-}
-
-// ─── Season config ────────────────────────────────────────────────────────────
 const SEASONS = [
-  { id: 51, label: "Season 51", totalCastaways: 21, current: true },
-  { id: 50, label: "Season 50", totalCastaways: 24 },
+  { id: 50, label: "Season 50", totalCastaways: 24, current: true },
   { id: 49, label: "Season 49", totalCastaways: 18 },
   { id: 48, label: "Season 48", totalCastaways: 18 },
   { id: 47, label: "Season 47", totalCastaways: 18 },
@@ -61,410 +42,39 @@ const SEASONS = [
   { id: 43, label: "Season 43", totalCastaways: 18 },
 ];
 
-// Season 51 cast. Results through Week 3 are applied below. Draft assignments use the confirmed published picks.
-const S51_CASTAWAYS = [
-  {
-    name: "Aaliyah Puglia",
-    age: 25,
-    hometown: "Providence, RI",
-    occupation: "Chef",
-    bio: "Professional chef with culinary nutrition training from Johnson & Wales. Reportedly worked with the New England Patriots and specializes in plant-based cuisine.",
-    photoUrl: "https://inside-survivor.ams3.digitaloceanspaces.com/wp-content/uploads/2026/05/aaliyaj-12%C2%A71.png",
-    tribe: "TBD", draftedBy: null,
-  },
-  {
-    name: "Alexis Levine",
-    age: 28,
-    hometown: "Atlanta, GA",
-    occupation: "Attorney",
-    bio: "Criminal defense attorney and Emory Law graduate. Public-interest/legal-reform profile makes her a strong talker and potential social strategist.",
-    photoUrl: "https://inside-survivor.ams3.digitaloceanspaces.com/wp-content/uploads/2026/05/alex-asdasd.png",
-    tribe: "TBD", draftedBy: null,
-  },
-  {
-    name: "Angelica 'Jelly' Loblack",
-    age: 29,
-    hometown: "Bloomington, IN",
-    occupation: "Sociology Professor",
-    bio: "Indiana University sociology professor whose research focuses on racialization, identity, embodiment, and political engagement.",
-    photoUrl: "https://inside-survivor.ams3.digitaloceanspaces.com/wp-content/uploads/2026/05/jelly-q44.png",
-    tribe: "TBD", draftedBy: null,
-  },
-  {
-    name: "Ana Sani",
-    age: 34,
-    hometown: "Toronto, ON",
-    occupation: "Actress / Voice Actor",
-    bio: "Award-winning Canadian actor known for animation voice work including Strawberry Shortcake and My Little Pony, plus a live-action role on The Boys.",
-    photoUrl: "https://inside-survivor.ams3.digitaloceanspaces.com/wp-content/uploads/2026/05/ana2424.png",
-    tribe: "TBD", draftedBy: null,
-  },
-  {
-    name: "Brady Booker",
-    age: 26,
-    hometown: "LaSalle, IL → Orlando, FL",
-    occupation: "Pro Wrestler / Trainer",
-    bio: "Former WWE/NXT performer Bodhi Hayward and former college football player. Likely one of the most obvious early physical-threat profiles.",
-    photoUrl: "https://inside-survivor.ams3.digitaloceanspaces.com/wp-content/uploads/2026/05/bradyb-113.png",
-    tribe: "TBD", draftedBy: null,
-  },
-  {
-    name: "Carter Krull",
-    age: 25,
-    hometown: "Rock Rapids, IA",
-    occupation: "Farmer / Cattle Rancher",
-    bio: "Runs Moon Creek Farms. Former University of Sioux Falls football player with farm/ranch life experience that should translate well to camp.",
-    photoUrl: "https://inside-survivor.ams3.digitaloceanspaces.com/wp-content/uploads/2026/05/carter_1313.png",
-    tribe: "TBD", draftedBy: null,
-  },
-  {
-    name: "Cristian Chavez",
-    age: 25,
-    hometown: "Salt Lake City, UT",
-    occupation: "Human Resources Executive",
-    bio: "Reported S47 alternate who finally made it on. Mr. USU Congeniality winner with an oddball gem-collector hook.",
-    photoUrl: "https://inside-survivor.ams3.digitaloceanspaces.com/wp-content/uploads/2026/05/cc_508.png",
-    tribe: "TBD", draftedBy: null,
-  },
-  {
-    name: "Danny 'Kilby' Kilby",
-    age: 28,
-    hometown: "London, Ontario, Canada",
-    occupation: "Game Studio Founder",
-    bio: "Founder of Noodle Goose Games and co-host of The Winner's Edit Survivor podcast. Superfan/game-theory profile.",
-    photoUrl: "https://inside-survivor.ams3.digitaloceanspaces.com/wp-content/uploads/2026/05/dk_5w4.png",
-    tribe: "TBD", draftedBy: null,
-  },
-  {
-    name: "Devin Way",
-    age: 33,
-    hometown: "Lufkin, TX → West Hollywood, CA",
-    occupation: "Actor / Model",
-    bio: "Actor/model with credits including Grey's Anatomy, Queer as Folk, and Sistas. Charisma archetype with a built-in threat-management question.",
-    photoUrl: "https://inside-survivor.ams3.digitaloceanspaces.com/wp-content/uploads/2026/05/devin_4242.png",
-    tribe: "TBD", draftedBy: null,
-  },
-  {
-    name: "Eric Macksoud",
-    age: 34,
-    hometown: "Sunderland, MA",
-    occupation: "Mental Health Therapist",
-    bio: "Former Clark University swimmer and theater performer. Counselor background could help with emotional reads and tribe management.",
-    photoUrl: "https://inside-survivor.ams3.digitaloceanspaces.com/wp-content/uploads/2026/05/ericm-adsad.png",
-    tribe: "TBD", draftedBy: null,
-  },
-  {
-    name: "Jenna Doore",
-    age: 31,
-    hometown: "Maumee, OH → Arizona",
-    occupation: "Wedding Videographer",
-    bio: "Wedding photographer/videographer and dedicated Survivor fan. Creative storyteller type who may read people well.",
-    photoUrl: "https://inside-survivor.ams3.digitaloceanspaces.com/wp-content/uploads/2026/05/jenna-31313.png",
-    tribe: "TBD", draftedBy: null,
-  },
-  {
-    name: "Kristin Flickinger",
-    age: 49,
-    hometown: "Santa Barbara, CA",
-    occupation: "Former Pride Director",
-    bio: " JD from Willamette; reportedly raised $20M+ for HIV services and has applied for years.",
-    photoUrl: "https://inside-survivor.ams3.digitaloceanspaces.com/wp-content/uploads/2026/05/kristin_24424.png",
-    tribe: "TBD", draftedBy: null,
-  },
-  {
-    name: "Lewis Kelly",
-    age: 28,
-    hometown: "Dublin, Ireland → Puerto Rico",
-    occupation: "Influencer / Model",
-    bio: "TikTok creator/model and reportedly the first Irish-born castaway. Became a U.S. citizen in 2025 after moving to Puerto Rico.",
-    photoUrl: "https://inside-survivor.ams3.digitaloceanspaces.com/wp-content/uploads/2026/05/lewis_asdad.png",
-    tribe: "TBD", draftedBy: null,
-  },
-  {
-    name: "Linnea Capobianco",
-    age: 26,
-    hometown: "Kearny, NJ → New York City",
-    occupation: "Sex Store Owner",
-    bio: "Co-owner of Afterglow in NYC with her brother. Former soccer/lacrosse athlete; likely comfortable in direct conversations.",
-    photoUrl: "https://inside-survivor.ams3.digitaloceanspaces.com/wp-content/uploads/2026/05/linnea_dsafas.png",
-    tribe: "TBD", draftedBy: null,
-  },
-  {
-    name: "Maggie Nestor",
-    age: 40,
-    hometown: "Charles Town, WV",
-    occupation: "Camp Counselor / Farmer",
-    bio: "Reportedly the first West Virginia castaway. Homeschools three kids while working as a camp counselor and farmer.",
-    photoUrl: "https://inside-survivor.ams3.digitaloceanspaces.com/wp-content/uploads/2026/05/mag.png",
-    tribe: "TBD", draftedBy: null,
-  },
-  {
-    name: "Michael Pinsky",
-    age: 32,
-    hometown: "New York, NY",
-    occupation: "Baseball Operations",
-    bio: "Assistant Director of Baseball Operations for the New York Yankees. Princeton grad with a sports-analytics/front-office profile.",
-    photoUrl: "https://inside-survivor.ams3.digitaloceanspaces.com/wp-content/uploads/2026/05/mike-assa.png",
-    tribe: "TBD", draftedBy: null,
-  },
-  {
-    name: "Ori Jean-Charles",
-    age: 27,
-    hometown: "Monsey, NY",
-    occupation: "Personal Trainer / Youth Director",
-    bio: "'Coach O' — Director of Youth Services at the MLK Center of Rockland and former University at Albany linebacker.",
-    photoUrl: "https://inside-survivor.ams3.digitaloceanspaces.com/wp-content/uploads/2026/05/ojads.jpg",
-    tribe: "TBD", draftedBy: null,
-  },
-  {
-    name: "Patt Cannaday",
-    age: 33,
-    hometown: "Norfolk, VA",
-    occupation: "U.S. Navy Attorney",
-    bio: "Attorney for the U.S. Navy. JD from Washington University in St. Louis; runs a boxing club for at-risk youth.",
-    photoUrl: "https://inside-survivor.ams3.digitaloceanspaces.com/wp-content/uploads/2026/05/pattc_252.png",
-    tribe: "TBD", draftedBy: null,
-  },
-  {
-    name: "Rob Antonson",
-    age: 40,
-    hometown: "Boston, MA",
-    occupation: "Airport Operations",
-    bio: "JetBlue/Logan Airport operations worker and aspiring comedian who hosts The Rob Show podcast.",
-    photoUrl: "https://inside-survivor.ams3.digitaloceanspaces.com/wp-content/uploads/2026/05/roba_2q131.png",
-    tribe: "TBD", draftedBy: null,
-  },
-  {
-    name: "Sharonda Cox",
-    age: 34,
-    hometown: "Berea, KY",
-    occupation: "OBGYN",
-    bio: "OBGYN and avid traveler. Reported medical-background player with a polished professional presence.",
-    photoUrl: "https://inside-survivor.ams3.digitaloceanspaces.com/wp-content/uploads/2026/05/sharo-424.png",
-    tribe: "TBD", draftedBy: null,
-  },
-  {
-    name: "Thien An Nguyen",
-    age: 25,
-    hometown: "Fort Worth, TX",
-    occupation: "Medical Student",
-    bio: "TCU medical student and marathon runner. Young, high-achieving profile with endurance upside.",
-    photoUrl: "https://inside-survivor.ams3.digitaloceanspaces.com/wp-content/uploads/2026/05/thien-asdas.png",
-    tribe: "TBD", draftedBy: null,
-  },
+const TRIBE_COLORS = { Vatu: "#a855c8", Kalo: "#2ab8a0", Cila: "#e8782a" };
+
+// draftedBy: 1=Miloa, 2=Jinga, 3=Ojalu, 4=Weloki, null=undrafted
+// Draft locked — do not modify picks here
+const S50_CASTAWAYS = [
+  { name: "Angelina Keeley",         tribe: "Vatu", origTribe: "Kalo", bio: "3rd place, S37 David vs. Goliath",                                    odds: "+4000", photo: "https://entertainmentnow.com/wp-content/uploads/2026/01/survivor-season-50-cast-spoilers-first-photos-angelina-keeley.jpg",         draftedBy: 5    },
+  { name: "Aubry Bracco",            tribe: "Kalo", origTribe: "Vatu", bio: "Runner-up S32 Kaoh Rong · S34 Game Changers · S38 Edge of Extinction", odds: "-250",  photo: "https://entertainmentnow.com/wp-content/uploads/2026/01/survivor-season-50-cast-spoilers-first-photos-aubry-bracco.jpg",            draftedBy: 4    },
+  { name: 'Benjamin "Coach" Wade',   tribe: "Kalo", origTribe: "Kalo", bio: "Runner-up S23 South Pacific · S18 Tocantins · S20 Heroes vs. Villains",odds: "+3500", photo: "https://entertainmentnow.com/wp-content/uploads/2026/01/survivor-season-50-cast-spoilers-first-photos-benjamin-coach-wade.jpg",   draftedBy: 1    },
+  { name: "Charlie Davis",           tribe: "Cila", origTribe: "Kalo", bio: "Runner-up S46",                                                        odds: "+2500", photo: "https://entertainmentnow.com/wp-content/uploads/2026/01/survivor-season-50-cast-spoilers-first-photos-charlie-davis.jpg",           draftedBy: 4    },
+  { name: "Chrissy Hofbeck",         tribe: "Kalo", origTribe: "Kalo", bio: "Runner-up S35 Heroes vs. Healers vs. Hustlers",                        odds: "+3000", photo: "https://entertainmentnow.com/wp-content/uploads/2026/01/survivor-season-50-cast-spoilers-first-photos-chrissy-hofbeck.jpg",         draftedBy: 5    },
+  { name: "Christian Hubicki",       tribe: "Vatu", origTribe: "Cila", bio: "7th place S37 David vs. Goliath",                                      odds: "+800",  photo: "https://entertainmentnow.com/wp-content/uploads/2026/01/survivor-season-50-cast-spoilers-first-photos-christian-hubicki.jpg",       draftedBy: 1    },
+  { name: "Cirie Fields",            tribe: "Cila", origTribe: "Cila", bio: "5x player · S12 Panama · S16 Micronesia · S20 HvV · S34 Game Changers",odds: "+1200", photo: "https://entertainmentnow.com/wp-content/uploads/2026/01/survivor-season-50-cast-spoilers-first-photos-cirie-fields.jpg",            draftedBy: 4    },
+  { name: "Colby Donaldson",         tribe: "Kalo", origTribe: "Vatu", bio: "Runner-up S2 Australian Outback · S8 All-Stars · S20 Heroes vs. Villains",odds:"+5000",photo: "https://entertainmentnow.com/wp-content/uploads/2026/01/survivor-season-50-cast-spoilers-first-photos-colby-donaldson.jpg",         draftedBy: 2    },
+  { name: "Dee Valladares",          tribe: "Cila", origTribe: "Kalo", bio: "WINNER S45 ★",                                                         odds: "+2000", photo: "https://entertainmentnow.com/wp-content/uploads/2026/01/survivor-season-50-cast-spoilers-first-photos-dee-valladares.jpg",          draftedBy: 3    },
+  { name: "Emily Flippen",           tribe: "Vatu", origTribe: "Cila", bio: "7th place S45",                                                        odds: "+2500", photo: "https://entertainmentnow.com/wp-content/uploads/2026/01/survivor-season-50-cast-spoilers-first-photos-emily-flippen.jpg",           draftedBy: 1    },
+  { name: "Genevieve Mushaluk",      tribe: "Kalo", origTribe: "Vatu", bio: "5th place S47",                                                        odds: "+2000", photo: "https://entertainmentnow.com/wp-content/uploads/2026/01/survivor-season-50-cast-spoilers-first-photos-genevieve-mushaluk.jpg",      draftedBy: 4    },
+  { name: "Jenna Lewis-Dougherty",   tribe: "Cila", origTribe: "Cila", bio: "S1 Borneo · Final 3 S8 All-Stars",                                     odds: "+4000", photo: "https://entertainmentnow.com/wp-content/uploads/2026/01/survivor-season-50-cast-spoilers-first-photos-jenna-lewis-dougherty.jpg",   draftedBy: 5    },
+  { name: "Joe Hunter",              tribe: "Kalo", origTribe: "Cila", bio: "3rd place S48",                                                        odds: "+700",  photo: "https://entertainmentnow.com/wp-content/uploads/2026/01/survivor-season-50-cast-spoilers-first-photos-joe-hunter.jpg",              draftedBy: 3    },
+  { name: "Jonathan Young",          tribe: "Cila", origTribe: "Kalo", bio: "4th place S42",                                                        odds: "+900",  photo: "https://entertainmentnow.com/wp-content/uploads/2026/01/survivor-season-50-cast-spoilers-first-photos-jonathan-young.jpg",          draftedBy: 2    },
+  { name: "Kamilla Karthigesu",      tribe: "Cila", origTribe: "Kalo", bio: "4th place S48",                                                        odds: "+2500", photo: "https://entertainmentnow.com/wp-content/uploads/2026/01/survivor-season-50-cast-spoilers-first-photos-kamilla-karthigesu.jpg",      draftedBy: 3    },
+  { name: "Kyle Fraser",             tribe: "Vatu", origTribe: "Vatu", bio: "WINNER S48 ★",                                                         odds: "+2000", photo: "https://entertainmentnow.com/wp-content/uploads/2026/01/survivor-season-50-cast-spoilers-first-photos-kyle-fraser.jpg",             draftedBy: 5    },
+  { name: "Mike White",              tribe: "Vatu", origTribe: "Kalo", bio: "Runner-up S37 David vs. Goliath · Creator of The White Lotus",         odds: "+3000", photo: "https://entertainmentnow.com/wp-content/uploads/2026/01/survivor-season-50-cast-spoilers-first-photos-mike-white.jpg",              draftedBy: 1    },
+  { name: "Ozzy Lusth",              tribe: "Vatu", origTribe: "Cila", bio: "Runner-up S13 Cook Islands · 4x player total",                         odds: "+3500", photo: "https://entertainmentnow.com/wp-content/uploads/2026/01/survivor-season-50-cast-spoilers-first-photos-ozzy-lutsh.jpg",              draftedBy: 2    },
+  { name: "Q Burdette",              tribe: "Vatu", origTribe: "Vatu", bio: "8th place S46",                                                        odds: "+3000", photo: "https://entertainmentnow.com/wp-content/uploads/2026/01/survivor-season-50-cast-spoilers-first-photos-quintavius-q-burdette.jpg",   draftedBy: 3    },
+  { name: "Rick Devens",             tribe: "Cila", origTribe: "Cila", bio: "4th place S38 Edge of Extinction",                                     odds: "+2500", photo: "https://entertainmentnow.com/wp-content/uploads/2026/01/survivor-season-50-cast-spoilers-first-photos-rick-devens.jpg",             draftedBy: 4    },
+  { name: "Rizo Velovic",            tribe: "Cila", origTribe: "Vatu", bio: "4th place S49",                                                        odds: "+3000", photo: "https://entertainmentnow.com/wp-content/uploads/2026/01/survivor-season-50-cast-spoilers-first-photos-rizo-velovic.jpg",            draftedBy: 2    },
+  { name: "Savannah Louie",          tribe: "Cila", origTribe: "Cila", bio: "WINNER S49 ★",                                                         odds: "+2500", photo: "https://entertainmentnow.com/wp-content/uploads/2026/01/survivor-season-50-cast-spoilers-first-photos-savannah-louie.jpg",          draftedBy: 1    },
+  { name: "Stephenie LaGrossa",      tribe: "Vatu", origTribe: "Vatu", bio: "Runner-up S11 Guatemala · S10 Palau · S20 Heroes vs. Villains",        odds: "+4000", photo: "https://entertainmentnow.com/wp-content/uploads/2026/01/survivor-season-50-cast-spoilers-first-photos-stephanie-lagrossa-kendrick.jpg", draftedBy: 3 },
+  { name: "Tiffany Ervin",           tribe: "Kalo", origTribe: "Vatu", bio: "8th place S46",                                                        odds: "+3500", photo: "https://entertainmentnow.com/wp-content/uploads/2026/01/survivor-season-50-cast-spoilers-first-photos-tiffany-ervin.jpg",           draftedBy: 2    },
 ];
 
-// ─── Historical results (unchanged) ──────────────────────────────────────────
-const S50_RESULTS = {
-  season: 50,
-  teamScores: [
-    { name: "Jinga",   members: "Team Mackereth", color: "#6a9fd8", score: 84, winner: true },
-    { name: "Weloki",  members: "Team Wells",     color: "#c46ab0", score: 71 },
-    { name: "Ojalu",   members: "Team Lestan",    color: "#6db86d", score: 52 },
-    { name: "Miloa",   members: "Team Miller",    color: "#c8922a", score: 41 },
-    { name: "Nochoso", members: "The Unchosen",   color: "#888888", score: 14 },
-  ],
-  placements: [
-    { place: 24, points: 26, player: "Aubry Bracco",           team: "Weloki",  teamColor: "#c46ab0" },
-    { place: 23, points: 24, player: "Jonathan Young",         team: "Jinga",   teamColor: "#6a9fd8" },
-    { place: 22, points: 22, player: "Joe Hunter",             team: "Ojalu",   teamColor: "#6db86d" },
-    { place: 21, points: 19, player: "Rizo Velovic",           team: "Jinga",   teamColor: "#6a9fd8" },
-    { place: 20, points: 18, player: "Tiffany Ervin",          team: "Jinga",   teamColor: "#6a9fd8" },
-    { place: 19, points: 17, player: "Cirie Fields",           team: "Weloki",  teamColor: "#c46ab0" },
-    { place: 18, points: 16, player: "Rick Devens",            team: "Weloki",  teamColor: "#c46ab0" },
-    { place: 17, points: 15, player: "Ozzy Lusth",             team: "Jinga",   teamColor: "#6a9fd8" },
-    { place: 16, points: 14, player: "Emily Flippen",          team: "Miloa",   teamColor: "#c8922a" },
-    { place: 15, points: 13, player: "Stephenie LaGrossa",     team: "Ojalu",   teamColor: "#6db86d" },
-    { place: 14, points: 12, player: "Christian Hubicki",      team: "Miloa",   teamColor: "#c8922a" },
-    { place: 13, points: 11, player: "Coach Wade",             team: "Miloa",   teamColor: "#c8922a" },
-    { place: 12, points: 10, player: "Chrissy Hofbeck",        team: "Nochoso", teamColor: "#888888" },
-    { place: 11, points: 9,  player: "Dee Valladares",         team: "Ojalu",   teamColor: "#6db86d" },
-    { place: 10, points: 8,  player: "Colby Donaldson",        team: "Jinga",   teamColor: "#6a9fd8" },
-    { place: 9,  points: 7,  player: "Genevieve Mushaluk",     team: "Weloki",  teamColor: "#c46ab0" },
-    { place: 8,  points: 6,  player: "Kamilla Karthigesu",     team: "Ojalu",   teamColor: "#6db86d" },
-    { place: 7,  points: 5,  player: "Charlie Davis",          team: "Weloki",  teamColor: "#c46ab0" },
-    { place: 6,  points: 4,  player: "Angelina Keeley",        team: "Nochoso", teamColor: "#888888" },
-    { place: 5,  points: 3,  player: "Mike White",             team: "Miloa",   teamColor: "#c8922a" },
-    { place: 4,  points: 2,  player: "Q Burdette",             team: "Ojalu",   teamColor: "#6db86d" },
-    { place: 3,  points: 1,  player: "Savannah Louie",         team: "Miloa",   teamColor: "#c8922a" },
-    { place: 2,  points: 0,  player: "Kyle Fraser",            team: "Nochoso", teamColor: "#888888" },
-    { place: 1,  points: 0,  player: "Jenna Lewis-Dougherty",  team: "Nochoso", teamColor: "#888888" },
-  ],
-};
-const S49_RESULTS = {
-  season: 49,
-  teamScores: [
-    { name: "Jinga",  members: "Team Mackereth", color: "#6a9fd8", score: 61, winner: true },
-    { name: "Ojalu",  members: "Team Lestan",    color: "#6db86d", score: 40 },
-    { name: "Weloki", members: "Team Wells",     color: "#c46ab0", score: 38 },
-    { name: "Miloa",  members: "Team Miller",    color: "#c8922a", score: 19 },
-  ],
-  placements: [
-    { place: 18, points: 20, player: "Savannah", team: "Jinga",  teamColor: "#6a9fd8" },
-    { place: 17, points: 18, player: "Sam",      team: "Ojalu",  teamColor: "#6db86d" },
-    { place: 16, points: 14, player: "Dee",      team: "Weloki", teamColor: "#c46ab0" },
-    { place: 15, points: 13, player: "Tiff",     team: "Jinga",  teamColor: "#6a9fd8" },
-    { place: 14, points: 12, player: "Eva",      team: "Ojalu",  teamColor: "#6db86d" },
-    { place: 13, points: 11, player: "Kamilla",  team: "Weloki", teamColor: "#c46ab0" },
-    { place: 12, points: 10, player: "Rachel",   team: "Jinga",  teamColor: "#6a9fd8" },
-    { place: 11, points: 9,  player: "Kyle",     team: "Miloa",  teamColor: "#c8922a" },
-    { place: 10, points: 8,  player: "Hunter",   team: "Ojalu",  teamColor: "#6db86d" },
-    { place: 9,  points: 7,  player: "Soda",     team: "Miloa",  teamColor: "#c8922a" },
-    { place: 8,  points: 6,  player: "Kenzie",   team: "Weloki", teamColor: "#c46ab0" },
-    { place: 7,  points: 5,  player: "Shauhin",  team: "Jinga",  teamColor: "#6a9fd8" },
-    { place: 6,  points: 4,  player: "Venus",    team: "Miloa",  teamColor: "#c8922a" },
-    { place: 5,  points: 3,  player: "Q",        team: "Ojalu",  teamColor: "#6db86d" },
-    { place: 4,  points: 2,  player: "Teeny",    team: "Miloa",  teamColor: "#c8922a" },
-    { place: 3,  points: 2,  player: "Maria",    team: "Weloki", teamColor: "#c46ab0" },
-    { place: 2,  points: 1,  player: "Randen",   team: "NA",     teamColor: "#777" },
-    { place: 1,  points: 0,  player: "Nicole",   team: "NA",     teamColor: "#777" },
-  ],
-};
-const S48_RESULTS = {
-  season: 48,
-  teamScores: [
-    { name: "Jinga",  members: "Team Mackereth", color: "#6a9fd8", score: 45, winner: true },
-    { name: "Weloki", members: "Team Wells",     color: "#c46ab0", score: 37 },
-    { name: "Miloa",  members: "Team Miller",    color: "#c8922a", score: 36 },
-    { name: "Ojalu",  members: "Team Lestan",    color: "#6db86d", score: 35 },
-  ],
-  placements: [
-    { place: 18, points: 20, player: "Kyle",      team: "Miloa",  teamColor: "#c8922a" },
-    { place: 17, points: 18, player: "Genevieve", team: "Jinga",  teamColor: "#6a9fd8" },
-    { place: 16, points: 14, player: "Kenzie",    team: "Weloki", teamColor: "#c46ab0" },
-    { place: 15, points: 13, player: "Kamilla",   team: "Ojalu",  teamColor: "#6db86d" },
-    { place: 14, points: 12, player: "Eva",       team: "Weloki", teamColor: "#c46ab0" },
-    { place: 13, points: 11, player: "Tiff",      team: "Jinga",  teamColor: "#6a9fd8" },
-    { place: 12, points: 10, player: "Joe",       team: "Ojalu",  teamColor: "#6db86d" },
-    { place: 11, points: 9,  player: "Saiounia",  team: "Miloa",  teamColor: "#c8922a" },
-    { place: 10, points: 8,  player: "Shauhin",   team: "Jinga",  teamColor: "#6a9fd8" },
-    { place: 9,  points: 7,  player: "David",     team: "Ojalu",  teamColor: "#6db86d" },
-    { place: 8,  points: 6,  player: "Charity",   team: "Weloki", teamColor: "#c46ab0" },
-    { place: 7,  points: 5,  player: "Cedrek",    team: "Miloa",  teamColor: "#c8922a" },
-    { place: 6,  points: 4,  player: "Mary",      team: "Jinga",  teamColor: "#6a9fd8" },
-    { place: 5,  points: 3,  player: "Teeny",     team: "Weloki", teamColor: "#c46ab0" },
-    { place: 4,  points: 2,  player: "Kevin",     team: "Ojalu",  teamColor: "#6db86d" },
-    { place: 3,  points: 2,  player: "Bianca",    team: "Miloa",  teamColor: "#c8922a" },
-    { place: 2,  points: 2,  player: "Chrissy",   team: "Ojalu",  teamColor: "#6db86d" },
-    { place: 1,  points: 0,  player: "Stephanie", team: "NA",     teamColor: "#777" },
-  ],
-};
-const S47_RESULTS = {
-  season: 47,
-  teamScores: [
-    { name: "Weloki", members: "Team Wells",     color: "#c46ab0", score: 94, winner: true },
-    { name: "Miloa",  members: "Team Miller",    color: "#c8922a", score: 62 },
-    { name: "Ojalu",  members: "Team Lestan",    color: "#6db86d", score: 56 },
-    { name: "Jinga",  members: "Team Mackereth", color: "#6a9fd8", score: 46 },
-  ],
-  placements: [
-    { place: 18, points: 46, player: "Rachel",    team: "Weloki", teamColor: "#c46ab0" },
-    { place: 17, points: 38, player: "Sam",       team: "Miloa",  teamColor: "#c8922a" },
-    { place: 16, points: 27, player: "Sue",       team: "Ojalu",  teamColor: "#6db86d" },
-    { place: 15, points: 24, player: "Genevieve", team: "Weloki", teamColor: "#c46ab0" },
-    { place: 14, points: 21, player: "Kyle",      team: "Jinga",  teamColor: "#6a9fd8" },
-    { place: 13, points: 20, player: "Andy",      team: "NA",     teamColor: "#777" },
-    { place: 12, points: 17, player: "Teeny",     team: "Jinga",  teamColor: "#6a9fd8" },
-    { place: 11, points: 15, player: "Gabe",      team: "Ojalu",  teamColor: "#6db86d" },
-    { place: 10, points: 14, player: "Sierra",    team: "Weloki", teamColor: "#c46ab0" },
-    { place: 9,  points: 12, player: "Sol",       team: "Ojalu",  teamColor: "#6db86d" },
-    { place: 8,  points: 12, player: "Caroline",  team: "Miloa",  teamColor: "#c8922a" },
-    { place: 7,  points: 10, player: "Rome",      team: "Miloa",  teamColor: "#c8922a" },
-    { place: 6,  points: 10, player: "Tiyana",    team: "Weloki", teamColor: "#c46ab0" },
-    { place: 5,  points: 8,  player: "Anika",     team: "Jinga",  teamColor: "#6a9fd8" },
-    { place: 4,  points: 2,  player: "Kishan",    team: "Ojalu",  teamColor: "#6db86d" },
-    { place: 3,  points: 2,  player: "Aysha",     team: "Miloa",  teamColor: "#c8922a" },
-    { place: 2,  points: 0,  player: "TK",        team: "Jinga",  teamColor: "#6a9fd8" },
-    { place: 1,  points: 0,  player: "Jon",       team: "NA",     teamColor: "#777" },
-  ],
-};
-const S46_RESULTS = {
-  season: 46,
-  teamScores: [
-    { name: "Weloki", members: "Team Wells",     color: "#c46ab0", score: 76, winner: true },
-    { name: "Ojalu",  members: "Team Lestan",    color: "#6db86d", score: 72 },
-    { name: "Miloa",  members: "Team Miller",    color: "#c8922a", score: 53 },
-    { name: "Jinga",  members: "Team Mackereth", color: "#6a9fd8", score: 29 },
-  ],
-  placements: [
-    { place: 18, points: 29, player: "Kenzie",  team: "Weloki", teamColor: "#c46ab0" },
-    { place: 17, points: 27, player: "Charlie", team: "Miloa",  teamColor: "#c8922a" },
-    { place: 16, points: 23, player: "Ben",     team: "Ojalu",  teamColor: "#6db86d" },
-    { place: 15, points: 19, player: "Liz",     team: "NA",     teamColor: "#777" },
-    { place: 14, points: 21, player: "Maria",   team: "Weloki", teamColor: "#c46ab0" },
-    { place: 13, points: 24, player: "Q",       team: "Ojalu",  teamColor: "#6db86d" },
-    { place: 12, points: 21, player: "Venus",   team: "Weloki", teamColor: "#c46ab0" },
-    { place: 11, points: 10, player: "Tiffany", team: "Miloa",  teamColor: "#c8922a" },
-    { place: 10, points: 20, player: "Hunter",  team: "Jinga",  teamColor: "#6a9fd8" },
-    { place: 9,  points: 16, player: "Tevin",   team: "Ojalu",  teamColor: "#6db86d" },
-    { place: 8,  points: 13, player: "Soda",    team: "Miloa",  teamColor: "#c8922a" },
-    { place: 7,  points: 9,  player: "Tim",     team: "Ojalu",  teamColor: "#6db86d" },
-    { place: 6,  points: 5,  player: "Jem",     team: "Jinga",  teamColor: "#6a9fd8" },
-    { place: 5,  points: 0,  player: "Moriah",  team: "Jinga",  teamColor: "#6a9fd8" },
-    { place: 4,  points: 3,  player: "Bhanu",   team: "Miloa",  teamColor: "#c8922a" },
-    { place: 3,  points: 5,  player: "Randen",  team: "Weloki", teamColor: "#c46ab0" },
-    { place: 2,  points: 4,  player: "Jess",    team: "Jinga",  teamColor: "#6a9fd8" },
-    { place: 1,  points: 0,  player: "David",   team: "NA",     teamColor: "#777" },
-  ],
-};
-const S45_RESULTS = {
-  season: 45,
-  teamScores: [
-    { name: "Miloa",  members: "Team Miller",    color: "#c8922a", score: 121, winner: true },
-    { name: "Jinga",  members: "Team Mackereth", color: "#6a9fd8", score: 118 },
-    { name: "Ojalu",  members: "Team Lestan",    color: "#6db86d", score: 51  },
-    { name: "Weloki", members: "Team Wells",     color: "#c46ab0", score: 0,   na: true },
-  ],
-  placements: [
-    { place: 18, points: 38, player: "Dee",     team: "Miloa",  teamColor: "#c8922a" },
-    { place: 17, points: 28, player: "Austin",  team: "Jinga",  teamColor: "#6a9fd8" },
-    { place: 16, points: 19, player: "Drew",    team: "Miloa",  teamColor: "#c8922a" },
-    { place: 15, points: 44, player: "Julie",   team: "Jinga",  teamColor: "#6a9fd8" },
-    { place: 14, points: 20, player: "Katura",  team: "Ojalu",  teamColor: "#6db86d" },
-    { place: 13, points: 13, player: "Niki",    team: "Ojalu",  teamColor: "#6db86d" },
-    { place: 12, points: 11, player: "Emily",   team: "Ojalu",  teamColor: "#6db86d" },
-    { place: 11, points: 20, player: "Bruce",   team: "Miloa",  teamColor: "#c8922a" },
-    { place: 10, points: 11, player: "Kellie",  team: "Jinga",  teamColor: "#6a9fd8" },
-    { place: 9,  points: 12, player: "Kendra",  team: "Miloa",  teamColor: "#c8922a" },
-    { place: 8,  points: 33, player: "Jake",    team: "Jinga",  teamColor: "#6a9fd8" },
-    { place: 7,  points: 32, player: "Kaleb",   team: "Jinga",  teamColor: "#6a9fd8" },
-    { place: 6,  points: 10, player: "J.",      team: "NA",     teamColor: "#777" },
-    { place: 5,  points: 6,  player: "Brando",  team: "Miloa",  teamColor: "#c8922a" },
-    { place: 4,  points: 3,  player: "Sean",    team: "Ojalu",  teamColor: "#6db86d" },
-    { place: 3,  points: 0,  player: "Sabiyah", team: "Miloa",  teamColor: "#c8922a" },
-    { place: 2,  points: 0,  player: "Brandon", team: "NA",     teamColor: "#777" },
-    { place: 1,  points: 0,  player: "Hanna",   team: "NA",     teamColor: "#777" },
-  ],
-};
-const S44_RESULTS = {
-  season: 44,
-  teamScores: [
-    { name: "Jinga",  members: "Team Mackereth", color: "#6a9fd8", score: 56, winner: true },
-    { name: "Ojalu",  members: "Team Lestan",    color: "#6db86d", score: 40 },
-    { name: "Miloa",  members: "Team Miller",    color: "#c8922a", score: 24 },
-    { name: "Weloki", members: "Team Wells",     color: "#c46ab0", score: 0,  na: true },
-  ],
-  placements: [
-    { place: 18, points: 21, player: "Yam Yam",  team: "Jinga",  teamColor: "#6a9fd8" },
-    { place: 17, points: 17, player: "Heidi",    team: "Ojalu",  teamColor: "#6db86d" },
-    { place: 16, points: 14, player: "Carolyn",  team: "Miloa",  teamColor: "#c8922a" },
-    { place: 15, points: 12, player: "Carson",   team: "Jinga",  teamColor: "#6a9fd8" },
-    { place: 14, points: 11, player: "Lauren",   team: "Ojalu",  teamColor: "#6db86d" },
-    { place: 13, points: 10, player: "Jaime",    team: "NA",     teamColor: "#777" },
-    { place: 12, points: 9,  player: "Danny",    team: "Miloa",  teamColor: "#c8922a" },
-    { place: 11, points: 8,  player: "Frannie",  team: "Ojalu",  teamColor: "#6db86d" },
-    { place: 10, points: 7,  player: "Kane",     team: "Jinga",  teamColor: "#6a9fd8" },
-    { place: 9,  points: 6,  player: "Brandon",  team: "Miloa",  teamColor: "#c8922a" },
-    { place: 8,  points: 5,  player: "MattB",    team: "Ojalu",  teamColor: "#6db86d" },
-    { place: 7,  points: 4,  player: "Josh",     team: "Jinga",  teamColor: "#6a9fd8" },
-    { place: 6,  points: 3,  player: "MattG",    team: "Miloa",  teamColor: "#c8922a" },
-    { place: 5,  points: 2,  player: "Sarah",    team: "Ojalu",  teamColor: "#6db86d" },
-    { place: 4,  points: 1,  player: "Claire",   team: "Jinga",  teamColor: "#6a9fd8" },
-    { place: 3,  points: 0,  player: "Helen",    team: "Miloa",  teamColor: "#c8922a" },
-    { place: 2,  points: 0,  player: "Maddy",    team: "NA",     teamColor: "#777" },
-    { place: 1,  points: 0,  player: "Bruce",    team: "NA",     teamColor: "#777" },
-  ],
-};
+const ADMIN_PASSWORD = "Ottffsse9";
+
 const S43_RESULTS = {
   season: 43,
   teamScores: [
@@ -495,7 +105,187 @@ const S43_RESULTS = {
   ],
 };
 
-const HISTORICAL = { 50: S50_RESULTS, 49: S49_RESULTS, 48: S48_RESULTS, 47: S47_RESULTS, 46: S46_RESULTS, 45: S45_RESULTS, 44: S44_RESULTS, 43: S43_RESULTS };
+const S44_RESULTS = {
+  season: 44,
+  teamScores: [
+    { name: "Jinga",  members: "Team Mackereth", color: "#6a9fd8", score: 56, winner: true },
+    { name: "Ojalu",  members: "Team Lestan",    color: "#6db86d", score: 40 },
+    { name: "Miloa",  members: "Team Miller",    color: "#c8922a", score: 24 },
+    { name: "Weloki", members: "Team Wells",     color: "#c46ab0", score: 0,  na: true },
+  ],
+  placements: [
+    { place: 18, points: 21, player: "Yam Yam",  team: "Jinga",  teamColor: "#6a9fd8" },
+    { place: 17, points: 17, player: "Heidi",    team: "Ojalu",  teamColor: "#6db86d" },
+    { place: 16, points: 14, player: "Carolyn",  team: "Miloa",  teamColor: "#c8922a" },
+    { place: 15, points: 12, player: "Carson",   team: "Jinga",  teamColor: "#6a9fd8" },
+    { place: 14, points: 11, player: "Lauren",   team: "Ojalu",  teamColor: "#6db86d" },
+    { place: 13, points: 10, player: "Jaime",    team: "NA",     teamColor: "#777" },
+    { place: 12, points: 9,  player: "Danny",    team: "Miloa",  teamColor: "#c8922a" },
+    { place: 11, points: 8,  player: "Frannie",  team: "Ojalu",  teamColor: "#6db86d" },
+    { place: 10, points: 7,  player: "Kane",     team: "Jinga",  teamColor: "#6a9fd8" },
+    { place: 9,  points: 6,  player: "Brandon",  team: "Miloa",  teamColor: "#c8922a" },
+    { place: 8,  points: 5,  player: "MattB",    team: "Ojalu",  teamColor: "#6db86d" },
+    { place: 7,  points: 4,  player: "Josh",     team: "Jinga",  teamColor: "#6a9fd8" },
+    { place: 6,  points: 3,  player: "MattG",    team: "Miloa",  teamColor: "#c8922a" },
+    { place: 5,  points: 2,  player: "Sarah",    team: "Ojalu",  teamColor: "#6db86d" },
+    { place: 4,  points: 1,  player: "Claire",   team: "Jinga",  teamColor: "#6a9fd8" },
+    { place: 3,  points: 0,  player: "Helen",    team: "Miloa",  teamColor: "#c8922a" },
+    { place: 2,  points: 0,  player: "Maddy",    team: "NA",     teamColor: "#777" },
+    { place: 1,  points: 0,  player: "Bruce",    team: "NA",     teamColor: "#777" },
+  ],
+};
+
+const S45_RESULTS = {
+  season: 45,
+  teamScores: [
+    { name: "Miloa",  members: "Team Miller",    color: "#c8922a", score: 121, winner: true },
+    { name: "Jinga",  members: "Team Mackereth", color: "#6a9fd8", score: 118 },
+    { name: "Ojalu",  members: "Team Lestan",    color: "#6db86d", score: 51  },
+    { name: "Weloki", members: "Team Wells",     color: "#c46ab0", score: 0,   na: true },
+  ],
+  placements: [
+    { place: 18, points: 38, player: "Dee",     team: "Miloa",  teamColor: "#c8922a" },
+    { place: 17, points: 28, player: "Austin",  team: "Jinga",  teamColor: "#6a9fd8" },
+    { place: 16, points: 19, player: "Drew",    team: "Miloa",  teamColor: "#c8922a" },
+    { place: 15, points: 44, player: "Julie",   team: "Jinga",  teamColor: "#6a9fd8" },
+    { place: 14, points: 20, player: "Katura",  team: "Ojalu",  teamColor: "#6db86d" },
+    { place: 13, points: 13, player: "Niki",    team: "Ojalu",  teamColor: "#6db86d" },
+    { place: 12, points: 11, player: "Emily",   team: "Ojalu",  teamColor: "#6db86d" },
+    { place: 11, points: 20, player: "Bruce",   team: "Miloa",  teamColor: "#c8922a" },
+    { place: 10, points: 11, player: "Kellie",  team: "Jinga",  teamColor: "#6a9fd8" },
+    { place: 9,  points: 12, player: "Kendra",  team: "Miloa",  teamColor: "#c8922a" },
+    { place: 8,  points: 33, player: "Jake",    team: "Jinga",  teamColor: "#6a9fd8" },
+    { place: 7,  points: 32, player: "Kaleb",   team: "Jinga",  teamColor: "#6a9fd8" },
+    { place: 6,  points: 10, player: "J.",      team: "NA",     teamColor: "#777" },
+    { place: 5,  points: 6,  player: "Brando",  team: "Miloa",  teamColor: "#c8922a" },
+    { place: 4,  points: 3,  player: "Sean",    team: "Ojalu",  teamColor: "#6db86d" },
+    { place: 3,  points: 0,  player: "Sabiyah", team: "Miloa",  teamColor: "#c8922a" },
+    { place: 2,  points: 0,  player: "Brandon", team: "NA",     teamColor: "#777" },
+    { place: 1,  points: 0,  player: "Hanna",   team: "NA",     teamColor: "#777" },
+  ],
+};
+
+const S46_RESULTS = {
+  season: 46,
+  teamScores: [
+    { name: "Weloki", members: "Team Wells",     color: "#c46ab0", score: 76, winner: true },
+    { name: "Ojalu",  members: "Team Lestan",    color: "#6db86d", score: 72 },
+    { name: "Miloa",  members: "Team Miller",    color: "#c8922a", score: 53 },
+    { name: "Jinga",  members: "Team Mackereth", color: "#6a9fd8", score: 29 },
+  ],
+  placements: [
+    { place: 18, points: 29, player: "Kenzie",  team: "Weloki", teamColor: "#c46ab0" },
+    { place: 17, points: 27, player: "Charlie", team: "Miloa",  teamColor: "#c8922a" },
+    { place: 16, points: 23, player: "Ben",     team: "Ojalu",  teamColor: "#6db86d" },
+    { place: 15, points: 19, player: "Liz",     team: "NA",     teamColor: "#777" },
+    { place: 14, points: 21, player: "Maria",   team: "Weloki", teamColor: "#c46ab0" },
+    { place: 13, points: 24, player: "Q",       team: "Ojalu",  teamColor: "#6db86d" },
+    { place: 12, points: 21, player: "Venus",   team: "Weloki", teamColor: "#c46ab0" },
+    { place: 11, points: 10, player: "Tiffany", team: "Miloa",  teamColor: "#c8922a" },
+    { place: 10, points: 20, player: "Hunter",  team: "Jinga",  teamColor: "#6a9fd8" },
+    { place: 9,  points: 16, player: "Tevin",   team: "Ojalu",  teamColor: "#6db86d" },
+    { place: 8,  points: 13, player: "Soda",    team: "Miloa",  teamColor: "#c8922a" },
+    { place: 7,  points: 9,  player: "Tim",     team: "Ojalu",  teamColor: "#6db86d" },
+    { place: 6,  points: 5,  player: "Jem",     team: "Jinga",  teamColor: "#6a9fd8" },
+    { place: 5,  points: 0,  player: "Moriah",  team: "Jinga",  teamColor: "#6a9fd8" },
+    { place: 4,  points: 3,  player: "Bhanu",   team: "Miloa",  teamColor: "#c8922a" },
+    { place: 3,  points: 5,  player: "Randen",  team: "Weloki", teamColor: "#c46ab0" },
+    { place: 2,  points: 4,  player: "Jess",    team: "Jinga",  teamColor: "#6a9fd8" },
+    { place: 1,  points: 0,  player: "David",   team: "NA",     teamColor: "#777" },
+  ],
+};
+
+const S47_RESULTS = {
+  season: 47,
+  teamScores: [
+    { name: "Weloki", members: "Team Wells",     color: "#c46ab0", score: 94, winner: true },
+    { name: "Miloa",  members: "Team Miller",    color: "#c8922a", score: 62 },
+    { name: "Ojalu",  members: "Team Lestan",    color: "#6db86d", score: 56 },
+    { name: "Jinga",  members: "Team Mackereth", color: "#6a9fd8", score: 46 },
+  ],
+  placements: [
+    { place: 18, points: 46, player: "Rachel",    team: "Weloki", teamColor: "#c46ab0" },
+    { place: 17, points: 38, player: "Sam",       team: "Miloa",  teamColor: "#c8922a" },
+    { place: 16, points: 27, player: "Sue",       team: "Ojalu",  teamColor: "#6db86d" },
+    { place: 15, points: 24, player: "Genevieve", team: "Weloki", teamColor: "#c46ab0" },
+    { place: 14, points: 21, player: "Kyle",      team: "Jinga",  teamColor: "#6a9fd8" },
+    { place: 13, points: 20, player: "Andy",      team: "NA",     teamColor: "#777" },
+    { place: 12, points: 17, player: "Teeny",     team: "Jinga",  teamColor: "#6a9fd8" },
+    { place: 11, points: 15, player: "Gabe",      team: "Ojalu",  teamColor: "#6db86d" },
+    { place: 10, points: 14, player: "Sierra",    team: "Weloki", teamColor: "#c46ab0" },
+    { place: 9,  points: 12, player: "Sol",       team: "Ojalu",  teamColor: "#6db86d" },
+    { place: 8,  points: 12, player: "Caroline",  team: "Miloa",  teamColor: "#c8922a" },
+    { place: 7,  points: 10, player: "Rome",      team: "Miloa",  teamColor: "#c8922a" },
+    { place: 6,  points: 10, player: "Tiyana",    team: "Weloki", teamColor: "#c46ab0" },
+    { place: 5,  points: 8,  player: "Anika",     team: "Jinga",  teamColor: "#6a9fd8" },
+    { place: 4,  points: 2,  player: "Kishan",    team: "Ojalu",  teamColor: "#6db86d" },
+    { place: 3,  points: 2,  player: "Aysha",     team: "Miloa",  teamColor: "#c8922a" },
+    { place: 2,  points: 0,  player: "TK",        team: "Jinga",  teamColor: "#6a9fd8" },
+    { place: 1,  points: 0,  player: "Jon",       team: "NA",     teamColor: "#777" },
+  ],
+};
+
+const S48_RESULTS = {
+  season: 48,
+  teamScores: [
+    { name: "Jinga",  members: "Team Mackereth", color: "#6a9fd8", score: 45, winner: true },
+    { name: "Weloki", members: "Team Wells",     color: "#c46ab0", score: 37 },
+    { name: "Miloa",  members: "Team Miller",    color: "#c8922a", score: 36 },
+    { name: "Ojalu",  members: "Team Lestan",    color: "#6db86d", score: 35 },
+  ],
+  placements: [
+    { place: 18, points: 20, player: "Kyle",      team: "Miloa",  teamColor: "#c8922a" },
+    { place: 17, points: 18, player: "Genevieve", team: "Jinga",  teamColor: "#6a9fd8" },
+    { place: 16, points: 14, player: "Kenzie",    team: "Weloki", teamColor: "#c46ab0" },
+    { place: 15, points: 13, player: "Kamilla",   team: "Ojalu",  teamColor: "#6db86d" },
+    { place: 14, points: 12, player: "Eva",       team: "Weloki", teamColor: "#c46ab0" },
+    { place: 13, points: 11, player: "Tiff",      team: "Jinga",  teamColor: "#6a9fd8" },
+    { place: 12, points: 10, player: "Joe",       team: "Ojalu",  teamColor: "#6db86d" },
+    { place: 11, points: 9,  player: "Saiounia",  team: "Miloa",  teamColor: "#c8922a" },
+    { place: 10, points: 8,  player: "Shauhin",   team: "Jinga",  teamColor: "#6a9fd8" },
+    { place: 9,  points: 7,  player: "David",     team: "Ojalu",  teamColor: "#6db86d" },
+    { place: 8,  points: 6,  player: "Charity",   team: "Weloki", teamColor: "#c46ab0" },
+    { place: 7,  points: 5,  player: "Cedrek",    team: "Miloa",  teamColor: "#c8922a" },
+    { place: 6,  points: 4,  player: "Mary",      team: "Jinga",  teamColor: "#6a9fd8" },
+    { place: 5,  points: 3,  player: "Teeny",     team: "Weloki", teamColor: "#c46ab0" },
+    { place: 4,  points: 2,  player: "Kevin",     team: "Ojalu",  teamColor: "#6db86d" },
+    { place: 3,  points: 2,  player: "Bianca",    team: "Miloa",  teamColor: "#c8922a" },
+    { place: 2,  points: 2,  player: "Chrissy",   team: "Ojalu",  teamColor: "#6db86d" },
+    { place: 1,  points: 0,  player: "Stephanie", team: "NA",     teamColor: "#777" },
+  ],
+};
+
+const S49_RESULTS = {
+  season: 49,
+  teamScores: [
+    { name: "Jinga",  members: "Team Mackereth", color: "#6a9fd8", score: 61, winner: true },
+    { name: "Ojalu",  members: "Team Lestan",    color: "#6db86d", score: 40 },
+    { name: "Weloki", members: "Team Wells",     color: "#c46ab0", score: 38 },
+    { name: "Miloa",  members: "Team Miller",    color: "#c8922a", score: 19 },
+  ],
+  placements: [
+    { place: 18, points: 20, player: "Savannah", team: "Jinga",  teamColor: "#6a9fd8" },
+    { place: 17, points: 18, player: "Sam",      team: "Ojalu",  teamColor: "#6db86d" },
+    { place: 16, points: 14, player: "Dee",      team: "Weloki", teamColor: "#c46ab0" },
+    { place: 15, points: 13, player: "Tiff",     team: "Jinga",  teamColor: "#6a9fd8" },
+    { place: 14, points: 12, player: "Eva",      team: "Ojalu",  teamColor: "#6db86d" },
+    { place: 13, points: 11, player: "Kamilla",  team: "Weloki", teamColor: "#c46ab0" },
+    { place: 12, points: 10, player: "Rachel",   team: "Jinga",  teamColor: "#6a9fd8" },
+    { place: 11, points: 9,  player: "Kyle",     team: "Miloa",  teamColor: "#c8922a" },
+    { place: 10, points: 8,  player: "Hunter",   team: "Ojalu",  teamColor: "#6db86d" },
+    { place: 9,  points: 7,  player: "Soda",     team: "Miloa",  teamColor: "#c8922a" },
+    { place: 8,  points: 6,  player: "Kenzie",   team: "Weloki", teamColor: "#c46ab0" },
+    { place: 7,  points: 5,  player: "Shauhin",  team: "Jinga",  teamColor: "#6a9fd8" },
+    { place: 6,  points: 4,  player: "Venus",    team: "Miloa",  teamColor: "#c8922a" },
+    { place: 5,  points: 3,  player: "Q",        team: "Ojalu",  teamColor: "#6db86d" },
+    { place: 4,  points: 2,  player: "Teeny",    team: "Miloa",  teamColor: "#c8922a" },
+    { place: 3,  points: 2,  player: "Maria",    team: "Weloki", teamColor: "#c46ab0" },
+    { place: 2,  points: 1,  player: "Randen",   team: "NA",     teamColor: "#777" },
+    { place: 1,  points: 0,  player: "Nicole",   team: "NA",     teamColor: "#777" },
+  ],
+};
+
+const HISTORICAL = { 43: S43_RESULTS, 44: S44_RESULTS, 45: S45_RESULTS, 46: S46_RESULTS, 47: S47_RESULTS, 48: S48_RESULTS, 49: S49_RESULTS };
 
 const SEASON_WINNERS = [
   { season: 43, winner: "Jinga"  },
@@ -505,7 +295,6 @@ const SEASON_WINNERS = [
   { season: 47, winner: "Weloki" },
   { season: 48, winner: "Jinga"  },
   { season: 49, winner: "Jinga"  },
-  { season: 50, winner: "Jinga"  },
 ];
 
 function getChampionshipsThrough(season) {
@@ -516,52 +305,76 @@ function getChampionshipsThrough(season) {
   return counts;
 }
 
-// ─── Storage ──────────────────────────────────────────────────────────────────
-const STORAGE_KEY = "sf_s51_state";
+const EP1_ELIMINATIONS = {
+  "Jenna Lewis-Dougherty": 1,
+  "Kyle Fraser": 2,
+  "Savannah Louie": 3,
+  "Q Burdette": 4,
+  "Mike White": 5,
+  "Angelina Keeley": 6,
+  "Charlie Davis": 7,
+  "Kamilla Karthigesu": 8,
+  "Genevieve Mushaluk": 9,
+  "Colby Donaldson": 10,
+  "Dee Valladares": 11,
+  // Episode 8
+  "Chrissy Hofbeck": 12,
+  'Benjamin "Coach" Wade': 13,
+  // Episode 9
+  "Christian Hubicki": 14,
+};
+
+function buildCastawaysForSeason50() {
+  return S50_CASTAWAYS.map((c, idx) => ({
+    id: idx + 1, name: c.name, tribe: c.tribe || "", origTribe: c.origTribe || "", bio: c.bio || "",
+    odds: c.odds || "", photo: c.photo || "",
+    draftedBy: c.draftedBy ?? null,
+    eliminationOrder: EP1_ELIMINATIONS[c.name] ?? null,
+  }));
+}
+
+function applyLockedDraft(castaways) {
+  return castaways.map(c => {
+    const master = S50_CASTAWAYS.find(m => m.name === c.name);
+    if (!master) return c;
+    const lockedElim = EP1_ELIMINATIONS[c.name];
+    return {
+      ...c,
+      draftedBy: master.draftedBy ?? null,
+      tribe: master.tribe || c.tribe,
+      origTribe: master.origTribe || c.origTribe || "",
+      eliminationOrder: lockedElim ?? c.eliminationOrder,
+    };
+  });
+}
+
+const STORAGE_KEY = "sf_v2_state";
+function loadState() {
+  try { const r = localStorage.getItem(STORAGE_KEY); return r ? JSON.parse(r) : null; } catch { return null; }
+}
 function saveState(s) {
   try { localStorage.setItem(STORAGE_KEY, JSON.stringify(s)); } catch {}
 }
 
-// Verified aired results through Week 5, October 21, 2026.
-const TOKA_NAMES = new Set([
-  "Aaliyah Puglia", "Thien An Nguyen", "Angelica 'Jelly' Loblack",
-  "Brady Booker", "Danny 'Kilby' Kilby", "Devin Way", "Jenna Doore",
-  "Maggie Nestor", "Michael Pinsky", "Patt Cannaday", "Carter Krull",
-]);
-const NAME_ALIASES = {
-  "Daniel Kilby": "Danny 'Kilby' Kilby",
-  "Jenna Greenawalt": "Jenna Doore",
-  "Sharonda Renee": "Sharonda Cox",
-};
-function hydrateCastaways(savedCastaways = []) {
-  const savedByName = new Map(
-    (Array.isArray(savedCastaways) ? savedCastaways : [])
-      .filter(c => c && typeof c.name === "string")
-      .map(c => [NAME_ALIASES[c.name] || c.name, c])
-  );
-  const currentTribes = {
-    Toka: ["Brady Booker", "Carter Krull", "Kristin Flickinger", "Maggie Nestor", "Michael Pinsky", "Thien An Nguyen"],
-    Savu: ["Alexis Levine", "Devin Way", "Angelica 'Jelly' Loblack", "Ori Jean-Charles", "Jenna Doore"],
-    Dina: ["Cristian Chavez", "Eric Macksoud", "Danny 'Kilby' Kilby", "Lewis Kelly", "Linnea Capobianco", "Sharonda Cox"],
-  };
-  return S51_CASTAWAYS.map((base, i) => ({
-    ...base,
-    draftedBy: savedByName.get(base.name)?.draftedBy ?? base.draftedBy ?? null,
-    eliminationOrder: ELIMINATIONS[base.name] ?? null,
-    eliminatedWeek: ELIMINATION_WEEKS[base.name] ?? null,
-    tribe: Object.entries(currentTribes).find(([, names]) => names.includes(base.name))?.[0] || (TOKA_NAMES.has(base.name) ? "Toka" : "Savu"),
-    id: i + 1,
-  }));
+function oddsColor(odds) {
+  if (!odds) return "#555";
+  if (odds.startsWith("-")) return "#c8922a";
+  const n = parseInt(odds.replace("+", ""), 10);
+  if (isNaN(n)) return "#aaa";
+  if (n <= 1000) return "#6db86d";
+  if (n <= 2500) return "#6a9fd8";
+  return "#aaa";
 }
 
-function initials(name = "") {
-  return name
-    .replace(/'[^']*'/g, "")
-    .split(/\s+/)
-    .filter(Boolean)
-    .slice(0, 2)
-    .map(part => part[0]?.toUpperCase())
-    .join("") || "?";
+function proxyPhoto(url) {
+  if (!url) return "";
+  return "https://images.weserv.nl/?url=" + encodeURIComponent(url) + "&w=400&output=jpg";
+}
+
+function Photo({ src, alt, className }) {
+  const [err, setErr] = useState(false);
+  if (!src || err) return <div className={className + "-placeholder"}><span>👤</span></div>;
+  return <img src={proxyPhoto(src)} alt={alt} className={className} onError={() => setErr(true)} loading="lazy" />;
 }
 
 function ordinal(n) {
@@ -569,567 +382,392 @@ function ordinal(n) {
   return n + (s[(v-20)%10] || s[v] || s[0]);
 }
 
-// ─── CSS ──────────────────────────────────────────────────────────────────────
 const CSS = `
   @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;900&family=DM+Mono:wght@400;500&display=swap');
   * { box-sizing: border-box; margin: 0; padding: 0; }
-  body { background: #080c0a; color: #f0ebe0; font-family: 'DM Mono', monospace; }
-  .app { min-height: 100vh; background: #080c0a; background-image: radial-gradient(ellipse at 15% 15%, rgba(60,140,80,0.06) 0%, transparent 55%), radial-gradient(ellipse at 85% 80%, rgba(40,100,60,0.05) 0%, transparent 55%); }
-  .header { border-bottom: 1px solid rgba(80,160,100,0.25); padding: 0.85rem 1.5rem; display: flex; align-items: center; justify-content: space-between; gap: 1rem; background: rgba(8,12,10,0.97); position: sticky; top: 0; z-index: 100; backdrop-filter: blur(8px); flex-wrap: wrap; }
-  .logo { font-family: 'Playfair Display', serif; font-size: 1.25rem; font-weight: 900; color: #5aaa72; letter-spacing: 0.04em; white-space: nowrap; }
+  body { background: #0a0a0a; color: #f0ebe0; font-family: 'DM Mono', monospace; }
+  .app { min-height: 100vh; background: #0a0a0a; background-image: radial-gradient(ellipse at 20% 20%, rgba(180,120,40,0.08) 0%, transparent 60%), radial-gradient(ellipse at 80% 80%, rgba(120,60,20,0.06) 0%, transparent 60%); }
+  .header { border-bottom: 1px solid rgba(180,120,40,0.3); padding: 0.85rem 1.5rem; display: flex; align-items: center; justify-content: space-between; gap: 1rem; background: rgba(10,10,10,0.95); position: sticky; top: 0; z-index: 100; backdrop-filter: blur(8px); flex-wrap: wrap; }
+  .logo { font-family: 'Playfair Display', serif; font-size: 1.3rem; font-weight: 900; color: #c8922a; letter-spacing: 0.05em; white-space: nowrap; }
   .logo span { color: #f0ebe0; font-weight: 700; }
-  .logo sub { font-size: 0.6rem; color: #6db86d; letter-spacing: 0.12em; text-transform: uppercase; margin-left: 0.4rem; font-family: 'DM Mono', monospace; vertical-align: middle; }
   .nav { display: flex; gap: 0.25rem; flex-wrap: wrap; }
   .nav-btn { background: none; border: 1px solid transparent; color: #bbb; padding: 0.4rem 0.75rem; font-family: 'DM Mono', monospace; font-size: 0.68rem; cursor: pointer; letter-spacing: 0.08em; text-transform: uppercase; transition: all 0.2s; border-radius: 2px; white-space: nowrap; }
-  .nav-btn:hover { color: #f0ebe0; border-color: rgba(90,170,114,0.3); }
-  .nav-btn.active { color: #5aaa72; border-color: rgba(90,170,114,0.5); background: rgba(90,170,114,0.07); }
+  .nav-btn:hover { color: #f0ebe0; border-color: rgba(180,120,40,0.3); }
+  .nav-btn.active { color: #c8922a; border-color: rgba(200,146,42,0.5); background: rgba(200,146,42,0.06); }
   .container { max-width: 1200px; margin: 0 auto; padding: 1.5rem; }
-  .season-bar { display: flex; align-items: center; gap: 0.5rem; margin-bottom: 2rem; padding-bottom: 1.25rem; border-bottom: 1px solid rgba(255,255,255,0.06); flex-wrap: wrap; }
+  .season-bar { display: flex; align-items: center; gap: 0.5rem; margin-bottom: 2rem; padding-bottom: 1.25rem; border-bottom: 1px solid rgba(255,255,255,0.07); flex-wrap: wrap; }
   .season-label { font-size: 0.62rem; color: #bbb; letter-spacing: 0.1em; text-transform: uppercase; margin-right: 0.5rem; }
   .season-btn { font-family: 'DM Mono', monospace; font-size: 0.65rem; padding: 0.35rem 0.75rem; border-radius: 2px; cursor: pointer; letter-spacing: 0.08em; text-transform: uppercase; border: 1px solid rgba(255,255,255,0.1); background: none; color: #ccc; transition: all 0.15s; }
-  .season-btn.active { background: rgba(90,170,114,0.1); border-color: rgba(90,170,114,0.4); color: #5aaa72; }
+  .season-btn.active { background: rgba(200,146,42,0.1); border-color: rgba(200,146,42,0.4); color: #c8922a; }
   .season-btn:hover:not(.active) { color: #f0ebe0; border-color: rgba(255,255,255,0.2); }
   .page-title { font-family: 'Playfair Display', serif; font-size: 2rem; font-weight: 900; color: #f0ebe0; margin-bottom: 0.3rem; }
   .page-subtitle { font-size: 0.68rem; color: #bbb; letter-spacing: 0.1em; text-transform: uppercase; margin-bottom: 2rem; }
-  .section-title { font-size: 0.63rem; letter-spacing: 0.12em; text-transform: uppercase; color: #bbb; margin-bottom: 1rem; padding-bottom: 0.5rem; border-bottom: 1px solid rgba(255,255,255,0.06); }
+  .section-title { font-size: 0.65rem; letter-spacing: 0.12em; text-transform: uppercase; color: #bbb; margin-bottom: 1rem; padding-bottom: 0.5rem; border-bottom: 1px solid rgba(255,255,255,0.06); }
   .leaderboard { display: flex; flex-direction: column; gap: 1rem; }
-  .lb-card { background: rgba(255,255,255,0.025); border: 1px solid rgba(255,255,255,0.07); border-radius: 4px; padding: 1.25rem 1.5rem; display: grid; grid-template-columns: 2.5rem 1fr auto; align-items: center; gap: 1.5rem; }
-  .lb-card.first { border-color: rgba(90,170,114,0.4); background: rgba(90,170,114,0.05); }
-  .lb-rank { font-family: 'Playfair Display', serif; font-size: 1.5rem; font-weight: 900; color: #444; }
-  .lb-card.first .lb-rank { color: #5aaa72; }
+  .lb-card { background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.07); border-radius: 4px; padding: 1.25rem 1.5rem; display: grid; grid-template-columns: 2.5rem 1fr auto; align-items: center; gap: 1.5rem; }
+  .lb-card.first { border-color: rgba(200,146,42,0.4); background: rgba(200,146,42,0.06); }
+  .lb-rank { font-family: 'Playfair Display', serif; font-size: 1.5rem; font-weight: 900; color: #555; }
+  .lb-card.first .lb-rank { color: #c8922a; }
   .lb-tribe { font-size: 1rem; font-weight: 500; margin-bottom: 0.15rem; }
   .lb-tags { display: flex; flex-wrap: wrap; gap: 0.3rem; }
   .c-tag { font-size: 0.6rem; padding: 0.15rem 0.45rem; border-radius: 2px; letter-spacing: 0.05em; text-transform: uppercase; }
-  .c-tag.alive { background: rgba(90,170,114,0.1); color: #6db86d; border: 1px solid rgba(90,170,114,0.2); }
-  .c-tag.eliminated { background: rgba(255,255,255,0.02); color: #888; border: 1px solid rgba(255,255,255,0.06); text-decoration: line-through; }
+  .c-tag.alive { background: rgba(80,180,80,0.1); color: #6db86d; border: 1px solid rgba(80,180,80,0.2); }
+  .c-tag.eliminated { background: rgba(255,255,255,0.03); color: #aaa; border: 1px solid rgba(255,255,255,0.07); text-decoration: line-through; }
   .lb-score { text-align: right; }
-  .lb-pts { font-family: 'Playfair Display', serif; font-size: 2.2rem; font-weight: 900; line-height: 1; }
+  .lb-pts { font-family: 'Playfair Display', serif; font-size: 2.2rem; font-weight: 900; color: #c8922a; line-height: 1; }
   .lb-pts-label { font-size: 0.58rem; color: #bbb; letter-spacing: 0.1em; text-transform: uppercase; margin-top: 0.1rem; }
-  .castaways-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(190px,1fr)); gap: 0.9rem; margin-bottom: 2rem; }
-  .castaway-card { background: rgba(255,255,255,0.025); border: 1px solid rgba(255,255,255,0.07); border-radius: 4px; overflow: hidden; position: relative; transition: border-color 0.2s; }
+  .castaways-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(160px,1fr)); gap: 0.75rem; margin-bottom: 2rem; }
+  .castaway-card { background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.07); border-radius: 4px; overflow: hidden; position: relative; transition: border-color 0.2s; }
   .castaway-card::after { content:''; position:absolute; top:0; left:0; right:0; height:2px; }
-  .castaway-card.alive::after { background: #5aaa72; }
-  .castaway-card.eliminated::after { background: #555; }
-  .castaway-card.rumored-player::after { background: #c8922a; }
-  .castaway-card.unknown-player { opacity: 0.45; }
-  .castaway-card:hover { border-color: rgba(90,170,114,0.3); }
-  .c-photo-wrap { position: relative; width: 100%; aspect-ratio: 1 / 1; background: radial-gradient(circle at 50% 30%, rgba(90,170,114,0.16), rgba(255,255,255,0.03) 62%, rgba(0,0,0,0.18)); border-bottom: 1px solid rgba(255,255,255,0.06); overflow: hidden; }
-  .c-photo { width: 100%; height: 100%; object-fit: cover; display: block; filter: saturate(0.96) contrast(1.02); }
-  .c-photo-fallback { width: 100%; height: 100%; display: flex; align-items: center; justify-content: center; font-family: 'Playfair Display', serif; font-size: 2.4rem; font-weight: 900; color: rgba(240,235,224,0.72); letter-spacing: 0.04em; background: radial-gradient(circle at 50% 30%, rgba(90,170,114,0.18), rgba(255,255,255,0.04) 62%, rgba(0,0,0,0.18)); }
-  .c-photo-fallback.with-photo { display: none; }
-  .c-info { padding: 0.75rem 0.85rem 0.85rem; }
+  .castaway-card.alive::after { background: #6db86d; }
+  .castaway-card.eliminated { opacity: 0.45; }
+  .castaway-card.undrafted::after { background: #2a2a2a; }
+  .castaway-card:hover { border-color: rgba(200,146,42,0.3); }
+  .c-photo { width: 100%; aspect-ratio: 3/4; object-fit: cover; object-position: top; display: block; background: #111; }
+  .c-photo-placeholder { width: 100%; aspect-ratio: 3/4; background: #111; display: flex; align-items: center; justify-content: center; font-size: 1.5rem; color: #bbb; }
+  .c-info { padding: 0.65rem 0.75rem; }
   .c-name { font-size: 0.75rem; font-weight: 500; margin-bottom: 0.15rem; line-height: 1.3; }
-  .c-age { font-size: 0.6rem; color: #888; margin-bottom: 0.1rem; }
-  .c-occ { font-size: 0.58rem; color: #5aaa72; margin-bottom: 0.2rem; font-weight: 500; line-height: 1.3; }
-  .c-bio { font-size: 0.56rem; color: #ccc; margin-bottom: 0.35rem; line-height: 1.45; }
+  .c-bio { font-size: 0.56rem; color: #ccc; margin-bottom: 0.35rem; line-height: 1.4; }
   .c-row { display: flex; justify-content: space-between; align-items: center; margin-top: 0.25rem; }
   .c-status { font-size: 0.58rem; letter-spacing: 0.08em; text-transform: uppercase; }
-  .c-status.predraft { color: #888; }
-  .c-status.rumored { color: #c8922a; }
-  .c-status.unknown { color: #555; }
+  .c-status.alive { color: #6db86d; }
+  .c-status.eliminated { color: #bbb; }
+  .c-status.undrafted { color: #aaa; }
+  .c-pts { font-family: 'Playfair Display', serif; font-size: 1rem; color: #c8922a; font-weight: 900; margin-top: 0.15rem; }
   .divider { height: 1px; background: rgba(255,255,255,0.06); margin: 1.5rem 0; }
-  .action-btn { font-family: 'DM Mono', monospace; font-size: 0.68rem; padding: 0.5rem 1rem; border-radius: 2px; cursor: pointer; letter-spacing: 0.08em; text-transform: uppercase; transition: all 0.15s; border: 1px solid; margin-bottom: 1rem; background: rgba(255,255,255,0.02); border-color: rgba(255,255,255,0.1); color: #ccc; }
-  .action-btn.primary { background: rgba(90,170,114,0.12); border-color: rgba(90,170,114,0.4); color: #5aaa72; }
-  .action-btn.primary:hover { background: rgba(90,170,114,0.22); }
+  .action-btn { font-family: 'DM Mono', monospace; font-size: 0.68rem; padding: 0.5rem 1rem; border-radius: 2px; cursor: pointer; letter-spacing: 0.08em; text-transform: uppercase; transition: all 0.15s; border: 1px solid; margin-bottom: 1rem; background: rgba(255,255,255,0.03); border-color: rgba(255,255,255,0.1); color: #ccc; }
+  .action-btn.primary { background: rgba(200,146,42,0.15); border-color: rgba(200,146,42,0.4); color: #c8922a; }
+  .action-btn.primary:hover { background: rgba(200,146,42,0.25); }
+  .action-btn.danger { background: rgba(200,60,60,0.08); border-color: rgba(200,60,60,0.3); color: #cc6060; }
+  .toast { position: fixed; bottom: 2rem; right: 2rem; background: #1a1a1a; border: 1px solid rgba(200,146,42,0.4); color: #f0ebe0; padding: 0.75rem 1.25rem; border-radius: 4px; font-size: 0.75rem; z-index: 999; animation: fadeUp 0.2s ease; }
   @keyframes fadeUp { from { transform: translateY(8px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
-  .panel { background: rgba(255,255,255,0.025); border: 1px solid rgba(255,255,255,0.07); border-radius: 4px; padding: 1rem 1.25rem; }
-  .select, .input { background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.12); color: #f0ebe0; border-radius: 3px; padding: 0.55rem 0.65rem; font-family: 'DM Mono', monospace; font-size: 0.75rem; outline: none; width: 100%; }
+  .panel { background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.07); border-radius: 4px; padding: 1rem 1.25rem; }
+  .grid2 { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; }
+  .select, .input { background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.12); color: #f0ebe0; border-radius: 3px; padding: 0.55rem 0.65rem; font-family: 'DM Mono', monospace; font-size: 0.75rem; outline: none; }
   .row { display:flex; gap:0.75rem; align-items:center; flex-wrap:wrap; }
-  .hint { font-size:0.65rem; color:#bbb; line-height:1.5; }
+  .hint { font-size:0.65rem; color:#bbb; line-height:1.4; }
   .hist-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px,1fr)); gap: 1rem; margin-bottom: 1.5rem; }
-  .hist-card { background: rgba(255,255,255,0.025); border: 1px solid rgba(255,255,255,0.07); border-radius: 4px; padding: 1rem 1.25rem; }
-  .hist-card.champ { border-color: rgba(90,170,114,0.4); background: rgba(90,170,114,0.06); }
+  .hist-card { background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.07); border-radius: 4px; padding: 1rem 1.25rem; }
+  .hist-card.champ { border-color: rgba(200,146,42,0.4); background: rgba(200,146,42,0.06); }
   .hist-score { font-family: 'Playfair Display', serif; font-size: 1.8rem; font-weight: 900; }
   .hist-table { width: 100%; border-collapse: collapse; font-size: 0.7rem; }
   .hist-table th { text-align: left; color: #bbb; font-size: 0.58rem; letter-spacing: 0.08em; text-transform: uppercase; padding: 0.4rem 0.75rem; border-bottom: 1px solid rgba(255,255,255,0.07); font-weight: 400; }
   .hist-table td { padding: 0.45rem 0.75rem; border-bottom: 1px solid rgba(255,255,255,0.04); }
   .hist-table tr:last-child td { border-bottom: none; }
   .hist-table tr:hover td { background: rgba(255,255,255,0.02); }
-  .rumor-card { background: rgba(255,255,255,0.025); border: 1px solid rgba(255,255,255,0.08); border-radius: 4px; padding: 1.1rem 1.25rem; margin-bottom: 0.75rem; position: relative; overflow: hidden; }
-  .rumor-card::before { content:''; position:absolute; left:0; top:0; bottom:0; width:3px; }
-  .rumor-card.confirmed::before { background: #5aaa72; }
-  .rumor-card.likely::before { background: #6a9fd8; }
-  .rumor-card.rumored::before { background: #c8922a; }
-  .rumor-card.speculation::before { background: #888; }
-  .rumor-badge { font-size: 0.55rem; letter-spacing: 0.1em; text-transform: uppercase; padding: 0.2rem 0.5rem; border-radius: 2px; display: inline-block; margin-bottom: 0.5rem; }
-  .rumor-badge.confirmed { background: rgba(90,170,114,0.12); color: #5aaa72; border: 1px solid rgba(90,170,114,0.25); }
-  .rumor-badge.likely { background: rgba(106,159,216,0.12); color: #6a9fd8; border: 1px solid rgba(106,159,216,0.25); }
-  .rumor-badge.rumored { background: rgba(200,146,42,0.1); color: #c8922a; border: 1px solid rgba(200,146,42,0.25); }
-  .rumor-badge.speculation { background: rgba(255,255,255,0.04); color: #999; border: 1px solid rgba(255,255,255,0.1); }
-  .rumor-title { font-size: 0.82rem; font-weight: 500; color: #f0ebe0; margin-bottom: 0.35rem; line-height: 1.4; }
-  .rumor-body { font-size: 0.68rem; color: #ccc; line-height: 1.65; }
-  .rumor-source { font-size: 0.58rem; color: #666; margin-top: 0.4rem; letter-spacing: 0.06em; }
-  .draft-table { width: 100%; border-collapse: collapse; font-size: 0.72rem; }
-  .draft-table th { font-size: 0.58rem; letter-spacing: 0.1em; text-transform: uppercase; color: #888; padding: 0.5rem 0.85rem; border-bottom: 1px solid rgba(255,255,255,0.07); text-align: left; font-weight: 400; }
-  .draft-table td { padding: 0.55rem 0.85rem; border-bottom: 1px solid rgba(255,255,255,0.04); vertical-align: top; }
-  .draft-table tr:hover td { background: rgba(255,255,255,0.015); }
+  .elim-row { display: flex; align-items: center; justify-content: space-between; padding: 0.55rem 0.75rem; border: 1px solid rgba(255,255,255,0.06); border-radius: 4px; background: rgba(255,255,255,0.02); gap: 0.5rem; }
+  .elim-row.done { opacity: 0.5; }
+
   @media (max-width: 700px) {
     .container { padding: 1rem; }
+    .grid2 { grid-template-columns: 1fr; }
     .lb-card { padding: 0.9rem 1rem; grid-template-columns: 2rem 1fr auto; gap: 0.75rem; }
     .lb-rank { font-size: 1.1rem; }
     .lb-pts { font-size: 1.6rem; }
   }
 `;
 
-// ─── Splash ───────────────────────────────────────────────────────────────────
-function Splash({ onDismiss }) {
-  return (
-    <div
-      role="button" tabIndex={0}
-      onClick={onDismiss}
-      onKeyDown={e => { if (e.key === "Enter" || e.key === " ") onDismiss(); }}
-      style={{
-        minHeight: "100vh",
-        background: "radial-gradient(circle at center, #0a1a10 0%, #050a07 60%, #030605 100%)",
-        display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center",
-        gap: "clamp(1rem, 3vh, 2rem)", padding: "clamp(1rem, 3vw, 2rem)", textAlign: "center",
-        cursor: "pointer",
-      }}
-    >
-      <div style={{ fontSize: "clamp(0.6rem, 1.2vw, 0.78rem)", letterSpacing: "0.2em", textTransform: "uppercase", color: "#5aaa72", opacity: 0.8 }}>
-        Fantasy Survivor League
-      </div>
-      <div style={{ fontFamily: "'Playfair Display', serif", fontSize: "clamp(2.5rem, 8vw, 6rem)", fontWeight: 900, color: "#f0ebe0", lineHeight: 1, letterSpacing: "-0.01em" }}>
-        Season 51
-      </div>
-      <div style={{ fontFamily: "'Playfair Display', serif", fontSize: "clamp(1rem, 3vw, 1.75rem)", fontWeight: 700, color: "#5aaa72", letterSpacing: "0.05em" }}>
-        The Open Era
-      </div>
-      <div style={{ maxWidth: 520, fontSize: "clamp(0.7rem, 1.4vw, 0.85rem)", color: "#bbb", lineHeight: 1.7, padding: "0 1rem" }}>
-        Week 5 complete · 21 castaways · 14 remaining. View the results, cast, and league history.
-      </div>
 
-      <button
-        onClick={e => { e.stopPropagation(); onDismiss(); }}
-        style={{
-          marginTop: "0.5rem",
-          background: "rgba(15,40,20,0.85)", border: "1px solid rgba(90,170,114,0.6)",
-          color: "#a8e6b8", fontFamily: "'DM Mono', monospace",
-          fontSize: "clamp(0.65rem, 1.1vw, 0.8rem)", letterSpacing: "0.12em",
-          textTransform: "uppercase", padding: "0.85rem 2.5rem", borderRadius: "3px",
-          cursor: "pointer", backdropFilter: "blur(4px)",
-        }}
-        onMouseEnter={e => e.currentTarget.style.background = "rgba(20,60,30,0.9)"}
-        onMouseLeave={e => e.currentTarget.style.background = "rgba(15,40,20,0.85)"}
-      >
-        Enter League Hub →
-      </button>
-    </div>
-  );
-}
-
-// ─── App ──────────────────────────────────────────────────────────────────────
 export default function App() {
   const [splashDismissed, setSplashDismissed] = useState(() => {
     try { return localStorage.getItem(`sf_splash_${SPLASH_VERSION}`) === "1"; } catch { return false; }
   });
-  const [page, setPage] = useState("overview");
-  const [historySeason, setHistorySeason] = useState(50);
+  const [page, setPage] = useState("leaderboard");
+  const [historySeason, setHistorySeason] = useState(49);
+  const [toast, setToast] = useState(null);
+  const [showOdds, setShowOdds] = useState(false);
 
-  const [draftPicks] = useState(loadDraft);
-  const [storageError, setStorageError] = useState(false);
-  const castaways = hydrateCastaways().map(c => {
-    const pickIndex = draftPicks.indexOf(c.name);
-    return { ...c, draftedBy: pickIndex >= 0 ? DRAFT_ORDER[pickIndex] : null };
+  const [castaways, setCastawaysRaw] = useState(() => {
+    const saved = loadState();
+    if (saved?.castaways?.length) return applyLockedDraft(saved.castaways);
+    return buildCastawaysForSeason50();
   });
 
-  useEffect(() => {
-    try {
-      localStorage.setItem(DRAFT_KEY, JSON.stringify(draftPicks));
-      // Keep the existing state format available for future season updates.
-      saveState({ castaways: hydrateCastaways().map(c => {
-        const index = draftPicks.indexOf(c.name);
-        return { ...c, draftedBy: index >= 0 ? DRAFT_ORDER[index] : null };
-      }) });
-      setStorageError(false);
-    } catch { setStorageError(true); }
-  }, [draftPicks]);
+  const [draftOrder, setDraftOrderRaw] = useState(() => {
+    const saved = loadState();
+    return saved?.draftOrder || TEAMS.map(t => t.id);
+  });
+
+  useEffect(() => { saveState({ castaways, draftOrder, showOdds }); }, [castaways, draftOrder, showOdds]);
+
+  const setCastaways = (fn) => setCastawaysRaw(prev => typeof fn === "function" ? fn(prev) : fn);
+  const setDraftOrder = (o) => setDraftOrderRaw(o);
+  const showToast = (msg) => { setToast(msg); setTimeout(() => setToast(null), 2500); };
+  const resetSeason = () => { setCastawaysRaw(buildCastawaysForSeason50()); setDraftOrderRaw(TEAMS.map(t => t.id)); setShowOdds(false); showToast("Season 50 reset."); };
+
+  const season50 = SEASONS.find(s => s.id === 50);
+
+  // Active players worth 13 pts each
+  const ACTIVE_POINTS = 13;
+
+  const scores = useMemo(() => {
+    return TEAMS.map(team => {
+      const picks = castaways.filter(c => c.draftedBy === team.id);
+      const total = picks.reduce((sum, c) => sum + (c.eliminationOrder ? calcPoints(c.eliminationOrder, season50.totalCastaways) : ACTIVE_POINTS), 0);
+      return { ...team, picks, total };
+    }).sort((a, b) => b.total - a.total);
+  }, [castaways, season50]);
 
   const dismissSplash = () => {
     try { localStorage.setItem(`sf_splash_${SPLASH_VERSION}`, "1"); } catch {}
     setSplashDismissed(true);
   };
 
-  if (!splashDismissed) return (<><style>{CSS}</style><Splash onDismiss={dismissSplash} /></>);
+  if (!splashDismissed) {
+    return (
+      <>
+        <style>{CSS}</style>
+        <div style={{
+          minHeight: "100vh", background: "#0a0a0a", display: "flex",
+          flexDirection: "column", alignItems: "center", justifyContent: "center",
+          padding: "2rem", textAlign: "center", position: "relative", overflow: "hidden",
+        }}>
+
+          {/* Subtle background texture */}
+          <div style={{
+            position: "absolute", inset: 0,
+            background: "radial-gradient(ellipse at 50% 40%, rgba(40,90,40,0.18) 0%, transparent 65%)",
+            pointerEvents: "none",
+          }} />
+
+          <div style={{ position: "relative", zIndex: 1, display: "flex", flexDirection: "column", alignItems: "center" }}>
+            <div
+            style={{
+              marginBottom: "1rem",
+              display: "flex",
+              justifyContent: "center",
+              alignItems: "center",
+            }}
+          >
+            <img
+              src={SPLASH_IMAGE}
+              alt="Jeff Probst competing"
+              style={{
+                width: "min(320px, 70vw)",
+                height: "auto",
+                display: "block",
+                filter: "drop-shadow(0 10px 30px rgba(0,0,0,0.55))",
+                transform: "rotate(-2deg)",
+                userSelect: "none",
+                pointerEvents: "none",
+              }}
+            />
+          </div>
+            <div style={{
+              fontFamily: "'Playfair Display', serif", fontSize: "1rem",
+              letterSpacing: "0.25em", textTransform: "uppercase",
+              color: "#c8922a", marginBottom: "0.5rem",
+            }}>Fantasy Survivor · Season 50</div>
+            <div style={{
+              fontFamily: "'Playfair Display', serif", fontWeight: 900,
+              fontSize: "clamp(1.6rem, 5vw, 2.4rem)", color: "#f0ebe0",
+              lineHeight: 1.2, marginBottom: "1.25rem",
+            }}>Scores have been updated<br/>for Episode 9</div>
+            <div style={{
+              fontStyle: "italic",
+              fontSize: "0.82rem",
+              color: "#a8d88a",
+              marginBottom: "1rem",
+              maxWidth: 420,
+              lineHeight: 1.7,
+            }}>
+              "A puzzle falls into the sea —<br />
+              The professor meets his fate."
+            </div>
+            <div style={{ fontSize: "0.78rem", color: "#999", marginBottom: "2.5rem", maxWidth: 380, lineHeight: 1.6 }}>
+              Watch episode 9 before continuing to avoid spoilers.
+            </div>
+            <button
+              onClick={dismissSplash}
+              style={{
+                background: "rgba(100,180,80,0.1)", border: "1px solid rgba(100,180,80,0.4)",
+                color: "#8fcc72", fontFamily: "'DM Mono', monospace", fontSize: "0.8rem",
+                letterSpacing: "0.12em", textTransform: "uppercase", padding: "0.85rem 2.5rem",
+                borderRadius: "2px", cursor: "pointer",
+              }}
+              onMouseEnter={e => e.target.style.background="rgba(100,180,80,0.2)"}
+              onMouseLeave={e => e.target.style.background="rgba(100,180,80,0.1)"}
+            >
+              Click to Continue →
+            </button>
+          </div>
+        </div>
+      </>
+    );
+  }
 
   return (
     <>
       <style>{CSS}</style>
       <div className="app">
         <header className="header">
-          <div className="logo">
-            SURVIVOR<span>FANTASY</span>
-            <sub>S51</sub>
-          </div>
+          <div className="logo">SURVIVOR<span>FANTASY</span></div>
           <nav className="nav">
-            {[
-              { key: "overview",  label: "Overview"  },
-              { key: "results",   label: "Results"    },
-              { key: "draft",     label: "Draft"      },
-              { key: "scoring",   label: "Scoring"    },
-              { key: "castaways", label: "Cast"       },
-              { key: "history",   label: "History"    },
-            ].map(p => (
-              <button key={p.key} className={`nav-btn ${page === p.key ? "active" : ""}`} onClick={() => setPage(p.key)}>
-                {p.label}
+            {["leaderboard","recap","points","castaways","history"].map(p => (
+              <button key={p} className={`nav-btn ${page === p ? "active" : ""}`} onClick={() => setPage(p)}>
+                {p}
               </button>
             ))}
           </nav>
         </header>
 
         <div className="container">
-          {storageError && <p className="hint">Browser saving is unavailable. The confirmed draft remains available from the published site.</p>}
-          {page === "overview"  && <Overview castaways={castaways} />}
-          {page === "results"   && <><WeekFive /><WeekFour /><WeekThree /><WeekTwo /><WeekOne /></>}
-          {page === "castaways" && <Castaways castaways={castaways} />}
-          {page === "draft" && <Draft castaways={castaways} picks={draftPicks} />}
-          {page === "scoring" && <Scoring castaways={castaways} />}
-          {page === "history"   && <History historySeason={historySeason} setHistorySeason={setHistorySeason} />}
+          {page === "leaderboard" && <Leaderboard season={season50} scores={scores} castaways={castaways} showOdds={showOdds} activePoints={ACTIVE_POINTS} />}
+          {page === "castaways"   && <Castaways   season={season50} castaways={castaways} showOdds={showOdds} />}
+          {page === "history"     && <History historySeason={historySeason} setHistorySeason={setHistorySeason} />}
+          {page === "points"      && <Points season={season50} castaways={castaways} activePoints={ACTIVE_POINTS} />}
+          {page === "recap"       && <Recap />}
         </div>
+
+        {toast && <div className="toast">{toast}</div>}
       </div>
     </>
   );
 }
 
-// ─── Draft page ──────────────────────────────────────────────────────────────
-function Draft({ castaways, picks }) {
-  return (
-    <div>
-      <div className="page-title">Season 51 Draft</div>
-      <div className="page-subtitle">Draft complete · 5 rounds · 5 players per team</div>
-      <div className="panel" style={{ marginBottom: "1.5rem" }}>
-        <div className="section-title">All 20 picks confirmed</div>
-        <p className="hint">All four teams have five players. Aaliyah was eliminated in Week 1 and was not drafted. Ana (Jinga) was eliminated in Week 2. Rob and Patt (both Miloa) exited in Week 3. Jenna (Weloki) exited in Week 4; Alexis (Miloa) and Linnea (Ojalu) exited in Week 5.</p>
-      </div>
-      <div className="section-title">Draft Board</div>
-      <div style={{ overflowX: "auto", marginBottom: "1.5rem" }}>
-        <table className="hist-table">
-          <thead><tr><th>Pick</th><th>Round</th><th>Team</th><th>Player</th></tr></thead>
-          <tbody>{DRAFT_ORDER.map((teamId, index) => {
-            const team = TEAMS.find(t => t.id === teamId);
-            return <tr key={index}>
-              <td>{index + 1}</td><td>{Math.floor(index / 4) + 1}</td>
-              <td style={{ color: team.color }}>{team.name}</td><td>{picks[index]}</td>
-            </tr>;
-          })}</tbody>
-        </table>
-      </div>
-      <div className="section-title">Team Rosters</div>
-      <div className="hist-grid">{TEAMS.filter(t => t.id !== 5).map(team => {
-        const roster = castaways.filter(c => c.draftedBy === team.id);
-        return <div className="panel" key={team.id}>
-          <div style={{ color: team.color, marginBottom: "0.5rem" }}>{team.name} · {roster.length}/5</div>
-          {roster.map((c, i) => <div className="hint" key={c.id} style={{ padding: "0.35rem 0" }}>{i + 1}. {c.name}</div>)}
-        </div>;
-      })}</div>
-    </div>
-  );
+function oddsToImplied(odds) {
+  if (!odds) return 0;
+  if (odds.startsWith("-")) { const n = Math.abs(parseInt(odds)); return n / (n + 100); }
+  const n = parseInt(odds.replace("+",""));
+  return 100 / (n + 100);
 }
 
-// ─── Scoring page ─────────────────────────────────────────────────────────────
-function Scoring({ castaways }) {
-  const total = SEASONS.find(season => season.current).totalCastaways;
-  const scores = TEAMS.map(team => {
-    const roster = castaways.filter(c => c.draftedBy === team.id);
-    return { ...team, roster, score: roster.reduce((sum, c) => sum + calcPoints(c), 0) };
-  }).sort((a, b) => b.score - a.score);
-  const placements = [...castaways].sort((a, b) => {
-    if (a.eliminationOrder == null && b.eliminationOrder == null) return a.name.localeCompare(b.name);
-    if (a.eliminationOrder == null) return -1;
-    if (b.eliminationOrder == null) return 1;
-    return b.eliminationOrder - a.eliminationOrder;
-  });
-  return (
-    <div>
-      <div className="page-title">Scoring</div>
-      <div className="page-subtitle">Season 51 · After Week 5 · Placement-based scoring</div>
-      <div className="section-title">Team Scores</div>
-      <div className="hist-grid">
-        {scores.map(team => {
-          const rank = scores.findIndex(t => t.score === team.score) + 1;
-          const tied = scores.filter(t => t.score === team.score).length > 1;
-          return <div className="hist-card" key={team.id}>
-            <div className="hint">{tied ? "Tied " : ""}{ordinal(rank)} place</div>
-            <div className="hist-score" style={{ color: team.color, marginTop: "0.4rem" }}>{team.score}<span style={{ fontSize: "0.7rem", color: "#888", marginLeft: "0.35rem" }}>pts</span></div>
-            <div style={{ color: team.color, marginTop: "0.3rem" }}>{team.name}</div>
-            <div className="hint">{team.members} · {team.roster.filter(c => !c.eliminationOrder).length} of 5 remaining</div>
-          </div>;
-        })}
-      </div>
-      <div className="section-title">Complete Placement Scoring Guide — Season 51</div>
-      <p className="hint" style={{ marginBottom: "0.8rem" }}>All 21 finishing positions and their point values are shown below. This is the same placement-based rule used for the current standings; final-three placements increase by two points each.</p>
-      <div style={{ border: "1px solid rgba(255,255,255,0.07)", borderRadius: 4, overflowX: "auto", marginBottom: "2rem" }}>
-        <table className="hist-table">
-          <thead><tr><th>Final Placement</th><th>Elimination Order</th><th style={{ textAlign: "right" }}>Points</th></tr></thead>
-          <tbody>
-            {Array.from({ length: total }, (_, index) => {
-              const finish = index + 1;
-              const eliminationOrder = total - finish + 1;
-              const pts = placementPoints(eliminationOrder, total);
-              return (
-                <tr key={finish}>
-                  <td style={{ color: "#f0ebe0", fontWeight: 600 }}>{ordinal(finish)}{finish === 1 ? " · Winner" : ""}</td>
-                  <td>{ordinal(eliminationOrder)} out</td>
-                  <td style={{ color: "#5aaa72", textAlign: "right", fontWeight: 700 }}>{pts}</td>
-                </tr>
-              );
-            })}
-          </tbody>
-        </table>
-      </div>
-      <div className="section-title">Placement Results — Season 51</div>
-      <div style={{ border: "1px solid rgba(255,255,255,0.07)", borderRadius: 4, overflowX: "auto" }}>
-        <table className="hist-table">
-          <thead><tr><th>Finish</th><th>Castaway</th><th>Team</th><th style={{ textAlign: "right" }}>Pts</th></tr></thead>
-          <tbody>
-            {placements.map(c => {
-              const team = TEAMS.find(t => t.id === c.draftedBy);
-              return <tr key={c.id}>
-                <td style={{ color: "#f0ebe0", fontFamily: "'Playfair Display',serif", fontWeight: 900 }}>
-                  {c.eliminationOrder == null ? "Still in" : ordinal(total - c.eliminationOrder + 1)}
-                </td>
-                <td style={{ color: "#f0ebe0" }}>{c.name}</td>
-                <td style={{ color: team?.color || "#777" }}>{team?.name || "—"}</td>
-                <td style={{ color: "#5aaa72", textAlign: "right", fontFamily: "'Playfair Display',serif", fontWeight: 900 }}>{calcPoints(c)}{c.eliminationOrder == null ? "*" : ""}</td>
-              </tr>;
-            })}
-          </tbody>
-        </table>
-      </div>
-      <p className="hint" style={{ marginTop: "1rem" }}>Scoring follows the History page: first and second eliminated = 0 points, third = 1, fourth = 2; each subsequent finish adds 1 point, with a 2-point increase for each of the final three placements. * Active castaways have provisional points based on their current minimum placement. Eliminated players' points are final.</p>
-    </div>
-  );
+function projectedPts(picks, totalCastaways, activePoints) {
+  const maxPts = calcPoints(totalCastaways, totalCastaways);
+  return picks
+    .filter(c => !c.eliminationOrder && c.odds)
+    .reduce((sum, c) => sum + oddsToImplied(c.odds) * maxPts, 0)
+    .toFixed(1);
 }
 
-// ─── Overview page ────────────────────────────────────────────────────────────
-function Overview({ castaways }) {
-  const remaining = castaways.filter(c => !c.eliminationOrder).length;
+function Leaderboard({ season, scores, castaways, showOdds, activePoints }) {
+  const eliminated = castaways.filter(c => c.eliminationOrder).length;
+  const remaining = season.totalCastaways - eliminated;
+  const champs = getChampionshipsThrough(49);
+
+  function teamOddsSummary(picks) {
+    const alive = picks.filter(c => !c.eliminationOrder && c.odds);
+    if (!alive.length) return null;
+    const totalImplied = alive.reduce((s, c) => s + oddsToImplied(c.odds), 0);
+    if (totalImplied >= 0.5) {
+      return "-" + Math.round((totalImplied / (1 - totalImplied)) * 100);
+    } else {
+      return "+" + Math.round(((1 - totalImplied) / totalImplied) * 100);
+    }
+  }
+
   return (
     <div>
-      <div className="page-title">Season 51</div>
-      <div className="page-subtitle">Week 5 complete · October 21, 2026</div>
-      <div className="hist-grid">
-        {[
-          { label: "Remaining", value: remaining },
-          { label: "Eliminated", value: castaways.length - remaining },
-          { label: "Week 5 immunity", value: "Toka" },
-        ].map(item => (
-          <div className="panel" key={item.label}>
-            <div className="section-title">{item.label}</div>
-            <div className="hist-score">{item.value}</div>
-          </div>
-        ))}
-      </div>
-      <WeekFive compact />
-      <div className="section-title">Fantasy Teams</div>
-      <div className="hist-grid">
-        {TEAMS.map(team => {
-          const roster = castaways.filter(c => c.draftedBy === team.id || c.draftedBy === team.name);
-          const points = roster.reduce((sum, c) => sum + calcPoints(c), 0);
-          return { ...team, roster, points };
-        }).sort((a, b) => b.points - a.points).map(team => {
-          const { roster, points } = team;
+      <div className="page-title">Leaderboard</div>
+      <div className="page-subtitle">Season {season.id} · {season.totalCastaways} Castaways · {eliminated} Eliminated · {remaining} Remaining · Jury phase underway</div>
+      <div className="leaderboard">
+        {scores.map((team, i) => {
+          const oddsDisplay = teamOddsSummary(team.picks);
+          const proj = projectedPts(team.picks, season.totalCastaways, activePoints);
+          const rank = i === 0 ? 1 : (scores[i].total < scores[i-1].total ? i + 1 : scores.findIndex(s => s.total === team.total) + 1);
           return (
-            <div className="panel" key={team.id}>
-              <div style={{ color: team.color, marginBottom: "0.4rem" }}>{team.name}</div>
-              <div className="hint">{team.members}</div>
-              {roster.length ? <>
-                <div className="hist-score" style={{ margin: "0.5rem 0" }}>{points} pts</div>
-                <div className="hint">{roster.filter(c => !c.eliminationOrder).length} of {roster.length} remaining</div>
-                <div className="lb-tags" style={{ marginTop: "0.5rem" }}>
-                  {roster.map(c => <span key={c.id} className={`c-tag ${c.eliminationOrder ? "eliminated" : "alive"}`}>{c.name}</span>)}
+            <div key={team.id} className={`lb-card ${rank === 1 ? "first" : ""}`}>
+              <div className="lb-rank">{rank}</div>
+              <div style={{ flex: 1 }}>
+                <div className="lb-tribe" style={{ color: team.color }}>
+                  {team.name}
+                  <span style={{ fontSize: "0.63rem", color: "#999", fontWeight: 400, marginLeft: "0.4rem" }}>{team.members}</span>
+                  {(champs[team.name] || 0) > 0 && (
+                    <span style={{ fontSize: "0.58rem", color: "#c8922a", marginLeft: "0.5rem", opacity: 0.75 }}>{"★".repeat(champs[team.name])}</span>
+                  )}
+                  {showOdds && oddsDisplay && (
+                    <span style={{ fontSize: "0.6rem", marginLeft: "0.6rem", color: oddsColor(oddsDisplay), fontWeight: 400 }}>
+                      {oddsDisplay} odds
+                    </span>
+                  )}
                 </div>
-              </> : <div className="hint" style={{ marginTop: "0.5rem" }}>No players drafted.</div>}
+                <div className="lb-tags">
+                  {team.picks.map(c => (
+                    <span key={c.id} className={`c-tag ${c.eliminationOrder ? "eliminated" : "alive"}`}>
+                      {c.name}{c.eliminationOrder
+                        ? ` · ${calcPoints(c.eliminationOrder, season.totalCastaways)}pt`
+                        : (showOdds && c.odds ? ` · ${c.odds} · ${activePoints}pt` : ` · ${activePoints}pt`)}
+                    </span>
+                  ))}
+                  {team.picks.length === 0 && <span style={{ fontSize: "0.65rem", color: "#aaa" }}>No picks</span>}
+                </div>
+              </div>
+              <div className="lb-score">
+                <div className="lb-pts" style={{ color: team.color }}>{team.total}</div>
+                <div className="lb-pts-label">points</div>
+                {showOdds && (
+                  <div style={{ fontSize: "0.58rem", color: "#777", marginTop: "0.25rem" }}>
+                    ~{proj} proj.
+                  </div>
+                )}
+              </div>
             </div>
           );
         })}
       </div>
-      <p className="hint">Scoring: placement-based, matching the History page. First two eliminated earn 0, third earns 1, fourth earns 2; the final three placements receive 2-point increases. Active players have provisional points.</p>
     </div>
   );
 }
 
-// ─── Castaways page ───────────────────────────────────────────────────────────
-function Castaways({ castaways }) {
-  const listed = castaways.filter(c => !c.unknown);
-  const unknown = castaways.filter(c => c.unknown);
-
+function Castaways({ season, castaways, showOdds }) {
+  const alive     = castaways.filter(c => !c.eliminationOrder && c.draftedBy);
+  const undrafted = castaways.filter(c => !c.eliminationOrder && !c.draftedBy);
+  const eliminated = castaways.filter(c => c.eliminationOrder).sort((a,b) => b.eliminationOrder - a.eliminationOrder);
   return (
     <div>
-      <div className="page-title">Season 51 Cast</div>
-      <div className="page-subtitle">After Week 5 · 14 remaining · 7 eliminated</div>
-
-      <div className="section-title">Castaways — {listed.length}</div>
-      <div className="castaways-grid">
-        {listed.map(c => <CastawayCard key={c.id} c={c} />)}
+      <div className="page-title">Castaways</div>
+      <div className="page-subtitle">Season {season.id} · {alive.length} Active · {undrafted.length} Undrafted · {eliminated.length} Eliminated</div>
+      <div className="section-title">Tribes</div>
+      <div className="row" style={{ marginBottom: "1.25rem" }}>
+        {Object.entries(TRIBE_COLORS).map(([t,c]) => (
+          <span key={t} className="hint">
+            <span style={{ display:"inline-block", width:10, height:10, borderRadius:99, background:c, marginRight:6 }} />{t}
+          </span>
+        ))}
       </div>
-
-      {unknown.length > 0 && (
-        <>
-          <div className="divider" />
-          <div className="section-title">Unknown — {unknown.length} slots remaining</div>
-          <div className="castaways-grid">
-            {unknown.map(c => <CastawayCard key={c.id} c={c} />)}
-          </div>
-        </>
-      )}
+      {alive.length > 0 && <><div className="section-title">Active — {alive.length}</div><div className="castaways-grid">{alive.map(c => <CastawayCard key={c.id} c={c} season={season} showOdds={showOdds} />)}</div></>}
+      {undrafted.length > 0 && <><div className="section-title">Undrafted — {undrafted.length}</div><div className="castaways-grid">{undrafted.map(c => <CastawayCard key={c.id} c={c} season={season} showOdds={showOdds} />)}</div></>}
+      {eliminated.length > 0 && <><div className="divider" /><div className="section-title">Eliminated — {eliminated.length}</div><div className="castaways-grid">{eliminated.map(c => <CastawayCard key={c.id} c={c} season={season} showOdds={showOdds} />)}</div></>}
     </div>
   );
 }
 
-function CastawayCard({ c }) {
-  const cls = c.unknown ? "unknown-player" : c.eliminationOrder ? "eliminated" : "alive";
+function CastawayCard({ c, season, showOdds }) {
+  const team = TEAMS.find(t => t.id === c.draftedBy);
+  const pts  = c.eliminationOrder ? calcPoints(c.eliminationOrder, season.totalCastaways) : null;
+  const cls  = c.eliminationOrder ? "eliminated" : (c.draftedBy ? "alive" : "undrafted");
   return (
     <div className={`castaway-card ${cls}`}>
-      <div className="c-photo-wrap">
-        {c.photoUrl && (
-          <img
-            className="c-photo"
-            src={c.photoUrl}
-            alt={`${c.name} profile`}
-            loading="lazy"
-            referrerPolicy="no-referrer"
-            onError={e => {
-              e.currentTarget.style.display = "none";
-              const fallback = e.currentTarget.nextElementSibling;
-              if (fallback) fallback.style.display = "flex";
-            }}
-          />
-        )}
-        <div className={`c-photo-fallback ${c.photoUrl ? "with-photo" : ""}`}>{initials(c.name)}</div>
-      </div>
+      <Photo src={c.photo} alt={c.name} className="c-photo" />
       <div className="c-info">
         <div className="c-name">{c.name}</div>
-        {c.age && <div className="c-age">Age {c.age}{c.hometown ? ` · ${c.hometown}` : ""}</div>}
-        {c.occupation && <div className="c-occ">{c.occupation}</div>}
-        <div className="hint" style={{ margin: "0.4rem 0" }}>{TEAMS.find(t => t.id === c.draftedBy)?.name || "Not drafted"}</div>
+        {c.bio && <div className="c-bio">{c.bio}</div>}
+        {c.tribe && (
+          <div style={{ marginBottom:"0.25rem", display:"flex", alignItems:"center", gap:"0.25rem", flexWrap:"wrap" }}>
+            {c.origTribe && c.origTribe !== c.tribe && (
+              <span style={{ fontSize:"0.55rem", letterSpacing:"0.1em", textTransform:"uppercase", padding:"0.1rem 0.4rem", borderRadius:"2px", background:`${(TRIBE_COLORS[c.origTribe]||"#aaa")}22`, color:TRIBE_COLORS[c.origTribe]||"#aaa", border:`1px solid ${(TRIBE_COLORS[c.origTribe]||"#aaa")}55` }}>
+                {c.origTribe}
+              </span>
+            )}
+            {c.origTribe && c.origTribe !== c.tribe && (
+              <span style={{ fontSize:"0.5rem", color:"#555" }}>→</span>
+            )}
+            <span style={{ fontSize:"0.55rem", letterSpacing:"0.1em", textTransform:"uppercase", padding:"0.1rem 0.4rem", borderRadius:"2px", background:`${(TRIBE_COLORS[c.tribe]||"#aaa")}22`, color:TRIBE_COLORS[c.tribe]||"#aaa", border:`1px solid ${(TRIBE_COLORS[c.tribe]||"#aaa")}55` }}>
+              {c.tribe}
+            </span>
+          </div>
+        )}
         <div className="c-row">
-          <span style={{ fontSize: "0.65rem", color: c.tribe === "Toka" ? "#e8c45b" : c.tribe === "Savu" ? "#c49be8" : c.tribe === "Dina" ? "#dc7979" : "#aaa" }}>{c.tribe}</span>
-          <span className={`c-tag ${c.eliminationOrder ? "eliminated" : "alive"}`}>{c.eliminationOrder ? `Out · Week ${c.eliminatedWeek}` : "In the game"}</span>
+          <div style={{ fontSize:"0.58rem", color: team ? team.color : "#888" }}>{team ? team.name : "Undrafted"}</div>
+          {c.odds && showOdds && <div style={{ fontSize:"0.62rem", fontWeight:500, color:oddsColor(c.odds) }}>{c.odds}</div>}
         </div>
-        {c.eliminationOrder && <div className="hint" style={{ marginTop: "0.4rem" }}>{ordinal(22 - c.eliminationOrder)} place · {calcPoints(c)} fantasy points</div>}
+        <div className={`c-status ${cls}`} style={{ marginTop:"0.2rem" }}>{c.eliminationOrder ? `Elim. #${c.eliminationOrder}` : (c.draftedBy ? "Active" : "—")}</div>
+        {pts !== null && <div className="c-pts">{pts} pts</div>}
       </div>
     </div>
   );
 }
 
-// ─── Week 5 ───────────────────────────────────────────────────────────────────
-function WeekFive({ compact = false }) {
-  return (
-    <div style={{ marginBottom: "1.5rem" }}>
-      {!compact && <><div className="page-title">Week 5</div><div className="page-subtitle">Not Here to Get a Pedicure · October 21, 2026</div></>}
-      <div className="section-title">Week 5 Results</div>
-      <div className="panel">
-        <div style={{ fontSize: "1rem", marginBottom: "0.6rem" }}>Alexis Levine (Miloa) and Linnea Capobianco (Ojalu) were voted out.</div>
-        <p className="hint">Alexis: 16th place · Linnea: 15th place · 14 castaways remain</p>
-        <ul className="hint" style={{ paddingLeft: "1.2rem", marginTop: "0.8rem", lineHeight: 1.9 }}>
-          <li>Double elimination: Savu voted out Alexis; Dina voted out Linnea.</li>
-          <li>Maggie gave two extra votes to Lewis and Kilby, creating a 4–4 deadlock at Dina.</li>
-          <li>After the tied revote, Dina chose Linnea rather than risk drawing rocks.</li>
-          <li>Fantasy standings and active castaway provisional points now reflect seven eliminations.</li>
-        </ul>
-        <a className="hint" style={{ color: "#6a9fd8", display: "inline-block", marginTop: "0.8rem" }} href="https://www.tvinsider.com/1298773/survivor-51-episode-5-recap-rock-draw-double-elimination-voted-out-jeff-probst/" target="_blank" rel="noopener noreferrer">Week 5 recap ↗</a>
-      </div>
-    </div>
-  );
-}
-
-// ─── Week 4 ───────────────────────────────────────────────────────────────────
-function WeekFour({ compact = false }) {
-  return (
-    <div style={{ marginBottom: "1.5rem" }}>
-      {!compact && <><div className="page-title">Week 4</div><div className="page-subtitle">That's the Magic of Survivor · October 14, 2026</div></>}
-      <div className="section-title">Week 4 Results</div>
-      <div className="panel">
-        <div style={{ fontSize: "1rem", marginBottom: "0.6rem" }}>Jenna Doore (Weloki) was voted out.</div>
-        <p className="hint">17th place · Savu · 16 castaways remained</p>
-        <ul className="hint" style={{ paddingLeft: "1.2rem", marginTop: "0.8rem", lineHeight: 1.9 }}>
-          <li>Tribe swap formed three tribes: Toka, Savu, and Dina.</li>
-          <li>Dina and Toka won immunity; Savu attended Tribal Council.</li>
-          <li>Jenna was voted out by a 4–1 vote.</li>
-        </ul>
-        <a className="hint" style={{ color: "#6a9fd8", display: "inline-block", marginTop: "0.8rem" }} href="https://www.paramountplus.com/sneak-peak/survivor-season-51-episode-4-recap/" target="_blank" rel="noopener noreferrer">Official Week 4 recap ↗</a>
-      </div>
-    </div>
-  );
-}
-
-// ─── Week 3 ───────────────────────────────────────────────────────────────────
-function WeekThree({ compact = false }) {
-  return (
-    <div style={{ marginBottom: "1.5rem" }}>
-      {!compact && <>
-        <div className="page-title">Week 3</div>
-        <div className="page-subtitle">What I’m Smellin’ Is Stinky · October 7, 2026</div>
-      </>}
-      <div className="section-title">Week 3 Results</div>
-      <div className="panel">
-        <div style={{ fontSize: "1rem", marginBottom: "0.6rem" }}>Rob Antonson and Patt Cannaday (both Miloa) exited.</div>
-        <p className="hint">Rob: 19th place · voluntary departure · Patt: 18th place · voted out · 17 remain</p>
-        <ul className="hint" style={{ paddingLeft: "1.2rem", marginTop: "0.8rem", lineHeight: 1.9 }}>
-          <li>Rob left voluntarily over concerns about a foot injury; his exit occurred before the immunity challenge.</li>
-          <li>Carter Krull moved from Savu to Toka in a mutiny twist; Lewis Kelly was also on Toka.</li>
-          <li>Savu won immunity; Toka attended Tribal Council.</li>
-          <li>Patt was blindsided at Tribal Council.</li>
-          <li>17 remaining castaways earned 1 Week 3 fantasy point. Rob and Patt earned 0 for Week 3, retaining their prior points.</li>
-        </ul>
-        <a className="hint" style={{ color: "#6a9fd8", display: "inline-block", marginTop: "0.8rem" }} href="https://www.tvline.com/2280490/survivor-51-recap-episode-3-rob-quits-patt-voted-out/" target="_blank" rel="noopener noreferrer">Week 3 recap ↗</a>
-      </div>
-    </div>
-  );
-}
-
-// ─── Week 2 ───────────────────────────────────────────────────────────────────
-function WeekTwo({ compact = false }) {
-  return (
-    <div style={{ marginBottom: "1.5rem" }}>
-      {!compact && <>
-        <div className="page-title">Week 2</div>
-        <div className="page-subtitle">Weaponized Honesty · September 30, 2026</div>
-      </>}
-      <div className="section-title">Week 2 Results</div>
-      <div className="panel">
-        <div style={{ fontSize: "1rem", marginBottom: "0.6rem" }}>Ana Sani (Jinga) was voted out.</div>
-        <p className="hint">20th place · Savu · 0 fantasy points · 19 castaways remain</p>
-        <ul className="hint" style={{ paddingLeft: "1.2rem", marginTop: "0.8rem", lineHeight: 1.9 }}>
-          <li>Toka won immunity; Savu attended Tribal Council.</li>
-          <li>Ana was eliminated in the second vote of the season.</li>
-          <li>Rob Antonson attempted to vote for himself, but self-voting is prohibited.</li>
-          <li>Brady Booker injured his thumb but remained in the game.</li>
-          <li>Lewis Kelly returned from Exile Island to join Toka.</li>
-          <li>All 19 remaining castaways earned 1 Week 2 fantasy point.</li>
-        </ul>
-        <a className="hint" style={{ color: "#6a9fd8", display: "inline-block", marginTop: "0.8rem" }} href="https://www.paramountplus.com/sneak-peak/survivor-season-51-episode-2-recap/" target="_blank" rel="noopener noreferrer">Official Week 2 recap ↗</a>
-      </div>
-    </div>
-  );
-}
-
-// ─── Week 1 ───────────────────────────────────────────────────────────────────
-function WeekOne({ compact = false }) {
-  return (
-    <div style={{ marginBottom: "1.5rem" }}>
-      {!compact && <>
-        <div className="page-title">Week 1</div>
-        <div className="page-subtitle">Permanent Uncertainty · September 23, 2026</div>
-      </>}
-      <div className="section-title">Week 1 Results</div>
-      <div className="panel">
-        <div style={{ fontSize: "1rem", marginBottom: "0.6rem" }}>Aaliyah Puglia was voted out first.</div>
-        <p className="hint">21st place · Toka · 0 fantasy points</p>
-        <ul className="hint" style={{ paddingLeft: "1.2rem", marginTop: "0.8rem", lineHeight: 1.9 }}>
-          <li>Savu won the first immunity challenge.</li>
-          <li>Rob found a hidden immunity idol.</li>
-          <li>Lewis spent the premiere on Exile Island and remains in the game.</li>
-          <li>Aaliyah and Jenna played unsuccessful Shots in the Dark.</li>
-        </ul>
-        <a className="hint" style={{ color: "#6a9fd8", display: "inline-block", marginTop: "0.8rem" }} href="https://www.paramountplus.com/sneak-peak/survivor-season-51-episode-1-recap/" target="_blank" rel="noopener noreferrer">Official Week 1 recap ↗</a>
-      </div>
-    </div>
-  );
-}
-
-// ─── History page ─────────────────────────────────────────────────────────────
 function History({ historySeason, setHistorySeason }) {
   const data = HISTORICAL[historySeason];
   const champs = getChampionshipsThrough(historySeason);
@@ -1141,7 +779,7 @@ function History({ historySeason, setHistorySeason }) {
       <div className="page-subtitle">Past season results</div>
       <div className="season-bar">
         <span className="season-label">Season</span>
-        {[50,49,48,47,46,45,44,43].map(id => (
+        {[49,48,47,46,45,44,43].map(id => (
           <button key={id} className={`season-btn ${historySeason === id ? "active" : ""}`} onClick={() => setHistorySeason(id)}>{id}</button>
         ))}
       </div>
@@ -1152,20 +790,20 @@ function History({ historySeason, setHistorySeason }) {
           <div className="hist-grid">
             {sorted.map((t, i) => (
               <div key={t.name} className={`hist-card ${t.winner ? "champ" : ""}`}>
-                <div style={{ fontSize: "0.62rem", color: t.winner ? "#5aaa72" : "#777", marginBottom: "0.25rem" }}>
+                <div style={{ fontSize:"0.62rem", color: t.winner ? "#c8922a" : "#777", marginBottom:"0.25rem" }}>
                   {t.winner ? "🏆 Champion" : ordinal(i+1) + " Place"}
                 </div>
-                <div className="hist-score" style={{ color: t.na ? "#444" : t.color }}>{t.na ? "—" : t.score}{!t.na && <span style={{ fontSize: "0.7rem", color: "#777", marginLeft: "0.35rem" }}>pts</span>}</div>
-                <div style={{ fontSize: "0.82rem", color: t.color, marginTop: "0.25rem", fontWeight: 500 }}>{t.name}</div>
-                <div style={{ fontSize: "0.62rem", color: "#777" }}>{t.members}</div>
-                {(champs[t.name]||0) > 0 && <div style={{ fontSize: "0.6rem", color: "#5aaa72", marginTop: "0.3rem", letterSpacing: "0.08em" }}>{"★".repeat(champs[t.name])}</div>}
-                {t.na && <div style={{ fontSize: "0.6rem", color: "#555", marginTop: "0.25rem" }}>Did not participate</div>}
+                <div className="hist-score" style={{ color: t.na ? "#444" : t.color }}>{t.na ? "—" : t.score}{!t.na && <span style={{ fontSize:"0.7rem", color:"#777", marginLeft:"0.35rem" }}>pts</span>}</div>
+                <div style={{ fontSize:"0.82rem", color:t.color, marginTop:"0.25rem", fontWeight:500 }}>{t.name}</div>
+                <div style={{ fontSize:"0.62rem", color:"#777" }}>{t.members}</div>
+                {(champs[t.name]||0) > 0 && <div style={{ fontSize:"0.6rem", color:"#c8922a", marginTop:"0.3rem" }}>{"★".repeat(champs[t.name])} {champs[t.name]} title{champs[t.name]>1?"s":""}</div>}
+                {t.na && <div style={{ fontSize:"0.6rem", color:"#555", marginTop:"0.25rem" }}>Did not participate</div>}
               </div>
             ))}
           </div>
 
           <div className="section-title">Placement Results — Season {historySeason}</div>
-          <div style={{ border: "1px solid rgba(255,255,255,0.07)", borderRadius: 4, overflow: "hidden" }}>
+          <div style={{ border:"1px solid rgba(255,255,255,0.07)", borderRadius:4, overflow:"hidden" }}>
             <table className="hist-table">
               <thead><tr><th>Finish</th><th>Castaway</th><th>Team</th><th style={{ textAlign:"right" }}>Pts</th></tr></thead>
               <tbody>
@@ -1173,12 +811,12 @@ function History({ historySeason, setHistorySeason }) {
                   const total = SEASONS.find(s => s.id === historySeason)?.totalCastaways || 18;
                   const finishPos = total - p.place + 1;
                   return (
-                    <tr key={p.place}>
-                      <td style={{ color:"#f0ebe0", fontFamily:"'Playfair Display',serif", fontWeight:900 }}>{ordinal(finishPos)}</td>
-                      <td style={{ color:"#f0ebe0" }}>{p.player}</td>
-                      <td style={{ color: p.team==="NA" ? "#555" : p.teamColor }}>{p.team==="NA" ? "—" : p.team}</td>
-                      <td style={{ color:"#5aaa72", textAlign:"right", fontFamily:"'Playfair Display',serif", fontWeight:900 }}>{p.points}</td>
-                    </tr>
+                  <tr key={p.place}>
+                    <td style={{ color:"#f0ebe0", fontFamily:"'Playfair Display',serif", fontWeight:900 }}>{ordinal(finishPos)}</td>
+                    <td style={{ color:"#f0ebe0" }}>{p.player}</td>
+                    <td style={{ color: p.team==="NA" ? "#555" : p.teamColor }}>{p.team==="NA" ? "—" : p.team}</td>
+                    <td style={{ color:"#c8922a", textAlign:"right", fontFamily:"'Playfair Display',serif", fontWeight:900 }}>{p.points}</td>
+                  </tr>
                   );
                 })}
               </tbody>
@@ -1188,6 +826,566 @@ function History({ historySeason, setHistorySeason }) {
       ) : (
         <div className="hint">No data for this season.</div>
       )}
+    </div>
+  );
+}
+
+const DRAFT_ORDER = [
+  "Christian Hubicki",
+  "Genevieve Mushaluk",
+  "Jonathan Young",
+  "Stephenie LaGrossa",
+  "Joe Hunter",
+  "Rizo Velovic",
+  "Rick Devens",
+  "Mike White",
+  'Benjamin "Coach" Wade',
+  "Aubry Bracco",
+  "Ozzy Lusth",
+  "Kamilla Karthigesu",
+  "Dee Valladares",
+  "Tiffany Ervin",
+  "Cirie Fields",
+  "Emily Flippen",
+  "Savannah Louie",
+  "Charlie Davis",
+  "Colby Donaldson",
+  "Q Burdette",
+  "Chrissy Hofbeck",
+  "Angelina Keeley",
+  "Kyle Fraser",
+  "Jenna Lewis-Dougherty",
+];
+
+function Points({ season, castaways, activePoints }) {
+  const [sortCol, setSortCol] = useState("default");
+  const [sortDir, setSortDir] = useState("asc");
+
+  const rows = castaways.map((c) => {
+    const team = c.draftedBy ? TEAMS.find(t => t.id === c.draftedBy) : null;
+    const pts = c.eliminationOrder ? calcPoints(c.eliminationOrder, season.totalCastaways) : null;
+    const finishPlace = c.eliminationOrder ? season.totalCastaways - c.eliminationOrder + 1 : null;
+    const draftPick = DRAFT_ORDER.indexOf(c.name) + 1 || null;
+
+    return {
+      name: c.name,
+      team,
+      teamName: team ? team.name : "—",
+      teamColor: team ? team.color : "#555",
+      eliminationOrder: c.eliminationOrder,
+      finishPlace,
+      pts,
+      draftPick,
+      isActive: c.eliminationOrder === null,
+    };
+  });
+
+  const sorted = [...rows].sort((a, b) => {
+    if (sortCol === "default") {
+      if (a.isActive && !b.isActive) return -1;
+      if (!a.isActive && b.isActive) return 1;
+      if (a.isActive && b.isActive) return (a.draftPick ?? 999) - (b.draftPick ?? 999);
+      return (a.finishPlace ?? 999) - (b.finishPlace ?? 999);
+    }
+
+    let av;
+    let bv;
+
+    if (sortCol === "place") {
+      av = a.finishPlace ?? 999;
+      bv = b.finishPlace ?? 999;
+    }
+    if (sortCol === "name") {
+      av = a.name;
+      bv = b.name;
+    }
+    if (sortCol === "drafted") {
+      av = a.draftPick ?? 999;
+      bv = b.draftPick ?? 999;
+    }
+    if (sortCol === "team") {
+      av = a.teamName;
+      bv = b.teamName;
+    }
+    if (sortCol === "pts") {
+      av = a.pts ?? -1;
+      bv = b.pts ?? -1;
+    }
+
+    if (typeof av === "string") {
+      return sortDir === "asc" ? av.localeCompare(bv) : bv.localeCompare(av);
+    }
+
+    return sortDir === "asc" ? av - bv : bv - av;
+  });
+
+  const toggleSort = (col) => {
+    if (sortCol === col) {
+      setSortDir((d) => (d === "asc" ? "desc" : "asc"));
+    } else {
+      setSortCol(col);
+      setSortDir("asc");
+    }
+  };
+
+  const arrow = (col) => {
+    if (sortCol !== col) return <span style={{ color: "#444", marginLeft: "0.3rem" }}>↕</span>;
+    return <span style={{ color: "#c8922a", marginLeft: "0.3rem" }}>{sortDir === "asc" ? "↑" : "↓"}</span>;
+  };
+
+  const thStyle = (col) => ({
+    padding: "0.6rem 0.85rem",
+    textAlign: (col === "pts" || col === "drafted" || col === "place") ? "center" : "left",
+    fontSize: "0.6rem",
+    letterSpacing: "0.1em",
+    textTransform: "uppercase",
+    color: sortCol === col ? "#c8922a" : "#888",
+    borderBottom: "1px solid rgba(255,255,255,0.08)",
+    cursor: "pointer",
+    userSelect: "none",
+    whiteSpace: "nowrap",
+    background: "rgba(255,255,255,0.02)",
+    fontWeight: 400,
+    fontFamily: "'DM Mono', monospace",
+  });
+
+  const eliminated = castaways.filter(c => c.eliminationOrder).length;
+  const remaining = season.totalCastaways - eliminated;
+
+  // Build full scoring reference: all 24 finish positions
+  const scoringRef = Array.from({ length: season.totalCastaways }, (_, i) => {
+    const finishPos = i + 1; // 1 = winner, 24 = first boot
+    const elimOrder = season.totalCastaways - finishPos + 1;
+    const pts = calcPoints(elimOrder, season.totalCastaways);
+    return { finishPos, elimOrder, pts };
+  });
+
+  return (
+    <div>
+      <div className="page-title">Points</div>
+      <div className="page-subtitle">
+        Season {season.id} · {eliminated} Eliminated · {remaining} Remaining · Active players worth {activePoints} pts
+      </div>
+
+      <div style={{ marginBottom: "0.75rem" }}>
+        <button
+          className="action-btn"
+          onClick={() => {
+            setSortCol("default");
+            setSortDir("asc");
+          }}
+          style={{
+            marginBottom: 0,
+            color: sortCol === "default" ? "#c8922a" : "#ccc",
+            borderColor: sortCol === "default" ? "rgba(200,146,42,0.4)" : "rgba(255,255,255,0.1)",
+            background: sortCol === "default" ? "rgba(200,146,42,0.08)" : "rgba(255,255,255,0.03)",
+          }}
+        >
+          Default Order
+        </button>
+      </div>
+
+      <div style={{ border: "1px solid rgba(255,255,255,0.08)", borderRadius: 4, overflow: "hidden" }}>
+        <table style={{ width: "100%", borderCollapse: "collapse" }}>
+          <thead>
+            <tr>
+              <th style={{ ...thStyle("place"), minWidth: "4.5rem" }} onClick={() => toggleSort("place")}>
+                Place {arrow("place")}
+              </th>
+              <th style={thStyle("name")} onClick={() => toggleSort("name")}>
+                Castaway {arrow("name")}
+              </th>
+              <th style={{ ...thStyle("drafted"), minWidth: "4.5rem" }} onClick={() => toggleSort("drafted")}>
+                Drafted {arrow("drafted")}
+              </th>
+              <th style={thStyle("team")} onClick={() => toggleSort("team")}>
+                Team {arrow("team")}
+              </th>
+              <th style={{ ...thStyle("pts"), minWidth: "4.5rem" }} onClick={() => toggleSort("pts")}>
+                Points {arrow("pts")}
+              </th>
+            </tr>
+          </thead>
+          <tbody>
+            {sorted.map((row, idx) => {
+              const isElim = row.eliminationOrder !== null;
+              return (
+                <tr
+                  key={row.name}
+                  style={{
+                    background: idx % 2 === 0 ? "rgba(255,255,255,0.015)" : "transparent",
+                    opacity: isElim ? 0.65 : 1,
+                  }}
+                >
+                  <td style={{ padding: "0.6rem 0.85rem", textAlign: "center", borderBottom: "1px solid rgba(255,255,255,0.04)" }}>
+                    {row.finishPlace !== null
+                      ? <span style={{ fontSize: "0.75rem", color: "#d0cab8" }}>{ordinal(row.finishPlace)}</span>
+                      : <span style={{ fontSize: "0.72rem", color: "#6db86d" }}>Active</span>}
+                  </td>
+
+                  <td style={{ padding: "0.6rem 0.85rem", borderBottom: "1px solid rgba(255,255,255,0.04)" }}>
+                    <div style={{ fontSize: "0.8rem", color: isElim ? "#888" : "#f0ebe0", textDecoration: isElim ? "line-through" : "none", fontWeight: 500 }}>
+                      {row.name}
+                    </div>
+                  </td>
+
+                  <td style={{ padding: "0.6rem 0.85rem", textAlign: "center", borderBottom: "1px solid rgba(255,255,255,0.04)" }}>
+                    {row.draftPick
+                      ? <span style={{ fontFamily: "'Playfair Display', serif", fontWeight: 900, fontSize: "0.85rem", color: "#555" }}>{row.draftPick}</span>
+                      : <span style={{ fontSize: "0.65rem", color: "#555" }}>—</span>}
+                  </td>
+
+                  <td style={{ padding: "0.6rem 0.85rem", borderBottom: "1px solid rgba(255,255,255,0.04)" }}>
+                    <span style={{ fontSize: "0.72rem", color: row.teamColor, fontWeight: 500 }}>
+                      {row.teamName}
+                    </span>
+                  </td>
+
+                  <td style={{ padding: "0.6rem 0.85rem", textAlign: "center", borderBottom: "1px solid rgba(255,255,255,0.04)" }}>
+                    {row.pts !== null
+                      ? <span style={{ fontFamily: "'Playfair Display', serif", fontWeight: 900, fontSize: "0.9rem", color: "#c8922a" }}>{row.pts}</span>
+                      : <span style={{ fontSize: "0.72rem", color: "#6db86d" }}>{activePoints}</span>}
+                  </td>
+                </tr>
+              );
+            })}
+          </tbody>
+        </table>
+      </div>
+
+      <div style={{ marginTop: "1.5rem", display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(180px, 1fr))", gap: "0.75rem" }}>
+        {TEAMS.map(t => {
+          const teamRows = rows.filter(r => r.teamName === t.name);
+          const scored = teamRows.reduce((sum, r) => sum + (r.pts !== null ? r.pts : activePoints), 0);
+          const alive = teamRows.filter(r => r.eliminationOrder === null).length;
+          return (
+            <div key={t.id} className="panel" style={{ borderColor: `${t.color}33` }}>
+              <div style={{ fontSize: "0.72rem", fontWeight: 500, color: t.color, marginBottom: "0.35rem" }}>{t.name}</div>
+              <div style={{ fontSize: "0.6rem", color: "#888", marginBottom: "0.5rem" }}>{t.members}</div>
+              <div style={{ display: "flex", gap: "1rem", alignItems: "baseline" }}>
+                <div>
+                  <div style={{ fontFamily: "'Playfair Display', serif", fontWeight: 900, fontSize: "1.5rem", color: t.color, lineHeight: 1 }}>{scored}</div>
+                  <div style={{ fontSize: "0.55rem", color: "#777", letterSpacing: "0.08em", textTransform: "uppercase" }}>pts</div>
+                </div>
+                <div>
+                  <div style={{ fontFamily: "'Playfair Display', serif", fontWeight: 900, fontSize: "1.5rem", color: alive > 0 ? "#6db86d" : "#555", lineHeight: 1 }}>{alive}</div>
+                  <div style={{ fontSize: "0.55rem", color: "#777", letterSpacing: "0.08em", textTransform: "uppercase" }}>alive</div>
+                </div>
+              </div>
+            </div>
+          );
+        })}
+      </div>
+
+      {/* Scoring Reference Table */}
+      <div style={{ marginTop: "2.5rem" }}>
+        <div className="section-title">Scoring Reference — All {season.totalCastaways} Positions</div>
+        <div style={{
+          border: "1px solid rgba(255,255,255,0.07)", borderRadius: 4, overflow: "hidden",
+          opacity: 0.85,
+        }}>
+          <div style={{
+            display: "grid",
+            gridTemplateColumns: "repeat(auto-fill, minmax(90px, 1fr))",
+            gap: 0,
+          }}>
+            {/* Header */}
+            <div style={{
+              gridColumn: "1 / -1",
+              display: "grid",
+              gridTemplateColumns: "repeat(auto-fill, minmax(90px, 1fr))",
+              background: "rgba(255,255,255,0.03)",
+              borderBottom: "1px solid rgba(255,255,255,0.08)",
+            }}>
+              {/* intentionally empty — labels inline below */}
+            </div>
+
+            {scoringRef.map(({ finishPos, pts }, i) => {
+              const isWinner = finishPos === 1;
+              const isRunnerup = finishPos === 2 || finishPos === 3;
+              const isFirstBoot = finishPos === season.totalCastaways;
+              const isSecondBoot = finishPos === season.totalCastaways - 1;
+              const highlight = isWinner
+                ? { bg: "rgba(200,146,42,0.12)", border: "rgba(200,146,42,0.3)", color: "#c8922a" }
+                : isRunnerup
+                ? { bg: "rgba(200,146,42,0.06)", border: "rgba(200,146,42,0.15)", color: "#a07830" }
+                : pts === 0
+                ? { bg: "rgba(255,255,255,0.01)", border: "rgba(255,255,255,0.04)", color: "#555" }
+                : { bg: "transparent", border: "rgba(255,255,255,0.04)", color: "#888" };
+
+              return (
+                <div
+                  key={finishPos}
+                  style={{
+                    padding: "0.5rem 0.6rem",
+                    background: highlight.bg,
+                    borderRight: "1px solid rgba(255,255,255,0.04)",
+                    borderBottom: "1px solid rgba(255,255,255,0.04)",
+                    display: "flex",
+                    flexDirection: "column",
+                    alignItems: "center",
+                    gap: "0.15rem",
+                  }}
+                >
+                  <div style={{
+                    fontSize: "0.55rem",
+                    color: highlight.color,
+                    letterSpacing: "0.06em",
+                    textTransform: "uppercase",
+                    opacity: 0.8,
+                  }}>
+                    {ordinal(finishPos)}
+                  </div>
+                  <div style={{
+                    fontFamily: "'Playfair Display', serif",
+                    fontWeight: 900,
+                    fontSize: pts >= 10 ? "1.05rem" : "0.95rem",
+                    color: pts === 0 ? "#444" : highlight.color !== "#888" ? highlight.color : "#c8922a",
+                    lineHeight: 1,
+                  }}>
+                    {pts}
+                  </div>
+                  <div style={{ fontSize: "0.48rem", color: "#555", letterSpacing: "0.05em" }}>pts</div>
+                </div>
+              );
+            })}
+          </div>
+        </div>
+        <div style={{ fontSize: "0.6rem", color: "#555", marginTop: "0.5rem", letterSpacing: "0.06em" }}>
+          Final 3 positions score double increments. 1st &amp; 2nd place score 0 pts (voted out at FTC).
+        </div>
+      </div>
+    </div>
+  );
+}
+
+const S50_EPISODES = [
+  {
+    number: 9,
+    title: "Episode 9",
+    airDate: "April 22, 2026",
+    eliminated: "Christian Hubicki",
+    advantages: [
+      {
+        holder: "Christian Hubicki",
+        kind: "disadvantage",
+        type: "Jimmy Fallon One in the Urn",
+        status: "applied",
+        note: 'Christian failed the Journey puzzle and was forced to vote for himself at Tribal Council — a Survivor first. He had some choice words for Jimmy Fallon: "This idea you had is terrible. No more ideas for you. I look forward to your apology."',
+      },
+      {
+        holder: "Rick Devens",
+        kind: "advantage",
+        type: "Fake Idol",
+        status: "active",
+        note: "Rick's fake idol (made from Christian's packaging) somehow kept him safe again despite putting a massive target on his back after last episode's stunt.",
+      },
+      {
+        holder: "Cirie Fields",
+        kind: "advantage",
+        type: "Extra Vote",
+        status: "active",
+        note: "Cirie's Extra Vote remains secret and unused. She brilliantly played along when both Christian and Emily pitched an Ozzy blindside — then worked behind the scenes to do the exact opposite.",
+      },
+      {
+        holder: "Stephenie LaGrossa",
+        kind: "advantage",
+        type: "Steal-a-Vote",
+        status: "active",
+        note: "Stephenie's Steal-a-Vote remains active and unused.",
+      },
+      {
+        holder: "Rizo Velovic",
+        kind: "advantage",
+        type: "Idol",
+        status: "active",
+        note: "Rizo's Boomerang Idol remains active. He was seen doing the robot while casting his vote against Christian.",
+      },
+      {
+        holder: "Ozzy Lusth",
+        kind: "advantage",
+        type: "Idol",
+        status: "active",
+        note: "Ozzy's Boomerang Idol remains active.",
+      },
+    ],
+    recap: `Episode 9 opened with the fallout from Rick Devens' fake idol stunt at the previous Tribal Council. Nearly everyone in the game — allies and adversaries alike — was furious. Jonathan mocked Devens' ego, Joe started imitating his idol retrieval antics, and Cirie's alliance marveled at how Rick had painted a bullseye on his own back. Even Emily, supposedly Rick's ally, was incensed: "He put our entire alliance in jeopardy with his antics." Meanwhile, Jeff Probst — citing a deal apparently struck with Jimmy Fallon during a Tonight Show appearance — announced a twist for the immunity challenge: the tribe could earn rice if four players could outlast the host himself in the challenge. After some negotiation (Jonathan bargained him down from five players to four), it was on. Probst lasted about seven and a half minutes, outlasting Emily, Rizo, Rick, and Cirie before bowing out — but all four side-bettors (Jonathan, Joe, Ozzy, and Tiffany) held on, winning the rice. Probst's takeaway: "I bow down. I'll never talk the same trash again. Until next season." Following the immunity win, Joe was given the power to send someone on a Journey. Rather than strategizing, he asked for volunteers and had them play rock-paper-scissors — a move criticized for allowing Christian, someone Joe's alliance didn't want gaining an advantage, to attend. On the Journey platform, Christian faced a Survivor-logo puzzle that had to be solved before anchors dragged it into the ocean — the "Jimmy Fallon One in the Urn" twist. A win would let him pre-load a vote against any player in the urn before Tribal. Christian failed the puzzle. The punishment: he had to vote for himself at Tribal Council — a Survivor first — and announce it to the whole tribe. His fate was likely sealed when he and Emily separately pitched an Ozzy blindside to Cirie, Ozzy's closest ally, who played along brilliantly before working to take out Christian instead. At Tribal, Christian lit into Fallon at every opportunity. His self-vote combined with the majority's resolve sent him home. His exit words: "I hope you enjoyed watching me play, because I enjoyed playing."`,
+  },
+  {
+    number: 8,
+    title: "Episode 8",
+    airDate: "April 15, 2026",
+    eliminated: 'Chrissy Hofbeck, Benjamin "Coach" Wade',
+    advantages: [
+      {
+        holder: 'Benjamin "Coach" Wade',
+        kind: "advantage",
+        type: "Shot in the Dark",
+        status: "applied",
+        note: 'Coach played his Shot in the Dark for his 2-person team with Chrissy, but it returned "Not Safe."',
+      },
+    ],
+    recap: `Episode 8, "Double the Fun, Double the Demise," built around a big pairs twist. The castaways had to divide themselves into duos, and that choice ended up mattering a lot because the episode's central shock was a double elimination: one vote at Tribal sent both members of a pair home. At the immunity challenge, Tiffany and Joe won and earned safety plus a food reward, which gave them extra time to talk strategy and strengthen connections. Meanwhile, Cirie had a major side mission on Exile Island, where she had to search through a huge pile of coconuts to protect her vote, and she returned ready to make a move. Back at camp and at Tribal, the power shifted. Cirie helped flip the game, and Rick Devens added chaos with a fake-idol stunt that rattled people and made the vote even more unpredictable. In the end, the twist and the strategy came together to take out Coach Wade and Chrissy Hofbeck, making them the two people eliminated in the same Tribal Council.`,
+  },
+  {
+    number: 7,
+    title: "Episode 7",
+    airDate: "April 8, 2026",
+    eliminated: "Dee Valladares",
+    advantages: [
+     
+      { holder: "Rizo Velovic", kind: "advantage", type: "Idol", status: "active", note: "Rizo's Boomerang Idol remains active, but its secrecy is fully gone — Emily blabbed to Rizo that Dee had told her about it. Now essentially the whole tribe knows." },
+      { holder: "Ozzy Lusth", kind: "advantage", type: "Idol", status: "active", note: "Ozzy's Boomerang Idol remains active. He won individual immunity this episode (his 8th career win), which kept him safe regardless." },
+      { holder: "Cirie Fields", kind: "advantage", type: "Extra Vote", status: "active", note: "Cirie's Extra Vote remains secret. She saw straight through Stephenie's lie about her journey advantage — but kept quiet." },
+      { holder: "Stephenie LaGrossa", kind: "advantage", type: "Steal-a-Vote", status: "active", note: "Stephenie went on a journey and was challenged to keep her arm raised for a full hour.  She earned a Steal-a-Vote advantage. She tried to lie about earning it, but Cirie immediately saw through her." },
+      { holder: "Aubry Bracco", kind: "advantage", type: "Idol", status: "applied", note: "Aubry played her Boomerang Idol on herself at Tribal Council as promised. It did not return to the finder (Devens) because Aubry played it herself rather than being voted out holding it. The idol is now spent." },
+      { holder: "Dee Valladares", kind: "advantage", type: "Shot in the Dark", status: "applied", note: "Dee played her Shot in the Dark at Tribal — it came up 'Not Safe,' so all votes against her counted. She was eliminated 9-4-1 (4 votes for Tiffany, 1 for Coach). First jury member." },
+    ],
+    recap: "Episode 7, 'That's Not How I Play Survivor,' opened to a fractured camp processing the Blood Moon fallout. Tiffany was furious about Kamilla's blindside; Coach emerged from his hammock fully recharged as the Dragon Slayer, declaring war on liars and naming Dee chief among them. Emily — incapable of keeping a secret — told Rizo that Dee had shared his idol information, blowing up what little cover Rizo had left. Coach then recruited Rizo into his Four Horsemen alliance alongside Jonathan and Joe, positioning him as Colby's replacement. Aubry, heat on her back for 'forgetting' to play her idol at the Blood Moon, promised the tribe she'd play it tonight — a move that doubled as a shield and a target. Stephenie was randomly selected for a journey: hold your arm above your head for one hour to win an advantage, or give up and keep your vote. With a surgically repaired shoulder from her Heroes vs. Villains injury, she couldn't use her right arm, yet she held on for the full hour and won a Steal-a-Vote. She tried to lie about earning it; Cirie immediately saw through her. At the immunity challenge — a beam-balance endurance — the final three came down to Dee, Ozzy, and Joe. Dee fell first, then Joe, giving Ozzy his 8th career immunity win, closing in on Boston Rob's record of nine. At Tribal, 14 players packed in for the largest single Tribal Council in show history. Coach monologued about honor while Dee and Tiffany's eyes rolled. Dee tried to spark a live Tribal, warning that 'the people who feel safe tonight should be scared.' As promised, Aubry played her Boomerang Idol on herself. Dee played her Shot in the Dark — Not Safe. The votes came in 9-4-1: Dee eliminated, becoming the first jury member. All five previous winners are now out of the game.",
+  },
+  {
+    number: 6,
+    title: "Episode 6",
+    airDate: "April 1, 2026",
+    eliminated: "Kamilla Karthigesu, Genevieve Mushaluk, Colby Donaldson",
+    advantages: [
+      { holder: "Cirie Fields", kind: "advantage", type: "Extra Vote", status: "active", note: "Cirie's Extra Vote remains secret. She survived the Blood Moon in the Teal group by steering the unanimous vote onto Colby." },
+      { holder: "Genevieve Mushaluk", kind: "advantage", type: "Shot in the Dark", status: "applied", note: "Genevieve used her Shot in the Dark at the Purple group tribal — it came up 'not safe,' so all votes against her counted. She was eliminated 3-0." },
+      { holder: "Colby Donaldson", kind: "disadvantage", type: "Lost Vote", status: "applied", note: "Colby's lost vote finally triggered at the Teal group's tribal. He had no vote and was eliminated unanimously." },
+    ],
+    recap: "Episode 6, 'The Blood Moon,' opened with the historic 17-player merge — the largest in the show's history. On the merged beach, information spread fast: Genevieve learned Aubry had an idol (said to have been sent by Devens), and Ozzy told Emily and Christian about his own. The next morning a hidden clue sent castaways scrambling; Ozzy found an Exile Island advantage that pulled him and a player of his choice out of the game for the night. He took Rizo, and the two solidified an alliance — Rizo revealing his own Boomerang Idol. Back at camp Jeff dropped the Blood Moon twist: three groups of five, three separate endurance immunity challenges, three tribal councils in one night, and anyone eliminated would not make the jury. Purple (Christian won immunity): Genevieve tried to build a counter-alliance with Christian and Joe but Aubry's camp was faster. Genevieve played her Shot in the Dark — not safe — and was voted out 3-0. Orange (Stephenie won immunity, plus Applebee's for her group after Chrissy stepped down): Jonathan flipped to Tiffany and the new-era players, sending Kamilla home 3-2 over Chrissy in a blindside that shocked both Tiffany and Kamilla herself. Teal (Dee won immunity): Colby, voteless and injured, tried to offer Dee his alliance's protection but Coach undermined him with a lie Dee immediately saw through. Cirie convinced Emily and Dee that Colby was the bigger long-term threat; the group voted him out unanimously, an emotional tribal that nearly brought Jeff to tears. The jury phase begins next episode.",
+  },
+  {
+    number: 5,
+    title: "Episode 5",
+    airDate: "March 25, 2026",
+    eliminated: "Angelina Keeley, Charlie Davis",
+    advantages: [
+      { holder: "Ozzy Lusth", kind: "advantage", type: "Idol", status: "active", note: "Ozzy's Boomerang Idol remains active." },
+      { holder: "Cirie Fields", kind: "advantage", type: "Extra Vote", status: "active", note: "Cirie's Extra Vote remains secret. She revealed it to Rizo when they committed to a final-two deal." },
+    ],
+    recap: "Episode 5, 'Open Wounds,' opened with Ozzy fuming over the Mike White blindside — a throwback to Cochran's betrayal in South Pacific. Christian took blame and handed Ozzy his Shot in the Dark as a gesture of trust, leaving himself vulnerable. Ozzy considered revenge but ultimately voted with the tribe: Angelina went out 4-1, giving her jacket to Christian on the way out — a full-circle callback to jacket-gate. At Cila, the episode's title fit Charlie perfectly: still wounded by Maria's Season 46 vote and now set off by Rizo admitting he also skipped his ally's win vote on S49. Jonathan and Devens pulled together an old-Kalo majority targeting Rizo, but Dee flipped the script — building a women's alliance with Rizo, who earned her trust by revealing his Billie Eilish Idol, and committed to a final-two with Cirie. Kamilla was the swing vote; Rizo got to her first with a Kyle Fraser name-drop (a lie) and the idol info. Charlie came second and felt too slow. Rizo delivered a Taylor Swift-coded speech at Tribal: 'This is no love story between us. Bad blood. RizGod-style getaway car.' Charlie was blindsided 4-3. The merge is next.",
+  },
+  {
+    number: 4,
+    title: "Episode 4",
+    airDate: "March 18, 2026",
+    eliminated: "Mike White",
+    advantages: [
+      { holder: "Ozzy Lusth", kind: "advantage", type: "Idol", status: "active", note: "Ozzy's Boomerang Idol (originally sent by Genevieve) remains active." },
+      { holder: "Cirie Fields", kind: "advantage", type: "Extra Vote", status: "active", note: "Cirie's Extra Vote (given by Ozzy in Episode 2) remains secret and unused." },
+    ],
+    recap: "Cila held a camp talent show won by Rizo's Mickey Mouse impression. On Kalo, Genevieve found a third Boomerang Idol while shadowing Aubry and sent it to Rizo, planning to blindside him later and get it back. The combined reward/immunity challenge had tribes raise a submerged boat, then solve a letter-cube arch puzzle spelling CELEBRATION — Kalo won first, earning a Sanctuary visit with country star Zac Brown, while Vatu lost and went to Tribal. At Vatu, Mike wanted Emily gone; Christian wanted Mike out. Ozzy wanted Angelina gone. Christian told Emily she was the target and they'd blindside Mike, but if Ozzy found out he might blow up the vote. She immediately told Ozzy that Mike wanted to vote her out but stopped short of revealing the full plan. This confirmed to Christian that Emily can't keep a secret. He went ahead anyway: Stephenie and Emily joined him to vote Mike out 3-2-1. Ozzy was kept in the dark and somehow more devastated than Mike.",
+  },
+  {
+    number: 3,
+    title: "Episode 3",
+    airDate: "March 11, 2026",
+    eliminated: "Q Burdette",
+    advantages: [
+      { holder: "Ozzy Lusth", kind: "advantage", type: "Idol", status: "active", note: "Ozzy's Boomerang Idol (from Genevieve) remains active." },
+      { holder: "Cirie Fields", kind: "advantage", type: "Extra Vote", status: "active", note: "Cirie's Extra Vote remains secret and unused. She is now on the new Cila tribe, outnumbered by four original Kalo members." },
+    ],
+    recap: "Jeff Probst rapped the tribe swap announcement. Three new tribes of seven reshuffled the game: Cirie was outnumbered 4-1 by original Kalo on new Cila; Coach told Chrissy she talked too much (she cried); Genevieve pushed distrust of Aubry on new Kalo. On new Vatu, the DvG trio of Christian, Mike, and Angelina reunited. Christian told Emily about Aubry's idol pre-swap — Emily immediately told everyone, then Q bluffed to Mike that he had an extra vote. Mike called it, and the tribe voted Q out 5-1 (only Stephenie voted Angelina). Q wore the same outfit as his Season 46 boot.",
+  },
+  {
+    number: 2,
+    title: "Episode 2",
+    airDate: "March 4, 2026",
+    eliminated: "Savannah Louie",
+    advantages: [
+      { holder: "Cirie Fields", kind: "advantage", type: "Extra Vote", status: "active", note: "Ozzy gave Cirie his Extra Vote — the first advantage of Cirie's entire Survivor career — after she campaigned to protect him from the vote." },
+    ],
+    recap: "Cila went to Tribal again. Savannah was on the outs — no one believed her Journey story — and Cirie steered the vote her way to flush the Block-a-Vote and eliminate a winner in one shot. Savannah voted out 6-1. Christian found Cila's Boomerang Idol and gave it to Aubry; Ozzy gave Cirie his Extra Vote, her first-ever advantage. Rick Devens capped the episode by planting a fake idol at Tribal (made from Christian's packaging) while Christian created a distraction by face-planting on the way out of the set.",
+  },
+  {
+    number: 1,
+    title: "Episode 1",
+    airDate: "February 25, 2026",
+    eliminated: "Jenna Lewis-Dougherty, Kyle Fraser (medevac)",
+    advantages: [
+      { holder: "Q Burdette", kind: "disadvantage", type: "Lost Vote", status: "applied", note: "Sent to Exile Island with Coach after the supplies challenge. Coach took the supplies key, leaving Q to trade away his vote to Ozzy in exchange for camp supplies." },
+      { holder: "Savannah Louie", kind: "advantage", type: "Block-a-Vote", status: "voted-out", note: "Won the Journey stacking challenge against Colby but never successfully deployed — her tribemates suspected she had it, and she was voted out in Episode 2 before she could use it." },
+    ],
+    recap: "24 returning legends, three tribes. Genevieve found the first Boomerang Idol and sent it to Ozzy. At Exile Island, Coach stole the supplies key — Q traded his vote to Ozzy for camp supplies. A Journey had Savannah beat Colby for a Block-a-Vote while Colby lost his vote. At Cila's Tribal, Jenna came in too hot targeting Cirie on Day 1 and was voted out 7-1. The premiere closed with Kyle Fraser medevac'd with a ruptured Achilles — the first Survivor winner ever evacuated.",
+  },
+];
+
+function Recap() {
+  return (
+    <div>
+      <div className="page-title">Recap</div>
+      <div className="page-subtitle">Season 50 · Episode-by-episode breakdown · Most recent first</div>
+
+      <div className="section-title">Advantages &amp; Disadvantages</div>
+      <div style={{ display: "flex", flexDirection: "column", gap: "0.5rem", marginBottom: "2rem" }}>
+        {(() => {
+          const all = [...S50_EPISODES].reverse().flatMap(ep =>
+            ep.advantages.map((adv, i) => ({ ...adv, epTitle: ep.title, epNum: ep.number, i }))
+          );
+          const seen = new Set();
+          const deduped = all.filter(adv => {
+            const key = adv.holder + "|" + adv.type;
+            if (seen.has(key)) return false;
+            seen.add(key);
+            return true;
+          });
+          const sorted = [
+            ...deduped.filter(a => a.status === "active").reverse(),
+            ...deduped.filter(a => a.status !== "active").reverse(),
+          ];
+          return sorted;
+        })().map((adv, idx) => {
+          const statusLabel = adv.status === "active" ? "Active"
+            : adv.status === "voted-out" ? "Voted Out"
+            : adv.status === "applied" ? "Applied"
+            : "Used";
+          const statusBg    = adv.status === "active" ? "rgba(109,184,109,0.1)" : "rgba(200,146,42,0.08)";
+          const statusBdr   = adv.status === "active" ? "1px solid rgba(109,184,109,0.25)" : "1px solid rgba(200,146,42,0.2)";
+          const statusColor = adv.status === "active" ? "#6db86d" : "#a07830";
+          return (
+            <div key={`${adv.epNum}-${adv.i}`} style={{ display: "flex", flexDirection: "column", gap: "0.35rem", padding: "0.75rem 1rem", background: idx % 2 === 0 ? "rgba(255,255,255,0.02)" : "transparent", border: "1px solid rgba(255,255,255,0.06)", borderRadius: 4 }}>
+              <div style={{ display: "flex", alignItems: "center", gap: "0.5rem", flexWrap: "wrap" }}>
+                <span style={{
+                  fontSize: "0.55rem", letterSpacing: "0.08em", textTransform: "uppercase",
+                  padding: "0.2rem 0.5rem", borderRadius: 2, whiteSpace: "nowrap",
+                  background: statusBg, border: statusBdr, color: statusColor,
+                }}>
+                  {statusLabel}
+                </span>
+                <span style={{ fontSize: "0.6rem", color: "#a78bda" }}>{adv.title || adv.epTitle}</span>
+                <span style={{ fontSize: "0.6rem", color: adv.kind === "disadvantage" ? "#c8922a" : "#6ab4d8" }}>
+                  {adv.kind === "disadvantage" ? "⬇ " : "⬆ "}{adv.type}
+                </span>
+              </div>
+              <div style={{ fontSize: "0.75rem", color: "#f0ebe0", fontWeight: 500 }}>{adv.holder}</div>
+              <div style={{ fontSize: "0.65rem", color: "#bbb", lineHeight: 1.5 }}>{adv.note}</div>
+            </div>
+          );
+        })}
+      </div>
+
+      <div className="section-title">Episodes</div>
+      <div style={{ display: "flex", flexDirection: "column", gap: "1.5rem" }}>
+        {S50_EPISODES.map(ep => (
+          <div key={ep.number} className="panel" style={{ borderColor: "rgba(255,255,255,0.09)", position: "relative", overflow: "hidden" }}>
+            <div style={{ position: "absolute", top: 0, left: 0, right: 0, height: 2, background: "linear-gradient(90deg, #c8922a, rgba(200,146,42,0.1))" }} />
+            <div style={{ display: "flex", alignItems: "flex-start", justifyContent: "space-between", flexWrap: "wrap", gap: "0.5rem", marginBottom: "1rem" }}>
+              <div style={{ display: "flex", alignItems: "center", gap: "0.75rem" }}>
+                <span style={{ fontFamily: "'Playfair Display', serif", fontSize: "1.15rem", fontWeight: 900, color: "#f0ebe0" }}>{ep.title}</span>
+                <span style={{ fontSize: "0.58rem", color: "#bbb", letterSpacing: "0.1em", textTransform: "uppercase" }}>{ep.airDate}</span>
+              </div>
+              <div style={{ display: "flex", alignItems: "center", gap: "0.4rem", background: "rgba(200,60,60,0.08)", border: "1px solid rgba(200,60,60,0.2)", borderRadius: 3, padding: "0.3rem 0.65rem" }}>
+                <span style={{ fontSize: "0.55rem", letterSpacing: "0.12em", textTransform: "uppercase", color: "#cc6060" }}>Eliminated</span>
+                <span style={{ fontSize: "0.68rem", color: "#f0ebe0" }}>{ep.eliminated}</span>
+              </div>
+            </div>
+            <p style={{ fontSize: "0.78rem", color: "#d0cab8", lineHeight: 1.75 }}>
+              {ep.recap}
+            </p>
+          </div>
+        ))}
+      </div>
     </div>
   );
 }
