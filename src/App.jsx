@@ -723,7 +723,7 @@ export default function App() {
   const [splashDismissed, setSplashDismissed] = useState(() => {
     try { return localStorage.getItem(`sf_splash_${SPLASH_VERSION}`) === "1"; } catch { return false; }
   });
-  const [page, setPage] = useState("leaderboard");
+  const [page, setPage] = useState("overview");
   const [historySeason, setHistorySeason] = useState(50);
 
   const [draftPicks] = useState(loadDraft);
@@ -763,11 +763,10 @@ export default function App() {
           </div>
           <nav className="nav">
             {[
-              { key: "leaderboard", label: "Leaderboard" },
               { key: "overview",  label: "Overview"  },
               { key: "results",   label: "Results"    },
-              { key: "draft",     label: "Draft"      },
               { key: "scoring",   label: "Scoring"    },
+              { key: "draft",     label: "Draft"      },
               { key: "castaways", label: "Cast"       },
               { key: "history",   label: "History"    },
             ].map(p => (
@@ -780,7 +779,6 @@ export default function App() {
 
         <div className="container">
           {storageError && <p className="hint">Browser saving is unavailable. The confirmed draft remains available from the published site.</p>}
-          {page === "leaderboard" && <Scoring castaways={castaways} leaderboard />}
           {page === "overview"  && <Overview castaways={castaways} />}
           {page === "results"   && <><WeekSeven /><WeekSix /><WeekFive /><WeekFour /><WeekThree /><WeekTwo /><WeekOne /></>}
           {page === "castaways" && <Castaways castaways={castaways} />}
@@ -829,7 +827,7 @@ function Draft({ castaways, picks }) {
 }
 
 // ─── Scoring page ─────────────────────────────────────────────────────────────
-function Scoring({ castaways, leaderboard = false }) {
+function Scoring({ castaways }) {
   const total = SEASONS.find(season => season.current).totalCastaways;
   const scores = TEAMS.map(team => {
     const roster = castaways.filter(c => c.draftedBy === team.id);
@@ -843,7 +841,7 @@ function Scoring({ castaways, leaderboard = false }) {
   });
   return (
     <div>
-      <div className="page-title">{leaderboard ? "Season 51 Leaderboard" : "Scoring"}</div>
+      <div className="page-title">Scoring</div>
       <div className="page-subtitle">Season 51 · After Week 7 · 12 remaining · Placement-based scoring</div>
       <div className="section-title">Team Scores</div>
       <div className="hist-grid">
@@ -1236,4 +1234,5 @@ function History({ historySeason, setHistorySeason }) {
     </div>
   );
 }
+
 
