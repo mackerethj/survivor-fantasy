@@ -1,15 +1,16 @@
 // src/App.jsx  —  Fantasy Survivor · Season 51 Edition
 import { useEffect, useState } from "react";
 
-const SPLASH_VERSION = "s51_week7_results_v1";
+const SPLASH_VERSION = "s51_week8_results_v1";
 
 // ─── Scoring ──────────────────────────────────────────────────────────────────
 // Same placement values as the History page (Season 50): first two out score
 // zero; thereafter each successive placement adds one point until the final
 // three, which increase by two points each. Active players are provisional.
-const CURRENT_WEEK = 7;
-const ELIMINATIONS = { "Aaliyah Puglia": 1, "Ana Sani": 2, "Rob Antonson": 3, "Patt Cannaday": 4, "Jenna Doore": 5, "Alexis Levine": 6, "Linnea Capobianco": 7, "Ori Jean-Charles": 8, "Brady Booker": 9 };
-const ELIMINATION_WEEKS = { "Aaliyah Puglia": 1, "Ana Sani": 2, "Rob Antonson": 3, "Patt Cannaday": 3, "Jenna Doore": 4, "Alexis Levine": 5, "Linnea Capobianco": 5, "Ori Jean-Charles": 6, "Brady Booker": 7 };
+// When players exit together, torch-snuffing order determines placement.
+const CURRENT_WEEK = 8;
+const ELIMINATIONS = { "Aaliyah Puglia": 1, "Ana Sani": 2, "Rob Antonson": 3, "Patt Cannaday": 4, "Jenna Doore": 5, "Alexis Levine": 6, "Linnea Capobianco": 7, "Ori Jean-Charles": 8, "Brady Booker": 9, "Kristin Flickinger": 10, "Danny 'Kilby' Kilby": 11 };
+const ELIMINATION_WEEKS = { "Aaliyah Puglia": 1, "Ana Sani": 2, "Rob Antonson": 3, "Patt Cannaday": 3, "Jenna Doore": 4, "Alexis Levine": 5, "Linnea Capobianco": 5, "Ori Jean-Charles": 6, "Brady Booker": 7, "Kristin Flickinger": 8, "Danny 'Kilby' Kilby": 8 };
 const COMPLETED_ELIMINATIONS = Object.keys(ELIMINATIONS).length;
 function placementPoints(eliminationOrder, totalCastaways) {
   if (eliminationOrder <= 2) return 0;
@@ -61,7 +62,7 @@ const SEASONS = [
   { id: 43, label: "Season 43", totalCastaways: 18 },
 ];
 
-// Season 51 cast. Results through Week 7 are applied below. Draft assignments use the confirmed published picks.
+// Season 51 cast. Results through Week 8 are applied below. Draft assignments use the confirmed published picks.
 const S51_CASTAWAYS = [
   {
     name: "Aaliyah Puglia",
@@ -522,7 +523,7 @@ function saveState(s) {
   try { localStorage.setItem(STORAGE_KEY, JSON.stringify(s)); } catch {}
 }
 
-// Verified aired results through Week 7, November 4, 2026.
+// Verified aired results through Week 8, November 11, 2026.
 const TOKA_NAMES = new Set([
   "Aaliyah Puglia", "Thien An Nguyen", "Angelica 'Jelly' Loblack",
   "Brady Booker", "Danny 'Kilby' Kilby", "Devin Way", "Jenna Doore",
@@ -549,7 +550,7 @@ function hydrateCastaways(savedCastaways = []) {
     draftedBy: savedByName.get(base.name)?.draftedBy ?? base.draftedBy ?? null,
     eliminationOrder: ELIMINATIONS[base.name] ?? null,
     eliminatedWeek: ELIMINATION_WEEKS[base.name] ?? null,
-    tribe: (!ELIMINATIONS[base.name] || base.name === "Brady Booker") ? "Tovutu" : Object.entries(currentTribes).find(([, names]) => names.includes(base.name))?.[0] || (TOKA_NAMES.has(base.name) ? "Toka" : "Savu"),
+    tribe: (!ELIMINATIONS[base.name] || ["Brady Booker", "Kristin Flickinger", "Danny 'Kilby' Kilby"].includes(base.name)) ? "Tovuto" : Object.entries(currentTribes).find(([, names]) => names.includes(base.name))?.[0] || (TOKA_NAMES.has(base.name) ? "Toka" : "Savu"),
     id: i + 1,
   }));
 }
@@ -696,7 +697,7 @@ function Splash({ onDismiss }) {
         The Open Era
       </div>
       <div style={{ maxWidth: 520, fontSize: "clamp(0.7rem, 1.4vw, 0.85rem)", color: "#bbb", lineHeight: 1.7, padding: "0 1rem" }}>
-        Week 7 complete · 21 castaways · 12 remaining. View the results, cast, and league history.
+        Week 8 complete · 21 castaways · 10 remaining. View the results, cast, and league history.
       </div>
 
       <button
@@ -759,7 +760,7 @@ export default function App() {
         <header className="header">
           <div className="logo">
             SURVIVOR<span>FANTASY</span>
-            <sub>{page === "history" ? `History · S${historySeason}` : "S51 · Week 7"}</sub>
+            <sub>{page === "history" ? `History · S${historySeason}` : "S51 · Week 8"}</sub>
           </div>
           <nav className="nav">
             {[
@@ -780,7 +781,7 @@ export default function App() {
         <div className="container">
           {storageError && <p className="hint">Browser saving is unavailable. The confirmed draft remains available from the published site.</p>}
           {page === "overview"  && <Overview castaways={castaways} />}
-          {page === "results"   && <><WeekSeven /><WeekSix /><WeekFive /><WeekFour /><WeekThree /><WeekTwo /><WeekOne /></>}
+          {page === "results"   && <><WeekEight /><WeekSeven /><WeekSix /><WeekFive /><WeekFour /><WeekThree /><WeekTwo /><WeekOne /></>}
           {page === "castaways" && <Castaways castaways={castaways} />}
           {page === "draft" && <Draft castaways={castaways} picks={draftPicks} />}
           {page === "scoring" && <Scoring castaways={castaways} />}
@@ -799,7 +800,7 @@ function Draft({ castaways, picks }) {
       <div className="page-subtitle">Draft complete · 5 rounds · 5 players per team</div>
       <div className="panel" style={{ marginBottom: "1.5rem" }}>
         <div className="section-title">All 20 picks confirmed</div>
-        <p className="hint">All four teams have five players. Aaliyah was eliminated in Week 1 and was not drafted. Ana (Jinga) was eliminated in Week 2. Rob and Patt (both Miloa) exited in Week 3. Jenna (Weloki) exited in Week 4; Alexis (Miloa) and Linnea (Ojalu) exited in Week 5. Ori (Weloki) exited in Week 6. Brady (Miloa) exited in Week 7 and became the first juror.</p>
+        <p className="hint">All four teams have five players. Aaliyah was eliminated in Week 1 and was not drafted. Ana (Jinga) was eliminated in Week 2. Rob and Patt (both Miloa) exited in Week 3. Jenna (Weloki) exited in Week 4; Alexis (Miloa) and Linnea (Ojalu) exited in Week 5. Ori (Weloki) exited in Week 6. Brady (Miloa) exited in Week 7 and later withdrew from the jury. Kristin (Weloki) and Kilby (Ojalu) exited together in Week 8.</p>
       </div>
       <div className="section-title">Draft Board</div>
       <div style={{ overflowX: "auto", marginBottom: "1.5rem" }}>
@@ -842,7 +843,7 @@ function Scoring({ castaways }) {
   return (
     <div>
       <div className="page-title">Scoring</div>
-      <div className="page-subtitle">Season 51 · After Week 7 · 12 remaining · Placement-based scoring</div>
+      <div className="page-subtitle">Season 51 · After Week 8 · 10 remaining · Placement-based scoring</div>
       <div className="section-title">Team Scores</div>
       <div className="hist-grid">
         {scores.map(team => {
@@ -907,12 +908,12 @@ function Overview({ castaways }) {
   return (
     <div>
       <div className="page-title">Season 51</div>
-      <div className="page-subtitle">Week 7 complete · November 4, 2026</div>
+      <div className="page-subtitle">Week 8 complete · November 11, 2026</div>
       <div className="hist-grid">
         {[
           { label: "Remaining", value: remaining },
           { label: "Eliminated", value: castaways.length - remaining },
-          { label: "Week 7 immunity", value: "Michael Pinsky" },
+          { label: "Week 8 immunity", value: "Lewis & Sharonda" },
         ].map(item => (
           <div className="panel" key={item.label}>
             <div className="section-title">{item.label}</div>
@@ -920,7 +921,7 @@ function Overview({ castaways }) {
           </div>
         ))}
       </div>
-      <WeekSeven compact />
+      <WeekEight compact />
       <div className="section-title">Fantasy Teams</div>
       <div className="hist-grid">
         {TEAMS.map(team => {
@@ -957,7 +958,7 @@ function Castaways({ castaways }) {
   return (
     <div>
       <div className="page-title">Season 51 Cast</div>
-      <div className="page-subtitle">After Week 7 · 12 remaining · 9 eliminated</div>
+      <div className="page-subtitle">After Week 8 · 10 remaining · 11 eliminated</div>
 
       <div className="section-title">Castaways — {listed.length}</div>
       <div className="castaways-grid">
@@ -1014,6 +1015,28 @@ function CastawayCard({ c }) {
 }
 
 // ─── Week 7 ───────────────────────────────────────────────────────────────────
+function WeekEight({ compact = false }) {
+  return (
+    <div style={{ marginBottom: "1.5rem" }}>
+      {!compact && <><div className="page-title">Week 8</div><div className="page-subtitle">Load the Ark, Two by Two · November 11, 2026</div></>}
+      <div className="section-title">Week 8 Results</div>
+      <div className="panel">
+        <div style={{ fontSize: "1rem", marginBottom: "0.6rem" }}>Kristin Flickinger (Weloki) and Danny 'Kilby' Kilby (Ojalu) were eliminated together by the only valid vote.</div>
+        <p className="hint">Kristin: 12th place · 8 points · Kilby: 11th place · 9 points · 10 remain</p>
+        <ul className="hint" style={{ paddingLeft: "1.2rem", marginTop: "0.8rem", lineHeight: 1.9 }}>
+          <li>Lewis and Sharonda won immunity and reward as a pair.</li>
+          <li>Jelly played her idol, protecting herself and Devin and cancelling eight votes.</li>
+          <li>Cristian's successful Shot in the Dark protected him and Carter; Kristin's was unsuccessful.</li>
+          <li>Devin's vote eliminated Kristin and Kilby together. Kristin's torch was snuffed first, then Kilby's; fantasy placements follow that order.</li>
+          <li>Brady withdrew from the jury to address his thumb injury; Kristin and Kilby are the first two jurors.</li>
+          <li>The 10 active castaways now have 10 provisional fantasy points each.</li>
+        </ul>
+        <a className="hint" style={{ color: "#6a9fd8", display: "inline-block", marginTop: "0.8rem" }} href="https://www.paramountplus.com/sneak-peak/survivor-season-51-episode-8-recap/" target="_blank" rel="noopener noreferrer">Official Week 8 recap ↗</a>
+      </div>
+    </div>
+  );
+}
+
 function WeekSeven({ compact = false }) {
   return (
     <div style={{ marginBottom: "1.5rem" }}>
@@ -1234,5 +1257,6 @@ function History({ historySeason, setHistorySeason }) {
     </div>
   );
 }
+
 
 
